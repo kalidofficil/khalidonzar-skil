@@ -1,63 +1,63 @@
-<!doctype html>
-<!-- Source for the 1200x630 social card. After editing, regenerate with:
-     python3 scripts/make-og-cover.py                                    -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,700&display=swap">
+<title>Social card source</title>
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    width: 1200px; height: 630px; overflow: hidden;
-    background: #F7F5F0; color: #16211C;
-    font-family: "Fraunces", Georgia, serif;
-    padding: 64px 80px 72px; position: relative;
-    display: flex; flex-direction: column; justify-content: space-between;
-  }
-  .row { display: flex; align-items: center; gap: 18px; }
-  .mark { display: flex; align-items: flex-end; gap: 5px; height: 34px; }
-  .mark i { display: block; width: 9px; background: #1A3A2E; border-radius: 2px; }
-  .mark i:nth-child(1) { height: 14px; }
-  .mark i:nth-child(2) { height: 23px; }
-  .mark i:nth-child(3) { height: 34px; background: #0B8757; }
-  .name { font-size: 26px; font-weight: 600; font-variation-settings: "opsz" 24; }
-  .label {
-    font-family: "Chivo Mono", monospace; font-size: 12px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase; color: #626E67;
-  }
-  h1 {
-    font-size: 76px; font-weight: 600; line-height: 1.05;
-    font-variation-settings: "opsz" 144;
-    letter-spacing: -0.022em; max-width: 17ch;
-  }
-  h1 em { font-style: italic; font-weight: 700; color: #1A3A2E; }
-  .stats { display: flex; gap: 64px; padding-top: 30px; border-top: 1px solid rgba(22,33,28,0.16); }
-  .stat b {
-    display: block; font-size: 34px; font-weight: 600; line-height: 1.15;
-    font-variation-settings: "opsz" 96; letter-spacing: -0.02em; color: #1A3A2E;
-  }
-  .stat span {
-    display: block; margin-top: 6px; line-height: 1.2;
-    font-family: "Chivo Mono", monospace; font-size: 12px; letter-spacing: 0.14em;
-    text-transform: uppercase; color: #626E67;
-  }
+  @font-face{font-family:"Newsreader";src:url("../assets/fonts/newsreader-latin.woff2") format("woff2");font-weight:500 600;font-style:normal}
+  @font-face{font-family:"Spline Sans Mono";src:url("../assets/fonts/spline-sans-mono-latin.woff2") format("woff2");font-weight:400 500;font-style:normal}
+  @font-face{font-family:"Archivo";src:url("../assets/fonts/archivo-latin.woff2") format("woff2");font-weight:400 500;font-style:normal}
+
+  *{box-sizing:border-box;margin:0}
+  body{width:1200px;height:630px;background:#EEF0F4;color:#0F1A2B;
+       font-family:"Archivo",Helvetica,Arial,sans-serif;overflow:hidden;position:relative}
+
+  .grid{position:absolute;inset:0;
+    background-image:
+      linear-gradient(to right,rgba(15,26,43,.05) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(15,26,43,.05) 1px,transparent 1px);
+    background-size:100px 100px}
+
+  .plot{position:absolute;right:-40px;top:0;width:660px;height:630px}
+
+  .copy{position:absolute;left:76px;top:126px;width:620px}
+  .kicker{font-family:"Spline Sans Mono",monospace;font-size:19px;letter-spacing:.19em;
+          text-transform:uppercase;color:#C62B38;margin-bottom:26px}
+  h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:63px;line-height:1.04;
+     letter-spacing:-.015em;max-width:13ch}
+  .sub{margin-top:28px;font-size:23px;line-height:1.5;color:#48566B;max-width:30ch}
+
+  .foot{position:absolute;left:76px;bottom:60px;display:flex;align-items:center;gap:14px;
+        font-family:"Spline Sans Mono",monospace;font-size:19px;letter-spacing:.11em;
+        text-transform:uppercase;color:#48566B}
+  .dot{width:11px;height:11px;border-radius:50%;background:#C62B38}
 </style>
 </head>
 <body>
-  <div class="row">
-    <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="name">Khalid Onzar</span>
-    <span class="label">White-label paid media</span>
+  <div class="grid"></div>
+
+  <svg class="plot" viewBox="0 0 660 630" fill="none">
+    <path d="M20 520 C 130 505, 180 480, 250 425 S 380 340, 460 285 S 560 215, 610 180"
+          stroke="#2B54B8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M20 545 C 130 538, 180 522, 250 492 S 380 448, 460 415 S 560 382, 610 368"
+          stroke="#0F1A2B" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="610" cy="180" r="10" fill="#2B54B8"/>
+    <circle cx="610" cy="368" r="10" fill="#0F1A2B"/>
+    <line x1="610" y1="180" x2="610" y2="368" stroke="#C62B38" stroke-width="4"/>
+    <line x1="578" y1="180" x2="642" y2="180" stroke="#C62B38" stroke-width="4" stroke-linecap="round"/>
+    <line x1="578" y1="368" x2="642" y2="368" stroke="#C62B38" stroke-width="4" stroke-linecap="round"/>
+    <text x="596" y="152" text-anchor="end" fill="#2B54B8"
+          font-family="Spline Sans Mono, monospace" font-size="20" letter-spacing="3">REPORTED</text>
+    <text x="566" y="416" text-anchor="end" fill="#0F1A2B"
+          font-family="Spline Sans Mono, monospace" font-size="20" letter-spacing="3">REAL</text>
+  </svg>
+
+  <div class="copy">
+    <p class="kicker">Meta ads &middot; COD e-commerce</p>
+    <h1>I find the gap between reported and real.</h1>
+    <p class="sub">A good cost per purchase is not a profit.</p>
   </div>
 
-  <h1>I run your paid accounts. Your client <em>never hears my name</em>.</h1>
-
-  <div class="stats">
-    <div class="stat"><b>$8.4M</b><span>Spend managed</span></div>
-    <div class="stat"><b>4.1&times;</b><span>Blended ROAS</span></div>
-    <div class="stat"><b>96%</b><span>Client retention</span></div>
-  </div>
+  <div class="foot"><span class="dot"></span>Khalid Ounzar &middot; Dubai, UAE</div>
 </body>
 </html>

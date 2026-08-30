@@ -1,8 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Khalid Onzar">
-  <rect width="64" height="64" rx="10" fill="#1A3A2E"/>
-  <g fill="#F7F5F0">
-    <rect x="13" y="36" width="8" height="15" rx="1.5"/>
-    <rect x="28" y="27" width="8" height="24" rx="1.5"/>
-    <rect x="43" y="14" width="8" height="37" rx="1.5" fill="#7FCFAE"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0F1A2B"/>
+  <!-- the gap mark: two jaws and the span between them -->
+  <line x1="16" y1="20" x2="48" y2="20" stroke="#2B54B8" stroke-width="5" stroke-linecap="round"/>
+  <line x1="16" y1="46" x2="48" y2="46" stroke="#EEF0F4" stroke-width="5" stroke-linecap="round"/>
+  <line x1="32" y1="24" x2="32" y2="42" stroke="#C62B38" stroke-width="4" stroke-linecap="round"/>
 </svg>

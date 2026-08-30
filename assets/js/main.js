@@ -1,378 +1,506 @@
 /* ==========================================================================
-   Khalid Onzar — portfolio interactions
-   Plain ES2019, no dependencies, no build step.
+   Khalid Ounzar, "The Gap"
+
+   The hero is scroll-scrubbed, but there is no video to scrub: the scene is
+   drawn in SVG and its geometry is driven by scroll progress instead of a
+   video's currentTime. Everything else follows the same standard as a
+   filmed hero: a dt-normalized lerp on a rAF loop that rests, delta-gated
+   DOM writes, bands paced in scroll distance, and the five static-hero
+   gates armed and disarmed live.
    ========================================================================== */
 (function () {
   "use strict";
 
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var CONTACT_EMAIL = "ounzar.khalid1999@gmail.com";
 
-  /* ── Sticky header state ───────────────────────────────────────────────── */
-  var head = document.getElementById("siteHead");
-  var onScroll = function () {
-    head.classList.toggle("is-stuck", window.scrollY > 12);
+  /* ---------------------------------------------------------------- utils */
+  var clamp = function (v, lo, hi) { return Math.min(hi, Math.max(lo, v)); };
+  var smoothstep = function (p, e0, e1) {
+    var t = clamp((p - e0) / (e1 - e0), 0, 1);
+    return t * t * (3 - 2 * t);
   };
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
+  function rng(seed) {
+    var s = seed >>> 0;
+    return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  }
+  var reduced = function () { return matchMedia("(prefers-reduced-motion:reduce)").matches; };
 
-  /* ── Mobile navigation ─────────────────────────────────────────────────── */
-  var toggle = document.getElementById("navToggle");
-  var nav = document.getElementById("primaryNav");
+  var hero = document.getElementById("hero");
+  var stage = hero && hero.querySelector(".stage");
+  var scene = document.querySelector(".scene");
+  var cue = document.getElementById("cue");
+  var bandEls = [].slice.call(document.querySelectorAll(".band"));
 
-  var closeNav = function () {
-    nav.classList.remove("is-open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
+  /* ================================================================ split
+     Words and characters, once at load, with a seeded generator so the
+     "random" offsets are identical on every load. */
+  function split(band) {
+    var fx = band.dataset.fx;
+    var target = band.classList.contains("band-settle")
+      ? band.querySelector(".settle-h")
+      : band;
+    var text = target.textContent.trim();
+    var rand = rng(text.length * 7919 + 13);
+    var spread = parseFloat(band.dataset.spread || "0.45");
 
-  toggle.addEventListener("click", function () {
-    var open = nav.classList.toggle("is-open");
-    toggle.setAttribute("aria-expanded", String(open));
+    var sr = document.createElement("span");
+    sr.className = "sr";
+    sr.textContent = text;
+
+    var vis = document.createElement("span");
+    vis.setAttribute("aria-hidden", "true");
+
+    var words = text.split(/(\s+)/).filter(function (t) { return t.length; });
+    var realWords = words.filter(function (t) { return !/^\s+$/.test(t); });
+    var totalChars = text.replace(/\s/g, "").length;
+    var charSeen = 0;
+    var wordSeen = 0;
+
+    words.forEach(function (token) {
+      if (/^\s+$/.test(token)) { vis.appendChild(document.createTextNode(token)); return; }
+
+      var w = document.createElement("span");
+      w.className = "w";
+      var wi = wordSeen++;
+
+      if (fx === "punch") {
+        w.style.setProperty("--th", (wi / Math.max(1, realWords.length) * 0.5).toFixed(3));
+        if (band.dataset.em && wi === realWords.length - 1) w.classList.add("em");
+      } else if (fx === "drift") {
+        w.style.setProperty("--th", (wi / Math.max(1, realWords.length) * 0.48 + rand() * 0.05).toFixed(3));
+      } else if (fx === "part") {
+        // Two halves pulled toward the centre line, parting outward: the caliper jaws.
+        var half = wi < Math.ceil(realWords.length / 2) ? -1 : 1;
+        w.style.setProperty("--jx", (half * (46 + rand() * 22)).toFixed(1) + "px");
+        w.style.setProperty("--th", (Math.abs(wi - (realWords.length - 1) / 2) / realWords.length * 0.34).toFixed(3));
+      } else if (fx === "rise") {
+        w.style.setProperty("--th", (wi / Math.max(1, realWords.length) * 0.42).toFixed(3));
+      }
+
+      if (fx === "grid") {
+        // Characters slide in horizontally, in reading order.
+        token.split("").forEach(function (ch) {
+          var c = document.createElement("span");
+          c.className = "c";
+          c.textContent = ch;
+          c.style.setProperty("--th", ((charSeen / Math.max(1, totalChars)) * spread + rand() * 0.06).toFixed(3));
+          c.style.setProperty("--jx", (-14 - rand() * 20).toFixed(1) + "px");
+          charSeen++;
+          w.appendChild(c);
+        });
+      } else {
+        w.textContent = token;
+      }
+
+      vis.appendChild(w);
+    });
+
+    target.textContent = "";
+    target.appendChild(sr);
+    target.appendChild(vis);
+    band.classList.add("fx-" + fx);
+  }
+
+  var bands = bandEls.map(function (el) {
+    split(el);
+    return {
+      el: el,
+      a: parseFloat(el.dataset.a),
+      b: parseFloat(el.dataset.b),
+      ramp: el.dataset.ramp ? parseFloat(el.dataset.ramp) : 0,
+      op: -1,
+      k: -1
+    };
   });
 
-  nav.addEventListener("click", function (e) {
-    if (e.target.closest("a")) closeNav();
+  /* ============================================================ scene setup
+     Measure the real path lengths so the draw-on maths is exact. */
+  if (scene) {
+    [["lineRep", "--len-rep"], ["lineReal", "--len-real"]].forEach(function (pair) {
+      var p = document.getElementById(pair[0]);
+      if (p && p.getTotalLength) scene.style.setProperty(pair[1], Math.ceil(p.getTotalLength()));
+    });
+    scene.style.setProperty("--len-cal", 186);
+  }
+
+  var sceneState = { dRep: -1, dReal: -1, cal: -1 };
+  function setSceneVar(name, value) {
+    var v = Math.round(value * 1000) / 1000;
+    if (Math.abs(sceneState[name] - v) < 0.004) return;   // delta gate
+    sceneState[name] = v;
+    scene.style.setProperty("--" + name, v);
+    if (name === "dReal") scene.style.setProperty("--dRealO", v > 0 ? 1 : 0);
+  }
+
+  function updateScene(p) {
+    if (!scene) return;
+    setSceneVar("dRep", 0.34 + 0.66 * smoothstep(p, 0.00, 0.30));
+    setSceneVar("dReal", smoothstep(p, 0.40, 0.62));
+    setSceneVar("cal", smoothstep(p, 0.62, 0.84));
+  }
+
+  /* ============================================================== captions */
+  function updateCaptions(p) {
+    for (var i = 0; i < bands.length; i++) {
+      var b = bands[i];
+      var f = Math.min(0.02, (b.b - b.a) / 3);
+      var inRamp = i === 0 ? 1 : smoothstep(p, b.a, b.a + f);
+      var outRamp = i === bands.length - 1 ? 1 : (1 - smoothstep(p, b.b - f, b.b));
+      var op = Math.round(inRamp * outRamp * 1000) / 1000;
+
+      var k = clamp((p - b.a) / (b.ramp || Math.min(0.025, (b.b - b.a) * 0.35)), 0, 1);
+      if (i === 0) k = Math.max(k, loadK);
+      k = Math.round(k * 1000) / 1000;
+
+      if (Math.abs(b.op - op) >= 0.004) { b.op = op; b.el.style.setProperty("--o", op); }
+      if (Math.abs(b.k - k) >= 0.008) { b.k = k; b.el.style.setProperty("--k", k); }
+    }
+    if (cue) {
+      var c = Math.round((1 - smoothstep(p, 0.01, 0.10)) * 100) / 100;
+      if (cue._o !== c) { cue._o = c; cue.style.setProperty("--cueO", c); }
+    }
+  }
+
+  /* ============================================== the drive (a loop that rests) */
+  var target = 0, shown = 0, rafId = null, lastTick = 0;
+  var heroOnScreen = true;
+  var loadK = 0, loadStart = 0;
+
+  function heroProgress() {
+    if (!hero) return 0;
+    var range = hero.offsetHeight - window.innerHeight;
+    if (range <= 0) return 0;
+    return clamp((window.scrollY - hero.offsetTop) / range, 0, 1);
+  }
+
+  function tick(now) {
+    var dt = Math.min(100, now - (lastTick || now));
+    lastTick = now;
+
+    // Band one's one-time load ramp, handing over to scroll.
+    if (loadK < 1) {
+      if (!loadStart) loadStart = now;
+      loadK = clamp((now - loadStart) / 900, 0, 1);
+      loadK = loadK * loadK * (3 - 2 * loadK);
+    }
+
+    var k = 0.16;
+    shown += (target - shown) * (1 - Math.pow(1 - k, dt / 16.667));
+
+    var settled = Math.abs(target - shown) < 0.0005;
+    if (settled) { shown = target; }
+
+    updateScene(shown);
+    updateCaptions(shown);
+
+    if (settled && loadK >= 1) { rafId = null; lastTick = 0; }
+    else rafId = requestAnimationFrame(tick);
+  }
+
+  function kick() { if (scrubOn && rafId === null && heroOnScreen) rafId = requestAnimationFrame(tick); }
+  function onScroll() { target = heroProgress(); kick(); }
+
+  if (hero && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      heroOnScreen = entries[0].isIntersecting;
+      if (heroOnScreen) kick();
+    }, { rootMargin: "10px" }).observe(hero);
+  }
+
+  /* ========================================== the five static-hero gates
+     Character-for-character identical to the media query block in styles.css. */
+  var GATES = [
+    "(max-width:720px)",
+    "(orientation:portrait) and (max-width:1024px)",
+    "(orientation:portrait) and (pointer:coarse)",
+    "(orientation:landscape) and (pointer:coarse) and (max-height:560px)",
+    "(prefers-reduced-motion:reduce)"
+  ];
+  var scrubOn = false;
+
+  function pinHero() {
+    if (!scene) return;
+    ["dRep", "dReal", "cal"].forEach(function (n) {
+      sceneState[n] = 1;
+      scene.style.setProperty("--" + n, 1);
+    });
+    scene.style.setProperty("--dRealO", 1);
+    bands.forEach(function (b) {
+      b.op = 1; b.k = 1;
+      b.el.style.setProperty("--o", 1);
+      b.el.style.setProperty("--k", 1);
+    });
+  }
+
+  function enableScrub() {
+    if (scrubOn) return;
+    scrubOn = true;
+    bands.forEach(function (b) { b.op = -1; b.k = -1; });
+    sceneState.dRep = sceneState.dReal = sceneState.cal = -1;
+    loadK = 0; loadStart = 0;
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    updateCaptions(heroProgress());
+  }
+
+  function disableScrub() {
+    if (scrubOn) {
+      scrubOn = false;
+      removeEventListener("scroll", onScroll);
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+    pinHero();   // unconditional: the first call happens before scrub was ever on
+  }
+
+  function applyHeroMode() {
+    if (GATES.some(function (q) { return matchMedia(q).matches; })) disableScrub();
+    else enableScrub();
+  }
+
+  var MQLS = GATES.map(function (q) { return matchMedia(q); });
+  MQLS.forEach(function (m) {
+    if (m.addEventListener) m.addEventListener("change", applyHeroMode);
+    else if (m.addListener) m.addListener(applyHeroMode);
   });
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeNav();
-  });
+  /* ======================================================= scroll reveals */
+  var revealables = [].slice.call(document.querySelectorAll(".reveal, .rule"));
+  if ("IntersectionObserver" in window) {
+    var revObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target;
+        el.classList.add("in");
+        revObs.unobserve(el);
+        // Retire the stagger on a timer, not on transitionend: an element whose
+        // own transition list omits opacity never fires one, and the delay would
+        // then lag every hover on it forever.
+        var d = parseFloat(el.style.transitionDelay) || 0;
+        if (d) setTimeout(function () { el.style.transitionDelay = "0ms"; }, d + 1000);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
 
-  /* ── Scroll spy: mark the section the reader is in ─────────────────────── */
-  var navLinks = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
-  var sections = navLinks
-    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
-    .filter(Boolean);
+    revealables.forEach(function (el, i) {
+      // Stagger siblings, then retire the delay so hovers never lag afterwards.
+      var sibs = el.parentElement ? [].slice.call(el.parentElement.children).filter(function (n) {
+        return n.classList && n.classList.contains("reveal");
+      }) : [];
+      var idx = sibs.indexOf(el);
+      if (idx > 0) el.style.transitionDelay = Math.min(idx, 5) * 80 + "ms";
+      revObs.observe(el);
+    });
+  } else {
+    revealables.forEach(function (el) { el.classList.add("in"); });
+  }
 
-  if ("IntersectionObserver" in window && sections.length) {
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        navLinks.forEach(function (a) {
-          var isCurrent = a.getAttribute("href") === "#" + entry.target.id;
-          if (isCurrent) a.setAttribute("aria-current", "true");
+  /* ================================================ nav: aria-current */
+  var navLinks = [].slice.call(document.querySelectorAll(".nav-links a"));
+  var sections = navLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+  if ("IntersectionObserver" in window && sections.every(Boolean)) {
+    var current = null;
+    var navObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = sections.indexOf(e.target);
+        if (i < 0 || current === i) return;
+        current = i;
+        navLinks.forEach(function (a, n) {
+          if (n === i) a.setAttribute("aria-current", "true");
           else a.removeAttribute("aria-current");
         });
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
-    sections.forEach(function (s) { spy.observe(s); });
+    sections.forEach(function (s) { navObs.observe(s); });
   }
 
-  /* ── Reveal on scroll, staggered within each group ─────────────────────── */
-  var revealables = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  /* ============================================ the one interactive moment
+     Press and hold to run the confirmations. A worked example at typical
+     Moroccan COD rates: 1,000 reported, 78% confirmed, 82% of those
+     delivered, and the true cost per delivered order counting up as it goes. */
+  (function () {
+    var pad = document.getElementById("holdPad");
+    if (!pad) return;
 
-  revealables.forEach(function (el) {
-    var step = el.getAttribute("data-reveal-step");
-    if (step) { el.style.setProperty("--reveal-i", step); return; }
-    var siblings = Array.prototype.slice.call(el.parentNode.children);
-    el.style.setProperty("--reveal-i", String(siblings.indexOf(el) % 6));
-  });
+    var wrap = document.getElementById("hold");
+    var fill = document.getElementById("holdFill");
+    var label = document.getElementById("holdLabel");
+    var done = document.getElementById("holdDone");
+    var outRep = document.getElementById("outRep");
+    var outConf = document.getElementById("outConf");
+    var outDel = document.getElementById("outDel");
+    var outCost = document.getElementById("outCost");
+    var boxes = ["outConfBox", "outDelBox", "outCostBox"].map(function (id) { return document.getElementById(id); });
 
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealables.forEach(function (el) { el.classList.add("is-in"); });
-  } else {
-    var revealer = new IntersectionObserver(function (entries, obs) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-in");
-        obs.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
-    revealables.forEach(function (el) { revealer.observe(el); });
-  }
+    var REPORTED = 1000, CONF_RATE = 0.78, DEL_RATE = 0.82, REPORTED_CPA = 1.5;
+    var delivered = Math.round(REPORTED * CONF_RATE * DEL_RATE);   // 640
+    var spend = REPORTED * REPORTED_CPA;
 
-  /* ── Count-up on the KPI row ───────────────────────────────────────────── */
-  var counters = Array.prototype.slice.call(document.querySelectorAll("[data-count-to]"));
+    var p = 0, holding = false, raf = null, last = 0, latched = false;
+    var lastPaint = -1, lastAt = 0;
+    var fmt = function (n) { return Math.round(n).toLocaleString("en-US"); };
 
-  var renderCount = function (el, value) {
-    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
-    var prefix = el.getAttribute("data-prefix") || "";
-    var suffix = el.getAttribute("data-suffix") || "";
-    el.textContent = prefix + value.toFixed(decimals) + suffix;
-  };
+    function paint(now) {
+      // ~14Hz, and only when the rendered figures actually changed.
+      if (now - lastAt < 70 && p !== 0 && p !== 1) return;
+      var q = Math.round(p * 200) / 200;
+      if (q === lastPaint) return;
+      lastPaint = q; lastAt = now;
 
-  var countUp = function (el) {
-    var target = parseFloat(el.getAttribute("data-count-to"));
-    if (isNaN(target)) return;
-    var duration = 1100;
-    var start = null;
-    var done = false;
-    var settle = function () {
-      if (done) return;
-      done = true;
-      renderCount(el, target);
-    };
-    var frame = function (now) {
-      if (done) return;
-      if (start === null) start = now;
-      var t = Math.min((now - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - t, 3);
-      renderCount(el, target * eased);
-      if (t < 1) requestAnimationFrame(frame);
-      else settle();
-    };
-    requestAnimationFrame(frame);
-    setTimeout(settle, duration + 400);
-  };
+      var conf = REPORTED - (REPORTED - REPORTED * CONF_RATE) * clamp(p / 0.55, 0, 1);
+      var del = REPORTED - (REPORTED - delivered) * clamp((p - 0.25) / 0.75, 0, 1);
+      var cost = spend / Math.max(1, del);
 
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    counters.forEach(function (el) { renderCount(el, parseFloat(el.getAttribute("data-count-to"))); });
-  } else {
-    var countObserver = new IntersectionObserver(function (entries, obs) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        countUp(entry.target);
-        obs.unobserve(entry.target);
-      });
-    }, { threshold: 0.6 });
-    counters.forEach(function (el) { countObserver.observe(el); });
-  }
-
-  /* ── ROAS chart ────────────────────────────────────────────────────────────
-     Single series (blended ROAS) against a neutral, directly-labelled target
-     rule. One measure, one axis. The series colour is a validated step: it sits
-     inside the light-mode lightness band, clears the chroma floor, and holds
-     contrast against the paper ground.
-     REPLACE: swap `series` for your own monthly figures.
-     ───────────────────────────────────────────────────────────────────────── */
-  var series = [
-    { month: "Sep 25", roas: 2.6 }, { month: "Oct 25", roas: 2.8 },
-    { month: "Nov 25", roas: 2.7 }, { month: "Dec 25", roas: 3.1 },
-    { month: "Jan 26", roas: 3.3 }, { month: "Feb 26", roas: 3.2 },
-    { month: "Mar 26", roas: 3.5 }, { month: "Apr 26", roas: 3.8 },
-    { month: "May 26", roas: 3.7 }, { month: "Jun 26", roas: 4.0 },
-    { month: "Jul 26", roas: 4.3 }, { month: "Aug 26", roas: 4.6 }
-  ];
-  var TARGET = 3.0;
-
-  var svg = document.getElementById("roasChart");
-  var wrap = svg ? svg.parentNode : null;
-  var tooltip = document.getElementById("chartTooltip");
-  var NS = "http://www.w3.org/2000/svg";
-
-  var el = function (name, attrs) {
-    var node = document.createElementNS(NS, name);
-    Object.keys(attrs || {}).forEach(function (k) { node.setAttribute(k, attrs[k]); });
-    return node;
-  };
-
-  var points = [];
-
-  function drawChart() {
-    if (!svg) return;
-    var w = Math.max(svg.clientWidth || wrap.clientWidth, 520);
-    var h = svg.clientHeight || 300;
-    var pad = { t: 26, r: 96, b: 34, l: 40 };
-
-    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
-
-    /* Clear everything but the accessible <title> and <desc> */
-    Array.prototype.slice.call(svg.children).forEach(function (node) {
-      var keep = node.nodeName === "title" || node.nodeName === "desc";
-      if (!keep) svg.removeChild(node);
-    });
-
-    var lo = 2.0, hi = 5.0;
-    var x = function (i) { return pad.l + (i / (series.length - 1)) * (w - pad.l - pad.r); };
-    var y = function (v) { return pad.t + (1 - (v - lo) / (hi - lo)) * (h - pad.t - pad.b); };
-
-    var defs = el("defs");
-    var grad = el("linearGradient", { id: "roasFill", x1: "0", y1: "0", x2: "0", y2: "1" });
-    grad.appendChild(el("stop", { offset: "0%", "stop-color": "#0B8757", "stop-opacity": "0.22" }));
-    grad.appendChild(el("stop", { offset: "100%", "stop-color": "#0B8757", "stop-opacity": "0" }));
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-
-    /* Recessive grid + y axis */
-    [2, 3, 4, 5].forEach(function (v) {
-      svg.appendChild(el("line", {
-        class: "grid-line", x1: pad.l, x2: w - pad.r, y1: y(v), y2: y(v)
-      }));
-      var label = el("text", { class: "axis-text", x: 0, y: y(v) + 3.5 });
-      label.textContent = v.toFixed(1) + "×";
-      svg.appendChild(label);
-    });
-
-    /* x axis — every other month, so labels never collide */
-    series.forEach(function (d, i) {
-      if (i % 2 !== 0 && i !== series.length - 1) return;
-      var label = el("text", { class: "axis-text", x: x(i), y: h - 8, "text-anchor": "middle" });
-      label.textContent = d.month;
-      svg.appendChild(label);
-    });
-
-    /* Target rule, directly labelled */
-    svg.appendChild(el("line", { class: "target-line", x1: pad.l, x2: w - pad.r, y1: y(TARGET), y2: y(TARGET) }));
-    var targetText = el("text", { class: "target-text", x: w - pad.r + 6, y: y(TARGET) + 3.5 });
-    targetText.textContent = "Target 3.0×";
-    svg.appendChild(targetText);
-
-    /* Area + line */
-    var linePath = series.map(function (d, i) { return (i ? "L" : "M") + x(i) + " " + y(d.roas); }).join(" ");
-    svg.appendChild(el("path", {
-      class: "area",
-      d: linePath + " L" + x(series.length - 1) + " " + y(lo) + " L" + x(0) + " " + y(lo) + " Z"
-    }));
-    var line = el("path", { class: "line", d: linePath });
-    svg.appendChild(line);
-
-    if (!reduceMotion && typeof line.getTotalLength === "function") {
-      var len = line.getTotalLength();
-      line.style.strokeDasharray = len;
-      line.style.strokeDashoffset = len;
-      line.getBoundingClientRect();
-      line.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.22,0.61,0.36,1)";
-      line.style.strokeDashoffset = "0";
+      outConf.textContent = fmt(conf);
+      outDel.textContent = fmt(del);
+      outCost.textContent = "$" + cost.toFixed(2);
+      wrap.style.setProperty("--hp", q);
+      wrap.style.setProperty("--holdGlow", q);
     }
 
-    /* Crosshair, drawn under the markers */
-    var crosshair = el("line", { class: "crosshair", y1: pad.t, y2: h - pad.b, x1: 0, x2: 0 });
-    svg.appendChild(crosshair);
-
-    /* Emphasised endpoint */
-    var lastIndex = series.length - 1;
-    svg.appendChild(el("circle", { class: "marker marker-end", cx: x(lastIndex), cy: y(series[lastIndex].roas), r: 5 }));
-    var endLabel = el("text", {
-      class: "end-label", x: x(lastIndex), y: y(series[lastIndex].roas) - 14, "text-anchor": "end"
-    });
-    endLabel.textContent = series[lastIndex].roas.toFixed(1) + "×";
-    svg.appendChild(endLabel);
-
-    /* Hover layer — hit targets far wider than the marks */
-    points = [];
-    var band = (w - pad.l - pad.r) / (series.length - 1);
-    series.forEach(function (d, i) {
-      var hit = el("rect", {
-        class: "hit", x: x(i) - band / 2, y: pad.t, width: band, height: h - pad.t - pad.b
+    function finish() {
+      done.style.setProperty("--doneO", 1);
+      label.textContent = "Run it again";
+      boxes.forEach(function (b, i) {
+        setTimeout(function () { b.classList.add("lit"); }, 120 * i);
       });
-      var marker = el("circle", { class: "marker", cx: x(i), cy: y(d.roas), r: 4, opacity: 0 });
-      svg.appendChild(marker);
-      svg.appendChild(hit);
-      points.push({ hit: hit, marker: marker, cx: x(i), cy: y(d.roas), datum: d });
+    }
+
+    function unfinish() {
+      done.style.setProperty("--doneO", 0);
+      label.textContent = "Press and hold";
+      boxes.forEach(function (b) { b.classList.remove("lit"); });
+    }
+
+    function loop(now) {
+      var dt = Math.min(100, now - (last || now));
+      last = now;
+      var was = p;
+      p = holding ? Math.min(1, p + dt / 1500) : Math.max(0, p - dt / 900);
+      paint(now);
+      if (p >= 1 && was < 1) { latched = true; finish(); }   // the result stays put once earned
+      if (p < 1 && was >= 1) unfinish();
+      var running = holding ? p < 1 : (p > 0 && !latched);
+      if (running) raf = requestAnimationFrame(loop);
+      else { raf = null; last = 0; }
+    }
+
+    function start(e) {
+      if (e && e.type === "pointerdown" && e.button) return;
+      if (reduced()) { p = 1; latched = true; paint(performance.now()); finish(); return; }
+      if (latched) { latched = false; p = 0; unfinish(); paint(performance.now()); }  // "Run it again"
+      holding = true;
+      if (raf === null) raf = requestAnimationFrame(loop);
+    }
+    function stop() {
+      holding = false;
+      if (raf === null && p > 0) raf = requestAnimationFrame(loop);
+    }
+
+    pad.addEventListener("pointerdown", function (e) { pad.setPointerCapture && pad.setPointerCapture(e.pointerId); start(e); });
+    pad.addEventListener("pointerup", stop);
+    pad.addEventListener("pointercancel", stop);
+    pad.addEventListener("pointerleave", stop);
+    pad.addEventListener("keydown", function (e) {
+      if (e.key === " " || e.key === "Enter") { e.preventDefault(); start(); }
     });
-
-    points.forEach(function (p) {
-      var enter = function () {
-        points.forEach(function (q) { q.marker.setAttribute("opacity", "0"); });
-        p.marker.setAttribute("opacity", "1");
-        crosshair.setAttribute("x1", p.cx);
-        crosshair.setAttribute("x2", p.cx);
-        crosshair.classList.add("is-on");
-        tooltip.hidden = false;
-        tooltip.innerHTML = p.datum.month + " &nbsp;<b>" + p.datum.roas.toFixed(1) + "×</b>";
-        var scaleX = (svg.clientWidth / w) || 1;
-        var scaleY = (svg.clientHeight / h) || 1;
-        tooltip.style.left = (p.cx * scaleX) + "px";
-        tooltip.style.top = (p.cy * scaleY) + "px";
-      };
-      var leave = function () {
-        p.marker.setAttribute("opacity", "0");
-        crosshair.classList.remove("is-on");
-        tooltip.hidden = true;
-      };
-      p.hit.addEventListener("mouseenter", enter);
-      p.hit.addEventListener("mouseleave", leave);
-      p.hit.addEventListener("touchstart", enter, { passive: true });
-      p.hit.addEventListener("touchend", leave);
+    pad.addEventListener("keyup", function (e) {
+      if (e.key === " " || e.key === "Enter") stop();
     });
-  }
+    pad.addEventListener("click", function (e) { e.preventDefault(); });
 
-  if (svg) {
-    drawChart();
-    var resizeTimer;
-    window.addEventListener("resize", function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(drawChart, 180);
-    });
-  }
+    // Reduced motion gets the finished state with no hold required.
+    function pinHold() { p = 1; holding = false; latched = true; paint(performance.now()); finish(); }
+    function unpinHold() {
+      if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
+      p = 0; lastPaint = -1; latched = false;
+      outConf.textContent = fmt(REPORTED);
+      outDel.textContent = fmt(REPORTED);
+      outCost.textContent = "$" + REPORTED_CPA.toFixed(2);
+      wrap.style.setProperty("--hp", 0);
+      wrap.style.setProperty("--holdGlow", 0);
+      unfinish();
+    }
+    if (reduced()) pinHold();
+    window._holdPin = pinHold;
+    window._holdUnpin = unpinHold;
+    outRep.textContent = fmt(REPORTED);
+  })();
 
-  /* ── Table view of the same data ───────────────────────────────────────── */
-  var tableBody = document.getElementById("roasTableBody");
-  if (tableBody) {
-    series.forEach(function (d) {
-      var row = document.createElement("tr");
-      row.innerHTML = "<th scope=\"row\">" + d.month + "</th><td>" + d.roas.toFixed(1) +
-                      "×</td><td>" + TARGET.toFixed(1) + "×</td>";
-      tableBody.appendChild(row);
-    });
-  }
+  /* ============================================ reduced motion, both ways */
+  var rmq = matchMedia("(prefers-reduced-motion:reduce)");
+  var onReducedChange = function (e) {
+    if (e.matches) {
+      disableScrub();
+      revealables.forEach(function (el) { el.classList.add("in"); el.style.transitionDelay = "0ms"; });
+      if (window._holdPin) window._holdPin();
+    } else {
+      applyHeroMode();
+      if (window._holdUnpin) window._holdUnpin();
+    }
+  };
+  if (rmq.addEventListener) rmq.addEventListener("change", onReducedChange);
+  else if (rmq.addListener) rmq.addListener(onReducedChange);
 
-  var tableToggle = document.getElementById("tableToggle");
-  var tableWrap = document.getElementById("roasTable");
-  if (tableToggle && tableWrap) {
-    tableToggle.addEventListener("click", function () {
-      var open = tableWrap.hidden;
-      tableWrap.hidden = !open;
-      tableToggle.setAttribute("aria-expanded", String(open));
-      tableToggle.textContent = open ? "Hide table" : "View as table";
-    });
-  }
+  /* ============================================ pause everything off-tab */
+  document.addEventListener("visibilitychange", function () {
+    document.body.classList.toggle("paused", document.hidden);
+  });
 
-  /* ── Contact form ──────────────────────────────────────────────────────────
-     Posts to data-endpoint when one is configured; otherwise it opens a
-     pre-filled email so the form works the moment the site goes live.
-     ───────────────────────────────────────────────────────────────────────── */
-  var form = document.getElementById("contactForm");
-  var status = document.getElementById("formStatus");
-  var CONTACT_EMAIL = "hello@khalidonzar.com"; /* REPLACE: your inbox */
+  /* ==================================================== the contact form */
+  (function () {
+    var form = document.getElementById("contactForm");
+    if (!form) return;
+    var doneEl = document.getElementById("formDone");
 
-  if (form) {
+    function fieldOf(input) { return input.closest(".field"); }
+    function showErr(input, id, show) {
+      var err = document.getElementById(id);
+      var f = fieldOf(input);
+      if (err) err.hidden = !show;
+      if (f) f.classList.toggle("bad", show);
+      input.setAttribute("aria-invalid", show ? "true" : "false");
+    }
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      var name = form.elements.name, email = form.elements.email, msg = form.elements.message;
+      var ok = true;
 
-      var fields = Array.prototype.slice.call(form.querySelectorAll("[required]"));
-      var firstInvalid = null;
-      fields.forEach(function (field) {
-        var bad = !field.value.trim() || (field.type === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(field.value));
-        field.classList.toggle("is-invalid", bad);
-        if (bad && !firstInvalid) firstInvalid = field;
-      });
+      var nameBad = !name.value.trim();
+      showErr(name, "err-name", nameBad); if (nameBad) ok = false;
 
-      if (firstInvalid) {
-        status.className = "form-status is-error";
-        status.textContent = "Add your name, a valid email and a short note.";
-        firstInvalid.focus();
+      var emailBad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+      showErr(email, "err-email", emailBad); if (emailBad) ok = false;
+
+      var msgBad = msg.value.trim().length < 4;
+      showErr(msg, "err-message", msgBad); if (msgBad) ok = false;
+
+      if (!ok) {
+        var first = form.querySelector('.field.bad input, .field.bad textarea');
+        if (first) first.focus();
         return;
       }
 
-      var data = new FormData(form);
-      var endpoint = form.getAttribute("data-endpoint");
+      var body = [
+        "Name: " + name.value.trim(),
+        "Email: " + email.value.trim(),
+        "Store or brand: " + (form.elements.brand.value.trim() || "not given"),
+        "Monthly ad spend: " + (form.elements.spend.value || "not given"),
+        "",
+        msg.value.trim()
+      ].join("\n");
 
-      if (endpoint) {
-        status.className = "form-status";
-        status.textContent = "Sending…";
-        fetch(endpoint, { method: "POST", body: data, headers: { Accept: "application/json" } })
-          .then(function (res) {
-            if (!res.ok) throw new Error("Request failed");
-            form.reset();
-            status.className = "form-status is-ok";
-            status.textContent = "Sent. I'll reply within two working days.";
-          })
-          .catch(function () {
-            status.className = "form-status is-error";
-            status.textContent = "That didn't send. Email " + CONTACT_EMAIL + " instead.";
-          });
-        return;
-      }
-
-      var body = "Name: " + data.get("name") + "\n" +
-                 "Email: " + data.get("email") + "\n" +
-                 "Monthly ad spend: " + data.get("budget") + "\n\n" +
-                 data.get("message");
       window.location.href = "mailto:" + CONTACT_EMAIL +
-        "?subject=" + encodeURIComponent("Paid media enquiry — " + data.get("name")) +
+        "?subject=" + encodeURIComponent("Ad account enquiry from " + name.value.trim()) +
         "&body=" + encodeURIComponent(body);
-      status.className = "form-status is-ok";
-      status.textContent = "Opening your email client…";
-    });
-  }
 
-  /* ── Placeholder links stay inert until real URLs are added ────────────── */
-  Array.prototype.slice.call(document.querySelectorAll("[data-placeholder-link]"))
-    .forEach(function (link) {
-      link.addEventListener("click", function (e) { e.preventDefault(); });
+      doneEl.hidden = false;
     });
+  })();
 
-  /* ── Footer year ───────────────────────────────────────────────────────── */
-  var year = document.getElementById("year");
-  if (year) year.textContent = String(new Date().getFullYear());
+  /* ========================================================== small stuff */
+  var yr = document.getElementById("year");
+  if (yr) yr.textContent = new Date().getFullYear();
+
+  applyHeroMode();
 })();

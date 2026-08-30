@@ -1,8 +1,0 @@
-Drop your files in this folder:
-
-  portrait.jpg   your photo
-  case-1.jpg     dashboard screenshot
-  case-2.jpg     dashboard screenshot
-  case-3.jpg     dashboard screenshot
-
-Any filename works, I will sort them out.
