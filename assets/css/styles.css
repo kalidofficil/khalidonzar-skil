@@ -342,14 +342,19 @@ a{color:inherit}
 .skill p{color:var(--text-secondary);font-size:.95rem;margin:0}
 
 /* ------------------------------------------------------------------ process */
-.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:clamp(1rem,2vw,1.4rem);position:relative}
-.step{position:relative;padding-top:3.6rem}
-.step::before{content:"";position:absolute;left:19px;top:38px;bottom:auto;height:calc(100% - 38px);width:1px;
-  background:linear-gradient(var(--rule),transparent);opacity:.9}
-@media (min-width:760px){
-  .step::before{left:38px;top:19px;height:1px;width:calc(100% + clamp(1rem,2vw,1.4rem) - 38px);
-    background:linear-gradient(to right,var(--rule),var(--rule))}
-  .step:last-child::before{display:none}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:clamp(1.6rem,3vw,2rem);position:relative}
+.step{position:relative;padding:0 0 0 3.4rem;min-width:0}
+/* The vertical run, for the stacked layout. */
+.step::before{content:"";position:absolute;left:19px;top:44px;height:calc(100% + clamp(1.6rem,3vw,2rem) - 44px);width:1px;
+  background:linear-gradient(var(--rule),var(--rule))}
+.step:last-child::before{display:none}
+
+/* Five steps only sit without a hole in one row or one column, so go straight
+   from stacked to all five across. */
+@media (min-width:1024px){
+  .steps{grid-template-columns:repeat(5,1fr);gap:clamp(1rem,1.8vw,1.4rem)}
+  .step{padding:3.4rem 0 0}
+  .step::before{left:44px;top:19px;width:calc(100% + clamp(1rem,1.8vw,1.4rem) - 44px);height:1px}
 }
 .step-n{position:absolute;top:0;left:0;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
   background:var(--ink);color:var(--canvas);font-family:var(--mono);font-size:.85rem;z-index:1;
