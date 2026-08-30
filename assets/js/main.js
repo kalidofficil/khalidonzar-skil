@@ -128,8 +128,10 @@
   }
 
   /* ── ROAS chart ────────────────────────────────────────────────────────────
-     Single series (blended ROAS) against a labelled target rule. One measure,
-     one axis. Colours are the validated chart steps from the stylesheet.
+     Single series (blended ROAS) against a neutral, directly-labelled target
+     rule. One measure, one axis. The series colour is a validated step: it sits
+     inside the light-mode lightness band, clears the chroma floor, and holds
+     contrast against the paper ground.
      REPLACE: swap `series` for your own monthly figures.
      ───────────────────────────────────────────────────────────────────────── */
   var series = [
@@ -175,8 +177,8 @@
 
     var defs = el("defs");
     var grad = el("linearGradient", { id: "roasFill", x1: "0", y1: "0", x2: "0", y2: "1" });
-    grad.appendChild(el("stop", { offset: "0%", "stop-color": "#CE7B20", "stop-opacity": "0.28" }));
-    grad.appendChild(el("stop", { offset: "100%", "stop-color": "#CE7B20", "stop-opacity": "0" }));
+    grad.appendChild(el("stop", { offset: "0%", "stop-color": "#0B8757", "stop-opacity": "0.22" }));
+    grad.appendChild(el("stop", { offset: "100%", "stop-color": "#0B8757", "stop-opacity": "0" }));
     defs.appendChild(grad);
     svg.appendChild(defs);
 

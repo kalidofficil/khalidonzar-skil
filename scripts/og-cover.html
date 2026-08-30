@@ -6,62 +6,58 @@
 <meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Martian+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,700&display=swap">
 <style>
   * { box-sizing: border-box; margin: 0; }
   body {
     width: 1200px; height: 630px; overflow: hidden;
-    background: #071E28; color: #F1EDE4;
-    font-family: "Bricolage Grotesque", sans-serif;
+    background: #F7F5F0; color: #16211C;
+    font-family: "Fraunces", Georgia, serif;
     padding: 64px 80px 72px; position: relative;
     display: flex; flex-direction: column; justify-content: space-between;
   }
-  body::before {
-    content: ""; position: absolute; inset: -30% -20% auto auto;
-    width: 620px; height: 620px;
-    background: radial-gradient(circle, rgba(240,162,75,0.20), transparent 62%);
-  }
-  body::after {
-    content: ""; position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(241,237,228,0.055) 1px, transparent 1px);
-    background-size: 100% 70px;
-  }
-  .row { position: relative; display: flex; align-items: center; gap: 18px; }
+  .row { display: flex; align-items: center; gap: 18px; }
   .mark { display: flex; align-items: flex-end; gap: 5px; height: 34px; }
-  .mark i { display: block; width: 9px; background: #F0A24B; border-radius: 2px; }
+  .mark i { display: block; width: 9px; background: #1A3A2E; border-radius: 2px; }
   .mark i:nth-child(1) { height: 14px; }
   .mark i:nth-child(2) { height: 23px; }
-  .mark i:nth-child(3) { height: 34px; }
-  .name { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+  .mark i:nth-child(3) { height: 34px; background: #0B8757; }
+  .name { font-size: 26px; font-weight: 600; font-variation-settings: "opsz" 24; }
   .label {
-    font-family: "Martian Mono", monospace; font-size: 12px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase; color: #8AA3AB;
+    font-family: "Chivo Mono", monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.2em; text-transform: uppercase; color: #626E67;
   }
   h1 {
-    position: relative; font-size: 82px; font-weight: 800; line-height: 0.98;
-    letter-spacing: -0.038em; max-width: 15ch;
+    font-size: 76px; font-weight: 600; line-height: 1.05;
+    font-variation-settings: "opsz" 144;
+    letter-spacing: -0.022em; max-width: 17ch;
   }
-  h1 em { font-style: normal; color: #F0A24B; }
-  .stats { position: relative; display: flex; gap: 64px; padding-top: 30px;
-           border-top: 1px solid rgba(241,237,228,0.14); }
-  .stat b { display: block; font-size: 34px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; color: #F0A24B; }
-  .stat span { display: block; margin-top: 6px; line-height: 1.2; font-family: "Martian Mono", monospace; font-size: 12px; letter-spacing: 0.14em;
-               text-transform: uppercase; color: #8AA3AB; }
+  h1 em { font-style: italic; font-weight: 700; color: #1A3A2E; }
+  .stats { display: flex; gap: 64px; padding-top: 30px; border-top: 1px solid rgba(22,33,28,0.16); }
+  .stat b {
+    display: block; font-size: 34px; font-weight: 600; line-height: 1.15;
+    font-variation-settings: "opsz" 96; letter-spacing: -0.02em; color: #1A3A2E;
+  }
+  .stat span {
+    display: block; margin-top: 6px; line-height: 1.2;
+    font-family: "Chivo Mono", monospace; font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #626E67;
+  }
 </style>
 </head>
 <body>
   <div class="row">
     <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
     <span class="name">Khalid Onzar</span>
-    <span class="label">Performance Marketing</span>
+    <span class="label">White-label paid media</span>
   </div>
 
-  <h1>I turn ad spend into <em>predictable</em> revenue.</h1>
+  <h1>I run your paid accounts. Your client <em>never hears my name</em>.</h1>
 
   <div class="stats">
     <div class="stat"><b>$8.4M</b><span>Spend managed</span></div>
     <div class="stat"><b>4.1&times;</b><span>Blended ROAS</span></div>
-    <div class="stat"><b>&minus;38%</b><span>Cost per acquisition</span></div>
+    <div class="stat"><b>96%</b><span>Client retention</span></div>
   </div>
 </body>
 </html>
