@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero prototype · The Frame · Khalid Ounzar</title>
+<meta name="description" content="Scroll-driven hero prototype for the Khalid Ounzar portfolio redesign. Prototype only, not the live site.">
+<meta name="theme-color" content="#150B08">
+<link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/newsreader-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/archivo-latin.woff2" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23150B08'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23F0B27E' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/fonts.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<a class="skip" href="#work">Skip to the work</a>
+
+<header class="topbar" id="topbar">
+  <a class="mark" href="#top"><span class="mark-name">Khalid Ounzar</span><span class="mark-role">Performance marketing &middot; Dubai</span></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="#work">Work</a>
+    <a class="nav-cta" href="#contact">Let&rsquo;s talk</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top" aria-label="Introduction">
+    <div class="stage" id="stage">
+
+      <div class="ground" id="ground" aria-hidden="true"></div>
+
+      <!-- Stage 1: oversized name, sits BEHIND the portrait -->
+      <div class="bigname" id="bigname" aria-hidden="true">
+        <span>K</span><span>H</span><span>A</span><span>L</span><span>I</span><span>D</span>
+      </div>
+
+      <!-- The subject: two copies of one photograph, a moving mask between them -->
+      <figure class="subject" id="subject">
+        <span class="contact" aria-hidden="true"></span>
+        <span class="halo" aria-hidden="true"></span>
+        <div class="copy shadowed" aria-hidden="true">
+          <img src="../../assets/img/portrait-cutout.png" alt="" width="800" height="1000" decoding="async">
+        </div>
+        <div class="copy lit" id="litCopy" aria-hidden="true">
+          <img src="../../assets/img/portrait-cutout.png" alt="" width="800" height="1000" decoding="async">
+        </div>
+        <span class="rim" id="rim" aria-hidden="true"></span>
+        <figcaption class="sr">Khalid Ounzar, photographed in a navy three-piece suit.</figcaption>
+      </figure>
+
+      <!-- Stage 2: the composed name block -->
+      <div class="namewrap" id="namewrap">
+        <h1 class="name" id="nameLine"><span class="sr">Khalid Ounzar</span><span class="vis" aria-hidden="true"></span></h1>
+        <p class="lede" id="ledeLine"><span class="sr">I find the gap between reported and real.</span><span class="vis" aria-hidden="true"></span></p>
+        <p class="chip" id="chipLine">Meta Ads &middot; COD e-commerce &middot; Creative analysis</p>
+      </div>
+
+      <!-- Stage 3: verified campaign figures, three depths -->
+      <div class="cards" id="cards" aria-hidden="true">
+        <article class="card" data-depth="far" style="--tx:6%;--ty:15%">
+          <p class="k">One account &middot; Meta Ads</p>
+          <p class="v">262 campaigns</p>
+          <p class="n">$23,331.55 spend &middot; 21.9M impressions</p>
+        </article>
+        <article class="card" data-depth="mid" style="--tx:30%;--ty:39%">
+          <p class="k">Best purchase run</p>
+          <p class="v">441 &middot; $0.28</p>
+          <p class="n">purchases &middot; cost per purchase</p>
+        </article>
+        <article class="card" data-depth="near" style="--tx:13%;--ty:63%">
+          <p class="k">Creative &middot; best hook</p>
+          <p class="v">61.08%</p>
+          <p class="n">hook rate &middot; 2.29% CTR</p>
+        </article>
+      </div>
+      <p class="basis" id="basis">All figures as reported in Meta Ads Manager. Reported is not delivered, and the site says so.</p>
+
+      <!-- Stage 4: the cream heading rises inside the hero, so the handover has no seam -->
+      <div class="handover" id="handover">
+        <p class="eyebrow-dark">Selected campaigns</p>
+        <p class="handline">Work that carried a number.</p>
+      </div>
+
+      <!-- Static hero: phones and reduced motion -->
+      <div class="static" id="static">
+        <figure class="static-portrait">
+          <img src="../../assets/img/portrait-cutout.png" alt="Khalid Ounzar, photographed in a navy three-piece suit." width="800" height="1000" decoding="async">
+        </figure>
+        <div class="static-copy">
+          <h1 class="static-name">Khalid <em>Ounzar</em></h1>
+          <p class="static-lede">I find the gap between reported and real.</p>
+          <p class="static-chip">Meta Ads &middot; COD e-commerce &middot; Creative analysis</p>
+          <a class="btn" href="#contact">Let&rsquo;s talk</a>
+        </div>
+      </div>
+
+      <p class="cue" id="cue" aria-hidden="true"><span></span>Scroll</p>
+    </div>
+  </section>
+
+  <!-- ================= CREAM CASE SECTION ================= -->
+  <section class="case" id="work" aria-labelledby="work-h">
+    <div class="shell">
+      <header class="case-head">
+        <p class="eyebrow-dark">Selected campaigns</p>
+        <h2 id="work-h">Work that carried a number.</h2>
+        <figure class="docked">
+          <img src="../../assets/img/portrait.jpg" alt="" width="800" height="1000" loading="lazy" decoding="async">
+        </figure>
+      </header>
+
+      <ol class="rows">
+        <li class="row">
+          <span class="no">CASE 01</span>
+          <span class="body">
+            <span class="t">COD e-commerce &middot; Meta Ads &middot; Morocco</span>
+            <span class="s">262 campaigns inside one account. Campaign analysis, creative testing and a full-funnel COD review.</span>
+          </span>
+          <span class="m">441 purchases &middot; $0.28 each</span>
+        </li>
+        <li class="row">
+          <span class="no">CASE 02</span>
+          <span class="body">
+            <span class="t">Creative performance &middot; Meta Ads</span>
+            <span class="s">Reading where attention turns into click intent, and where it stops.</span>
+          </span>
+          <span class="m">61.08% hook rate &middot; 2.29% CTR</span>
+        </li>
+        <li class="row">
+          <span class="no">CASE 03</span>
+          <span class="body">
+            <span class="t">Reach at scale &middot; Meta Ads</span>
+            <span class="s">Balancing audience scale against acquisition efficiency.</span>
+          </span>
+          <span class="m">608,805 impressions &middot; 328 purchases</span>
+        </li>
+      </ol>
+
+      <p class="foot" id="contact">
+        Figures as reported in Meta Ads Manager. Account and client names are cropped out of every screenshot.
+        <br>Prototype only. <a href="mailto:ounzar.khalid1999@gmail.com">ounzar.khalid1999@gmail.com</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<script src="app.js" defer></script>
+</body>
+</html>
