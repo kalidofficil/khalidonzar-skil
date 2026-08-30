@@ -1,110 +1,92 @@
 # Verified content inventory — Khalid Ounzar redesign
 
 Working record for the redesign on `claude/khalid-portfolio-redesign-2jx71t`.
-Everything in "Verified" was supplied by Khalid in this session (screenshots of the
-old Lovable site, or written instructions). Everything in "Missing" must arrive
-before it can appear on the site. Nothing gets invented to fill a gap.
+Everything under "Verified" comes from Khalid's own materials found in this repo or
+supplied in session. Nothing gets invented to fill a gap.
 
 Rules in force, set by Khalid:
 
 - No invented clients, testimonials, qualifications, revenue, ROAS or outcomes.
-- Reported COD orders, confirmed/delivered orders and actual profit are distinct
-  and must be labelled as such.
-- The old site is a content source only. Its design, colours, layout, typography
-  and animations must not carry over. The repo's previous "paper & ink" build and
-  the "storm into still" cinematic brief are superseded for design purposes.
-- Screenshots must be scrubbed of confidential client information before they are
-  committed or shown on the site. Sensitive originals are never committed.
+- Reported orders, confirmed orders, delivered orders and actual profit are
+  distinct and labelled as such. Ads-Manager figures are labelled "as reported".
+- The old sites are content sources only; their design does not carry over.
+- Screenshots are sanitised before commit or display; originals with client
+  information are never committed.
 
-## Identity (verified)
+## Identity and contact (verified)
 
-- **Name:** Khalid Ounzar — this spelling everywhere, visible text and metadata.
-  (The repo previously used "Onzar"; every occurrence gets corrected in the redesign.)
-- **Base:** Dubai.
-- **Role:** Performance marketer and media buyer, hands-on e-commerce experience.
-- **Audience for this site, in order:** brands and business owners considering his
-  services; employers and recruiters hiring a media buyer / performance marketer;
-  agencies interested in collaboration (not exclusively white-label).
-- **Positioning note:** website and landing-page work is presented as a supporting
-  creative capability, evidenced by actual projects.
+- **Name:** Khalid Ounzar (site + metadata; repo's older "Onzar" gets corrected).
+- **Base:** Dubai, UAE.
+- **Role:** Performance marketer and media buyer; Meta Ads primary, alongside
+  Google, TikTok and Snapchat; deep COD e-commerce experience, Morocco + region.
+- **Email:** ounzar.khalid1999@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/khalidonzar
+- **Audience:** brands/business owners; employers and recruiters; agencies open
+  to collaboration (not exclusively white-label).
 
-## Old site content, transcribed from screenshots (verified)
+## Asset provenance (found on `claude/website-completion-7rnt0e`)
 
-Source: three screenshots of the Lovable project "Khalid Ounzar Portfolio"
-(project 74b1d2be-593e-4f74-bd9c-f2aff1df9ad2), supplied 2026-08-30. Site nav:
-Home · Portfolio · Let's Talk.
+| Asset | Source path on that branch | Now on redesign branch |
+|---|---|---|
+| Portrait, 800×1000 | `assets/img/portrait.jpg` | `assets/img/portrait.jpg` |
+| Portrait cutout (made locally with rembg) | — | `assets/img/portrait-cutout.png` |
+| Account overview screenshot | `assets/img/case-cod.jpg` | same path |
+| Budget/spend columns | `assets/img/case-441.jpg` | same path |
+| Impressions/reach columns | `assets/img/case-608k.jpg` | same path |
+| CPM/CPC columns | `assets/img/case-61.jpg` | same path |
+| Reach/frequency/ROAS columns | `assets/img/case-173.jpg` | same path |
+| Hook-rate column | `assets/img/case-hook.jpg` | same path |
 
-### Process — "What happens next: From first conversation to campaign action"
+All six case images are already sanitised: everything left of the metrics columns,
+browser chrome and taskbar are cropped away; no account name, business ID, URL or
+campaign name is visible. Verified by opening each file in this session.
 
-Lede: "A clear process designed to understand the business before recommending
-media decisions."
+Also on that branch: self-hosted woff2 subsets of Newsreader, Archivo and Spline
+Sans Mono (`assets/fonts/`), reusable if the final type direction keeps them.
 
-1. **Initial Conversation** — We discuss your business, current advertising
-   situation and primary objectives.
-2. **Discovery & Access** — I review the offer, audience, previous results,
-   creatives and available campaign data.
-3. **Audit & Priorities** — I identify the strongest opportunities and the main
-   performance bottlenecks.
-4. **Action Plan** — You receive a focused testing and optimization plan aligned
-   with your goals and budget.
-5. **Execution & Reporting** — We launch the agreed actions, monitor performance
-   and communicate what is working, what is not and what to test next.
+## Positioning and copy (verified, from `origin/claude/website-completion-7rnt0e:index.html`)
 
-### Skills — "The skills behind the numbers"
+- **Headline:** "I find the gap between reported and real."
+- **Subline:** "Meta ads and COD e-commerce. I read the campaign, the funnel and
+  the delivery, then tell you which number to trust."
+- **About:** "I am Khalid Ounzar, a performance marketer based in Dubai. My primary
+  focus is Meta ads, alongside Google, TikTok and Snapchat, and a lot of my work
+  sits in cash-on-delivery e-commerce accounts across Morocco and the region." plus
+  the reported/confirmed/delivered habit paragraphs.
+- **Toolkit chips:** Meta Ads, Google Ads, TikTok Ads, Snapchat Ads, Meta Pixel,
+  GA4, Google Tag Manager, UTMs, COD funnels.
+- **FAQ:** five real Q&As (budget trust, account-vs-bank gap, Dubai/Morocco
+  location, what's needed to start, not-an-agency).
+- **COD worked example** (hold-to-run interactive): 1,000 reported → confirmed →
+  640 delivered, labelled "A worked example at typical Moroccan COD rates. Not a
+  client result." Keep that label verbatim.
 
-1. **Meta Ads & Media Buying** — Campaign analysis, audience testing, budget
-   decisions and performance optimization across paid social campaigns.
-2. **Creative Analysis** — Evaluating hooks, CTR, CPC and creative performance to
-   understand where attention turns into action.
-3. **E-commerce Funnel Analysis** — Looking beyond the ad to understand landing
-   pages, orders, confirmation, delivery and real profitability.
-4. **Product & Competitor Research** — Researching products, competitors, customer
-   feedback and market signals before making advertising decisions.
-5. **Tracking & Measurement** — Working knowledge of Meta Pixel, GA4, GTM, UTMs
-   and conversion tracking to understand campaign performance.
-6. **Data-Driven Optimization** — Using CPM, CTR, CPC, CPA, frequency, conversion
-   rate and other signals to diagnose problems and identify opportunities.
+## Campaign figures (verified as reported in Meta Ads Manager, per screenshots)
 
-### Approach — "How I approach it" (main heading partly hidden by the nav in the screenshot)
+- One account: 262 campaigns, $23,331.55 total spend, 21.9M impressions, 5.07M reach.
+- 441 purchases at $0.28 per purchase on $125.02 spend.
+- 61.08% hook rate, 2.29% CTR, 229 purchases (creative case).
+- 608,805 impressions, 328 purchases, $1.47 per purchase.
+- 173 purchases at $1.77 per purchase, $306 spend.
+- 61 purchases at $0.39 per purchase, 30.65% hook rate.
 
-Lede: "I connect media buying decisions with creative performance, conversion data
-and the wider customer journey."
+Every figure ships with the "as reported in Meta Ads Manager" basis line; the
+reported-vs-delivered distinction is part of the positioning and stays explicit.
 
-1. **Campaign & Funnel Audit** — Review campaign structure, audiences, creatives,
-   tracking and conversion points to locate the main bottlenecks.
-2. **Structured Testing** — Prioritize meaningful tests across hooks, offers,
-   creative formats, audiences and landing-page elements.
-3. **Performance Optimization** — Analyze CPM, CTR, CPC, CPA, frequency and
-   conversion rate to improve budget allocation and campaign efficiency.
-4. **Business-Level Analysis** — Evaluate results beyond Ads Manager, including
-   confirmation, delivery, returns and profitability when data is available.
+## Old Lovable site (content transcribed from screenshots, verified)
 
-## Missing before build-out (exact items)
+Process (5 steps), Skills (6), Approach (4) — transcribed in full in the session
+and matching the `website-completion` copy almost verbatim; the merged canonical
+versions above take precedence.
 
-1. **Portrait as a file.** The portrait was pasted inline in chat, which this
-   environment can view but does not save to disk, so it cannot be processed or
-   embedded. It must be re-sent as a file attachment (the four reference videos
-   arrived that way and landed correctly). Highest available resolution.
-2. **Homepage hero + about copy** from the old site: the headline, subheadline and
-   any biography/experience text (screenshot or pasted text). Also the full
-   "How I approach it" heading, which the nav bar covers in the screenshot.
-3. **The Portfolio page**: every project/case study — client or project name (or
-   anonymised label), what was run, platform, and the real figures with periods.
-   Screenshots that will appear on the site must come as file attachments, and
-   anything confidential gets scrubbed before it is committed.
-4. **Campaign results**: the real numbers Khalid wants shown (spend managed, ROAS,
-   COD reported vs delivered rates, etc.), each with its basis and period.
-5. **Certifications**: names, issuers, dates; badge files if they should be shown.
-6. **Contact details**: email for the site, LinkedIn URL, and any other channels
-   (WhatsApp, calendar link, phone) that should appear.
+## Still missing (exact items)
 
-## Environment constraints (verified in this session)
-
-- Egress blocks `lovable.app` / `lovableproject.com` / Higgsfield's CDN, so the
-  old site cannot be fetched directly and generated media cannot be downloaded
-  here. Anything generated externally reaches the build only as a file upload
-  into the session.
-- Inline chat images are viewable but not saved to disk; file attachments are
-  saved. Assets that must ship with the site need to be file attachments.
-- Verified working locally: ffmpeg (static), Playwright + Chromium for testing,
-  rembg (bria-rmbg-2.0) for portrait cutouts, Node 22, Python 3.11.
+1. **Certifications** — none found on any branch or screenshot. Names, issuers,
+   dates, badge files if they exist; omitted from the site until supplied.
+2. **Website / landing-page work as supporting creative capability** — Khalid asked
+   for this to be evidenced by actual projects; no project files or URLs exist in
+   the repo. Needed: names/URLs or screenshots of pages he built, per project.
+3. **Lovable "Portfolio" page** — if it lists projects beyond the six Ads-Manager
+   cases above, screenshots or text of that page; otherwise nothing further.
+4. Optional: WhatsApp/phone/calendar link if any should appear beside email and
+   LinkedIn.
