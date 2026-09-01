@@ -129,15 +129,23 @@ strategy**. They have not run and are not presented as results.
   readable contrast
 - The page is complete and readable with video blocked, and with JavaScript off
 
+## Contact details
+
+All three channels are Khalid's, supplied and confirmed by him:
+
+| Channel | Value | Where it lives |
+|---|---|---|
+| Email | `ounzar.khalid1999@gmail.com` | `index.html` (list, button, JSON-LD) and `CONTACT_EMAIL` in `assets/js/cinematic.js` |
+| WhatsApp | `+971 58 968 0262` → `https://wa.me/971589680262` | `index.html` (list, button) |
+| LinkedIn | `linkedin.com/in/khalid-ounzar-664bbb424` | `index.html` (list, button, JSON-LD `sameAs`) |
+
+The `wa.me` link takes the number in international form with no `+`, spaces or
+dashes — `971589680262`. Both external links open in a new tab with
+`rel="noopener noreferrer"`.
+
 ## Before publishing
 
-1. **Check the contact email.** The page uses `kalidofficial55@gmail.com`, the
-   address on the repository account. Swap it for a business address if you
-   have one — it appears in `index.html` (twice, plus the JSON-LD) and once as
-   `CONTACT_EMAIL` in `assets/js/cinematic.js`.
-2. **Add LinkedIn / WhatsApp if you want them.** They are deliberately absent:
-   no verified URL was available, and a broken button is worse than no button.
-3. **Set the domain.** `index.html` (canonical, Open Graph), `robots.txt` and
+1. **Set the domain.** `index.html` (canonical, Open Graph), `robots.txt` and
    `sitemap.xml` currently point at the GitHub Pages URL for this repository.
-4. **Deploy.** `.github/workflows/deploy-pages.yml` publishes on push to `main`
+2. **Deploy.** `.github/workflows/deploy-pages.yml` publishes on push to `main`
    only, so nothing goes live from a feature branch.

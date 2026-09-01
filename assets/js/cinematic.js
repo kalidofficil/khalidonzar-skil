@@ -9,7 +9,7 @@
 (function () {
   "use strict";
 
-  var CONTACT_EMAIL = "kalidofficial55@gmail.com";
+  var CONTACT_EMAIL = "ounzar.khalid1999@gmail.com";
 
   document.documentElement.classList.add("js");
 
