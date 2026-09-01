@@ -22,12 +22,20 @@ scripts/og-cover.html         source for assets/og-cover.png
 ## Run it
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+node scripts/serve.js        # → http://localhost:8000
 ```
 
-Open `index.html` directly and the relative paths still work, but serve it if
-you want the video range requests to behave as they will in production.
+**Use that server, not `python3 -m http.server`.** The scroll-linked scenes seek
+inside their clips, and seeking needs HTTP Range support. Python's built-in
+server ignores the `Range` header and answers `200` with the whole file;
+Chromium then reports `video.seekable` as an empty range and silently refuses
+every `currentTime` assignment. The journey still swaps scenes as you scroll, so
+it looks like it works — but no scene ever scrubs, and there is no console error
+to tell you why. Every real host (GitHub Pages, Netlify, Vercel, Cloudflare)
+serves ranges, so this only ever bites locally.
+
+Opening `index.html` straight off disk has the same problem, for the same
+reason.
 
 ## The journey
 
