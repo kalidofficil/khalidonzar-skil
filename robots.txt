@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# REPLACE: point this at your live domain
-Sitemap: https://khalidonzar.com/sitemap.xml
+Sitemap: https://kalidofficil.github.io/khalidonzar-skil/sitemap.xml

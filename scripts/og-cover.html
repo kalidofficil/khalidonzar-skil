@@ -1,63 +1,28 @@
-<!doctype html>
-<!-- Source for the 1200x630 social card. After editing, regenerate with:
-     python3 scripts/make-og-cover.py                                    -->
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,700&display=swap">
+<!doctype html><meta charset="utf-8">
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    width: 1200px; height: 630px; overflow: hidden;
-    background: #F7F5F0; color: #16211C;
-    font-family: "Fraunces", Georgia, serif;
-    padding: 64px 80px 72px; position: relative;
-    display: flex; flex-direction: column; justify-content: space-between;
-  }
-  .row { display: flex; align-items: center; gap: 18px; }
-  .mark { display: flex; align-items: flex-end; gap: 5px; height: 34px; }
-  .mark i { display: block; width: 9px; background: #1A3A2E; border-radius: 2px; }
-  .mark i:nth-child(1) { height: 14px; }
-  .mark i:nth-child(2) { height: 23px; }
-  .mark i:nth-child(3) { height: 34px; background: #0B8757; }
-  .name { font-size: 26px; font-weight: 600; font-variation-settings: "opsz" 24; }
-  .label {
-    font-family: "Chivo Mono", monospace; font-size: 12px; font-weight: 500;
-    letter-spacing: 0.2em; text-transform: uppercase; color: #626E67;
-  }
-  h1 {
-    font-size: 76px; font-weight: 600; line-height: 1.05;
-    font-variation-settings: "opsz" 144;
-    letter-spacing: -0.022em; max-width: 17ch;
-  }
-  h1 em { font-style: italic; font-weight: 700; color: #1A3A2E; }
-  .stats { display: flex; gap: 64px; padding-top: 30px; border-top: 1px solid rgba(22,33,28,0.16); }
-  .stat b {
-    display: block; font-size: 34px; font-weight: 600; line-height: 1.15;
-    font-variation-settings: "opsz" 96; letter-spacing: -0.02em; color: #1A3A2E;
-  }
-  .stat span {
-    display: block; margin-top: 6px; line-height: 1.2;
-    font-family: "Chivo Mono", monospace; font-size: 12px; letter-spacing: 0.14em;
-    text-transform: uppercase; color: #626E67;
-  }
+  @font-face{font-family:"Fraunces";src:url("../assets/fonts/fraunces-latin.woff2") format("woff2");font-weight:300 700}
+  @font-face{font-family:"Public Sans";src:url("../assets/fonts/publicsans-latin.woff2") format("woff2");font-weight:400 700}
+  *{margin:0;box-sizing:border-box}
+  body{width:1200px;height:630px;background:#0A0F16;color:#EDF1F5;display:grid;
+       grid-template-columns:440px 1fr;font-family:"Public Sans",sans-serif;overflow:hidden}
+  .shot{position:relative;overflow:hidden}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+  .shot::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(to right,rgba(10,15,22,0) 55%,rgba(10,15,22,.96) 100%)}
+  .copy{padding:76px 76px 68px 56px;display:flex;flex-direction:column;justify-content:center}
+  .eyebrow{font-family:ui-monospace,monospace;font-size:15px;letter-spacing:.19em;
+           text-transform:uppercase;color:#E0A052;margin-bottom:26px}
+  h1{font-family:"Fraunces",serif;font-size:80px;line-height:1;letter-spacing:-.035em;font-weight:300}
+  h1 b{font-weight:600}
+  .role{margin-top:24px;font-size:25px;color:#EDF1F5;font-weight:500}
+  .sub{margin-top:9px;font-size:19px;color:#9BA9B6;line-height:1.45;max-width:30ch}
+  .rule{margin-top:36px;width:76px;height:2px;background:#E0A052}
 </style>
-</head>
-<body>
-  <div class="row">
-    <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="name">Khalid Onzar</span>
-    <span class="label">White-label paid media</span>
-  </div>
-
-  <h1>I run your paid accounts. Your client <em>never hears my name</em>.</h1>
-
-  <div class="stats">
-    <div class="stat"><b>$8.4M</b><span>Spend managed</span></div>
-    <div class="stat"><b>4.1&times;</b><span>Blended ROAS</span></div>
-    <div class="stat"><b>96%</b><span>Client retention</span></div>
-  </div>
-</body>
-</html>
+<div class="shot"><img src="../assets/cinematic/s01-intro-poster.jpg" alt=""></div>
+<div class="copy">
+  <span class="eyebrow">Dubai, UAE</span>
+  <h1>Khalid <b>Ounzar</b></h1>
+  <p class="role">Performance Marketer — Media Buyer</p>
+  <p class="sub">Meta Ads for e-commerce and cash-on-delivery. Reported campaign figures, shown honestly.</p>
+  <span class="rule"></span>
+</div>

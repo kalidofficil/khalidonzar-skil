@@ -1,155 +1,135 @@
-# Khalid Onzar — white-label paid media
+# Khalid Ounzar — cinematic portfolio
 
-A single-page portfolio site for a white-label paid media partner working with
-agencies. Static HTML, CSS and vanilla JavaScript: no framework, no build step,
-no dependencies. Drop it on any host and it runs.
+A single-page portfolio for a performance marketer in Dubai. One continuous
+cinematic journey through an office, broken open in the middle by a plain,
+readable editorial section carrying the campaign figures.
+
+Static HTML, CSS and vanilla JavaScript. No framework, no build step, no
+third-party requests at runtime — fonts and every media file are self-hosted.
 
 ```
-index.html              the whole page — all copy lives here
-assets/css/styles.css   design tokens and layout
-assets/js/main.js       nav, scroll reveals, KPI count-up, ROAS chart, contact form
-assets/img/             your photos and case-study screenshots
-assets/favicon.svg      tab icon
-assets/og-cover.png     1200×630 social share card
-scripts/og-cover.html   source for that card
-scripts/make-og-cover.py     regenerates assets/og-cover.png
-scripts/build-single-file.py builds dist/index.html with everything inlined
-.github/workflows/deploy-pages.yml  publishes to GitHub Pages on push to main
+index.html                    the page — all copy lives here
+legacy.html                   the previous "paper & ink" site, kept intact
+assets/css/cinematic.css      design tokens, the cinematic stage, the editorial bands
+assets/js/cinematic.js        scroll-linked playback, the two speaking scenes, page wiring
+assets/cinematic/             web derivatives: MP4 + WebM, desktop + mobile, posters
+assets/captions/*.vtt         captions for the two speaking scenes
+assets/fonts/                 Fraunces and Public Sans, self-hosted woff2
+scripts/build-media.sh        rebuilds every derivative from the Release originals
+scripts/og-cover.html         source for assets/og-cover.png
 ```
 
-## Run it locally
-
-Open `index.html` in a browser, or serve it so relative paths behave exactly as
-they will in production:
+## Run it
 
 ```bash
 python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-## Adding your own images
+Open `index.html` directly and the relative paths still work, but serve it if
+you want the video range requests to behave as they will in production.
 
-The page ships with placeholder graphics so nothing looks broken before your
-files arrive. There are four image slots:
+## The journey
 
-| Slot | File to add | Shape | Where it appears |
+Nine scenes cut from eight approved clips. Two of them speak; the rest are
+driven by the scroll.
+
+| # | Scene | Clip | Playback |
 |---|---|---|---|
-| Portrait | `assets/img/portrait.jpg` | 4:5 (e.g. 1200×1500) | Beside the About copy |
-| Case study 1 | `assets/img/case-1.jpg` | 16:10 (e.g. 1600×1000) | Inside the first case row |
-| Case study 2 | `assets/img/case-2.jpg` | 16:10 | Inside the second case row |
-| Case study 3 | `assets/img/case-3.jpg` | 16:10 | Inside the third case row |
+| 1 | Office introduction | `s01-intro` | **normal speed, original audio** |
+| 2 | Office pullback to the window | `s02-pullback` | scroll-linked |
+| 3 | Building exterior, blue hour | `s03-exterior` | scroll-linked |
+| 4 | Conference-room presentation | `s04-conference` | scroll-linked, with a reading hold |
+| 5 | Through the television, out again | `s05-transition` | scroll-linked |
+| 6 | Project room, team at work | `s06-project` | scroll-linked |
+| — | Performance evidence | — | editorial HTML |
+| 7 | Corridor walk | `s07-corridor` | scroll-linked |
+| 8 | "Let's work together. Contact me." | `s08-contact` | **normal speed, original audio** |
+| 9 | Building exit and Dubai aerial | `s09-aerial` | scroll-linked |
 
-To use one, drop the file into `assets/img/` and update two things in
-`index.html` — the `src` and the `alt` text:
+Scenes 4 and 5 are two halves of one clip, cut at the same frame, so the join
+is invisible. Scene 8 is never scroll-scrubbed: it plays on its own clock while
+the scroll-linked journey holds, which is what "pause the cinematic while the
+sentence plays" means here.
 
-```html
-<img src="assets/img/case-1.jpg"
-     alt="Blended ROAS climbing across five months in the client dashboard"
-     width="1600" height="1000" loading="lazy" decoding="async">
-```
+## How the scroll system works
 
-Then delete the `REPLACE` line in the `<figcaption>` above it, or write a real
-caption there.
-
-A few practical notes. Images are cropped to fill their slot (`object-fit:
-cover`), so keep the subject near the centre. Export at roughly 1600px wide and
-compress — a portfolio page has no business shipping 4MB screenshots. And crop
-or blur anything in a dashboard screenshot that identifies a client: account
-names, campaign names, URLs, currency totals you don't have permission to show.
-
-## Before you publish: replace the placeholders
-
-Every invented figure, quote and link is marked with a `REPLACE` comment:
-
-```bash
-grep -rn "REPLACE" index.html assets robots.txt
-```
-
-The list, in page order:
-
-| Where | What to change |
-|---|---|
-| `<head>` | Canonical URL, Open Graph URLs, JSON-LD profile and social links |
-| Hero | Current capacity line, your terms and base |
-| Partner snapshot | The four rows and the channel mix split |
-| Results | The four KPI figures and their notes |
-| Chart | `series` and `TARGET` in `assets/js/main.js`, plus the figure caption |
-| Selected work | All three cases, and their screenshots (see above) |
-| About | Bio, portrait, toolkit, engagement terms |
-| References | **Both quotes are placeholder text** — see the warning below |
-| Contact | Email address (also `CONTACT_EMAIL` in `main.js`), calendar and LinkedIn URLs |
-| `robots.txt` / `sitemap.xml` | Your live domain |
-
-**Two things to be careful about.** The testimonials are written as obvious
-placeholders on purpose — publish real quotes only, with the partner's written
-permission to use their name and title. And the metrics throughout are
-illustrative: swap in figures you can evidence from your own records before the
-site goes anywhere near a prospect.
-
-The cases are written anonymised ("DTC skincare", "B2B SaaS") which is the
-normal convention for white-label work under NDA. Name a partner or a client
-only where you have written permission.
-
-## Make the contact form send
-
-Out of the box the form validates, then opens a pre-filled email to
-`CONTACT_EMAIL`. To have it post to a form service instead, add your endpoint to
-the form tag in `index.html`:
+Each journey is one tall `<section>` with a `position: sticky` stage inside it.
+Section progress (0→1) is split into chapter ranges declared on each `<video>`:
 
 ```html
-<form class="contact-form" id="contactForm" data-endpoint="https://formspree.io/f/YOUR_ID">
+<video data-from="0.37" data-to="0.62" data-join="wipe" data-hold="0.30,0.72" ...>
 ```
 
-Anything that accepts a `multipart/form-data` POST and returns 2xx works —
-Formspree, Basin, Netlify Forms, or your own handler. The mailto fallback stays
-in place if the request fails.
+- `data-from` / `data-to` — the chapter's slice of the section
+- `data-hold` — a dead zone in the scroll where the footage freezes so a reader
+  can finish the overlay before the camera moves again
+- `data-join` — `fade`, `wipe` (a dark architectural band sweeps the cut where
+  two clips do not frame-match), or `none` (a true continuous cut)
 
-## Deploy
+Playhead position is eased toward its target each frame rather than assigned
+directly, so a fast flick decelerates instead of stuttering. Videos are encoded
+with a keyframe every 5 frames so seeking lands where it should.
 
-**GitHub Pages** — the included workflow publishes the repo root on every push to
-`main`. Enable it once under *Settings → Pages → Source → GitHub Actions*. For a
-custom domain, add a `CNAME` file containing the domain and point your DNS at
-GitHub.
+Loading is per chapter: the active clip and the next one, nothing else. Posters
+are attached on demand too, which is why the first screen is ~167 KB.
 
-**Netlify / Vercel / Cloudflare Pages** — connect the repo. There is no build
-command; the publish directory is the repo root.
+## Media
 
-**Anything else** — upload `index.html`, `assets/`, `robots.txt` and
-`sitemap.xml`. Or build the one-file version and upload that alone — it inlines
-the CSS, JS and every image:
+`assets/cinematic/` holds four encodes of every scene — H.264 MP4 and VP9 WebM,
+each at desktop (1080×1350) and mobile (720×900) — plus a poster and an end
+frame. MP4 is preferred at runtime; WebM covers browsers built without the
+proprietary codecs.
+
+The originals are **not** committed. To rebuild:
 
 ```bash
-python3 scripts/build-single-file.py   # → dist/index.html
+gh release download cinematic-assets -R kalidofficil/khalidonzar-skil -D ./originals
+bash scripts/build-media.sh ./originals
 ```
 
-## Regenerate the social card
+That script documents what inspection found and fixes: a spurious end-card frame
+on every clip, bands of damaged green rows in three of them, and five different
+source aspect ratios normalised to 4:5. It re-verifies the output at the end.
 
-Edit `scripts/og-cover.html`, then:
+## What the figures mean
 
-```bash
-python3 scripts/make-og-cover.py
-```
+Every number in the case studies is a metric **reported by Meta Ads Manager**.
+The page says so, in those words, and shows no revenue, profit, ROAS, delivery
+rate or confirmation rate, because there is no verified data for them. A
+reported purchase on a cash-on-delivery campaign is not a delivered order, and
+the page does not let a reader believe otherwise.
 
-It drives headless Chromium (`--chromium /path/to/chrome` if it isn't on your
-PATH) and writes `assets/og-cover.png`.
+Two figures are marked as derived (CPM in case A, reach in case B) — they are
+arithmetic on the reported figures, not separate claims. Case C shows
+`CPC — all clicks` rather than a bare CPC, because $0.01 against a 2.29% link
+CTR only reconciles as cost per *all* clicks.
 
-## Notes on the build
+The salon and real-estate pieces are labelled **Concept** and **Sample
+strategy**. They have not run and are not presented as results.
 
-- **Design.** Warm paper ground with a deep ink-green accent, set in Fraunces,
-  Public Sans and Chivo Mono, laid out as ruled bands with account-style labels
-  and tabular figures. One committed light world rather than a light/dark pair,
-  so every colour is painted explicitly. The contact band is the single inverted
-  block on the page.
-- **Contrast.** Every ink and accent value is checked against the paper ground:
-  body text 15.2:1, secondary 6.7:1, muted labels 4.9:1, accent 11.4:1.
-- **Chart.** A single series against a neutral, directly-labelled target rule —
-  one measure, one axis. The series colour sits inside the light-mode lightness
-  band, clears the chroma floor, and holds contrast against the paper. It ships
-  with a crosshair tooltip and a "view as table" toggle so the figures are
-  readable without the graphic.
-- **Accessibility.** Skip link, visible focus states, labelled form fields,
-  `aria-current` on the nav, an accessible name and description on the chart,
-  alt text on every image, and all animation disabled under
-  `prefers-reduced-motion`.
-- **SEO.** Description, Open Graph and Twitter cards, JSON-LD `Person`,
-  `sitemap.xml` and `robots.txt`.
+## Accessibility
+
+- `prefers-reduced-motion` replaces the whole scroll system with poster frames
+  and the same copy in normal document flow; nothing seeks and nothing autoplays
+- Captions on both speaking scenes, from real `<track>` files, painted into an
+  `aria-live` region so they are styled and still announced
+- Full transcripts in `<details>` beside each speaking scene
+- Every control is keyboard reachable with a visible focus ring
+- All body text meets WCAG AA against its own ground; the process ladder marks
+  its active step with colour and a rule rather than by dimming text below
+  readable contrast
+- The page is complete and readable with video blocked, and with JavaScript off
+
+## Before publishing
+
+1. **Check the contact email.** The page uses `kalidofficial55@gmail.com`, the
+   address on the repository account. Swap it for a business address if you
+   have one — it appears in `index.html` (twice, plus the JSON-LD) and once as
+   `CONTACT_EMAIL` in `assets/js/cinematic.js`.
+2. **Add LinkedIn / WhatsApp if you want them.** They are deliberately absent:
+   no verified URL was available, and a broken button is worse than no button.
+3. **Set the domain.** `index.html` (canonical, Open Graph), `robots.txt` and
+   `sitemap.xml` currently point at the GitHub Pages URL for this repository.
+4. **Deploy.** `.github/workflows/deploy-pages.yml` publishes on push to `main`
+   only, so nothing goes live from a feature branch.
