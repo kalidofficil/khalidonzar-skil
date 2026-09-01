@@ -1,28 +1,29 @@
 <!doctype html><meta charset="utf-8">
 <style>
-  @font-face{font-family:"Fraunces";src:url("../assets/fonts/fraunces-latin.woff2") format("woff2");font-weight:300 700}
-  @font-face{font-family:"Public Sans";src:url("../assets/fonts/publicsans-latin.woff2") format("woff2");font-weight:400 700}
+  @font-face{font-family:"Instrument Serif";src:url("../assets/fonts/instrument-serif-latin.woff2") format("woff2");font-weight:400}
+  @font-face{font-family:"Instrument Serif";src:url("../assets/fonts/instrument-serif-italic-latin.woff2") format("woff2");font-weight:400;font-style:italic}
+  @font-face{font-family:"Manrope";src:url("../assets/fonts/manrope-latin.woff2") format("woff2");font-weight:400 800}
   *{margin:0;box-sizing:border-box}
-  body{width:1200px;height:630px;background:#0A0F16;color:#EDF1F5;display:grid;
-       grid-template-columns:440px 1fr;font-family:"Public Sans",sans-serif;overflow:hidden}
+  body{width:1200px;height:630px;background:#0A0A0B;color:#F3EBDD;display:grid;
+       grid-template-columns:1fr 470px;font-family:"Manrope",sans-serif;overflow:hidden;position:relative}
+  .copy{padding:82px 34px 74px 74px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+  .eyebrow{font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#F5A13A;margin-bottom:30px}
+  h1{font-family:"Instrument Serif",serif;font-size:92px;line-height:.94;letter-spacing:-.03em;font-weight:400}
+  h1 em{font-style:italic}
+  .role{margin-top:28px;font-size:24px;font-weight:600}
+  .sub{margin-top:10px;font-size:18px;color:#C9BDB0;line-height:1.45;max-width:32ch}
+  .rule{margin-top:34px;width:82px;height:3px;background:#E94516}
   .shot{position:relative;overflow:hidden}
-  .shot img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+  .shot img{width:100%;height:100%;object-fit:cover;object-position:52% 30%}
   .shot::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(to right,rgba(10,15,22,0) 55%,rgba(10,15,22,.96) 100%)}
-  .copy{padding:76px 76px 68px 56px;display:flex;flex-direction:column;justify-content:center}
-  .eyebrow{font-family:ui-monospace,monospace;font-size:15px;letter-spacing:.19em;
-           text-transform:uppercase;color:#E0A052;margin-bottom:26px}
-  h1{font-family:"Fraunces",serif;font-size:80px;line-height:1;letter-spacing:-.035em;font-weight:300}
-  h1 b{font-weight:600}
-  .role{margin-top:24px;font-size:25px;color:#EDF1F5;font-weight:500}
-  .sub{margin-top:9px;font-size:19px;color:#9BA9B6;line-height:1.45;max-width:30ch}
-  .rule{margin-top:36px;width:76px;height:2px;background:#E0A052}
+    background:linear-gradient(to left,rgba(10,10,11,0) 34%,rgba(10,10,11,.98) 100%),
+               radial-gradient(90% 100% at 100% 40%,rgba(40,16,10,0) 40%,rgba(40,16,10,.5) 100%)}
 </style>
-<div class="shot"><img src="../assets/cinematic/s01-intro-poster.jpg" alt=""></div>
 <div class="copy">
   <span class="eyebrow">Dubai, UAE</span>
-  <h1>Khalid <b>Ounzar</b></h1>
+  <h1>Khalid<br><em>Ounzar</em></h1>
   <p class="role">Performance Marketer — Media Buyer</p>
-  <p class="sub">Meta Ads for e-commerce and cash-on-delivery. Reported campaign figures, shown honestly.</p>
+  <p class="sub">Meta Ads for e-commerce and cash on delivery. Reported campaign figures, shown honestly.</p>
   <span class="rule"></span>
 </div>
+<div class="shot"><img src="../assets/cinematic/s1-intro-poster.jpg" alt=""></div>
