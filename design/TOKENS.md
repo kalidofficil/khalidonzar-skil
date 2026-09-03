@@ -1,122 +1,125 @@
-# Version 2 — visual tokens
+# Version 3 — visual tokens
 
-The palette is not applied to the footage. It is derived *from* it, then used for
-everything that is not footage.
+The palette is not applied to the footage. It is measured *from* the master, then
+used for everything that is not the master.
 
-## What the film actually looks like
+## What the master actually looks like
 
-Twelve frames were sampled from each of the eight source clips and every pixel
-classified by hue, saturation and value. The warm content of the film — lamp
-light, wood, lit windows, the low sun on the tower — lands in a narrow band:
+Thirty-four frames were sampled across `khalid-cinematic-master-v3.mp4` and every
+pixel classified by hue, saturation and value.
 
-| clip | mean frame | warm pixels | mean warm hue | mean warm colour |
-|---|---|---|---|---|
-| 01 office introduction | `#4F4640` | 38.6% | 24° | `#624837` |
-| 02 office pullback | `#504640` | 38.4% | 24° | `#624837` |
-| 03 building exterior | `#4F4540` | 38.5% | 24° | `#624836` |
-| 05 boardroom | `#676C72` | 17.5% | 23° | `#7E5A43` |
-| 06 project room | `#776956` | 46.7% | 31° | `#907558` |
-| 07 corridor | `#647278` | 5.1% | 23° | `#875C41` |
-| 08 contact | `#544F45` | 35.2% | 30° | `#5F4B38` |
-| 09 Dubai aerial | `#63757C` | 5.2% | 26° | `#906A4E` |
+| measure | value |
+|---|---|
+| mean frame | `#4B4D50` |
+| warm pixels | 19.0% |
+| mean warm colour | `#725641` |
+| warm hue histogram | **20–30° 71%**, 10–20° 16%, 30–40° 12%, 0–10° 1% |
 
-**Hue 20–35° in every clip.** Cinematic orange sits at 21° and warm amber at 33°,
-so those two are literally the film's own colour. Ember (13°) and oxblood (6.5°)
-are hotter than anything on screen, which is exactly why they work as accent and
-shadow rather than as surfaces.
+**Hue 20–30° carries 71% of the master's warm content.** Cinematic orange sits at
+21° and warm amber at 33°, so those two are literally the film's own colour. Ember
+(13°) and oxblood (6.5°) are hotter than anything on screen, which is exactly why
+they work as accent and shadow rather than as surfaces. The master's warm colours
+are also dark and desaturated (`#725641`), so vivid orange is rationed to accents
+and small marks while the large surfaces stay ink.
 
-The other half of the finding: the film's warm colours are *dark and desaturated*
-(`#624837`, `#907558`) — nothing on screen is vivid. So vivid orange is rationed
-to accents and small marks, and the large surfaces use ink and the warm near-blacks
-below.
+## On the supplied colour references
 
-## The grade
+The two reference screenshots are purple and magenta dominant — lilac glass over a
+violet sunset, and a plum ground with hot-pink accents. That conflicts with the
+brief's own palette and its avoid-list, which names purple-to-blue gradients and
+rainbow colour, and with the instruction to adapt the references *to the footage*.
 
-Version 1 cooled every clip to reconcile blue hour with daylight. That fought the
-palette. Version 2 grades neutral-to-warm and lets the footage's own light carry
-the colour. Faces are never pushed: the warm bias sits in mids and highlights, and
-saturation moves at most ±5%.
+What was taken from them is therefore structural rather than chromatic: a deep
+near-black ground, a single luminous saturated accent rather than many, a soft
+glow field behind raised surfaces, rounded translucent card edges, and strong
+separation between subject and ground. The hue was rotated from magenta into the
+ember family the master already contains. The three motion references are
+red / black / off-white and needed no such adjustment.
 
 ## Colour
 
 | token | value | role |
 |---|---|---|
 | `--ink` | `#0A0A0B` | the ground almost everything sits on |
-| `--umber` | `#2A211A` | warm near-black, sampled between ink and the film's warm shadows |
-| `--sepia` | `#3B2C22` | raised card ground on dark sections |
-| `--oxblood` | `#45140E` | deep shadow field, the contact section's ground |
+| `--umber` | `#241C16` | warm near-black, between ink and the master's warm shadows |
+| `--sepia` | `#33261D` | raised card ground on dark surfaces |
+| `--oxblood` | `#45140E` | deep shadow field; the contact section's ground |
 | `--ember` | `#E94516` | the hot accent — rules, marks, one word in a headline |
-| `--orange` | `#FF6A1A` | primary accent on dark; the film's own hue |
-| `--amber` | `#F5A13A` | secondary warm, figures and highlights |
+| `--orange` | `#FF6A1A` | primary accent on dark; the master's own hue |
+| `--amber` | `#F5A13A` | secondary warm; figures and highlights |
 | `--cream` | `#F3EBDD` | type on dark, and the light sections' ground |
-| `--linen-2` | `#E8DECD` | card ground on light sections |
+| `--linen` | `#E8DECD` | card ground on light surfaces |
 | `--stone` | `#C9BDB0` | secondary type on dark |
 | `--warm-grey` | `#81756D` | rules and non-text marks only — fails AA as body text |
 
-Text colours are separated per surface because one value cannot serve both grounds.
+Text colour is separated per surface, because no single value serves all three.
 
 | surface | primary | secondary | tertiary | accent |
 |---|---|---|---|---|
-| dark (`--ink`) | `#F3EBDD` 16.3:1 | `#C9BDB0` 10.4:1 | `#8E827A` 5.3:1 | `#FF6A1A` 6.8:1 |
-| light (`--cream`) | `#14100E` 15.9:1 | `#4A423C` 8.1:1 | `#6B6058` 5.1:1 | `#B32E08` 5.4:1 |
+| ink `#0A0A0B` | `#F3EBDD` 16.3:1 | `#C9BDB0` 10.4:1 | `#8E827A` 5.3:1 | `#FF6A1A` 6.8:1 |
+| sepia card `#33261D` | `#F3EBDD` | `#C9BDB0` | `#A0958C` 4.9:1 | `#F5A13A` |
+| cream `#F3EBDD` | `#14100E` 15.9:1 | `#4A423C` 8.1:1 | `#6B6058` 5.1:1 | `#B32E08` 5.4:1 |
 
-`--ember` on cream is 3.2:1 — display sizes and graphics only, never body text.
-`--warm-grey` on cream is 3.8:1 — never type.
+`#8E827A` is 3.9:1 on the sepia card ground, which is why cards use `#A0958C`
+instead. The primary button is ink on ember at 5.0:1; cream on ember is 3.3:1 and
+is never used.
 
 ## Type
 
-- **Instrument Serif** — display headlines, pull quotes, the closing line. One
-  weight, high contrast, real character at size. Self-hosted, latin subset, 20 KB.
+- **Instrument Serif** — display headlines, the closing line, card titles. One
+  weight, high contrast, real character at size. Self-hosted, latin, 20 KB.
 - **Manrope** — body, navigation, figures, labels, buttons. Variable 400–800,
   self-hosted, 24 KB.
 
-Rules: sentence case; uppercase only on small utility labels with tracking; body
-never below 15px; headlines carry deliberate line breaks rather than falling where
-the box ends.
+Sentence case; uppercase only on small utility labels with tracking; body never
+below 15px; headlines carry deliberate line breaks.
 
 ## Motion
 
-| element | movement | settles |
-|---|---|---|
-| content cards | ≤4° rotateX, ≤3° rotateY, 14px depth | flat within 15% of viewport centre |
-| section entrance | 18px rise, 600ms | once, never repeats |
-| film | scroll-linked playhead, eased | speaking scenes hold |
-
-All of it is removed under `prefers-reduced-motion`, and card rotation is halved
-below 900px.
-
-## The nine scenes and their seven joins
-
-Scenes 4 and 5 are two halves of one source clip and share one file, so that join
-does not exist. The remaining seven were chosen by measurement — the outgoing final
-frame and the incoming first frame were compared for structure (normalised
-correlation of a 24×16 luma signature) and exposure.
-
-| join | structure | exposure Δ | transition |
+| element | entering | settled | receding |
 |---|---|---|---|
-| 1 → 2 introduction → pullback | 0.657 | 9 | optical dissolve, 260ms |
-| 2 → 3 pullback → exterior | 0.244 | 30 | architectural wipe, 620ms |
-| 3 → 4 exterior → boardroom | 0.172 | 22 | architectural wipe, 620ms |
-| 4 → 5 boardroom → through the screen | — | — | none: one continuous clip |
-| 5 → 6 transition → project room | 0.510 | 5 | optical dissolve, 260ms |
-| 6 → 7 project room → corridor | 0.453 | 9 | optical dissolve, 260ms |
-| 7 → 8 corridor → contact | 0.910 | 2 | frame match, 80ms cut |
-| 8 → 9 contact → Dubai aerial | 0.912 | 2 | frame match, 80ms cut |
+| stacked card | `translateY(70vh) scale(.92) rotateX(6°)` opacity .75 | `translateY(0) scale(1) rotateX(0)` opacity 1 | `scale(.96)`, `translateZ(-46px)`, `brightness(.74)`, `blur(≤2px)` |
+| grid card | — | flat within 16% of viewport centre | ≤4° tilt away from centre |
+| section entrance | 18px rise, 750ms, once | — | — |
 
-Two joins are near-perfect frame matches and take a cut. The two weakest are the
-only places a wipe is used, and it is a dark vertical edge travelling the frame —
-a mullion, not a page transition.
+Measured in the browser: entering cards reach 5.52° and scale 0.920 at opacity
+0.750; settled cards read 0.00° at scale 1.000; the card beneath recedes to 0.971
+with 1.43px blur. Mobile caps rotation at 1.84°. All of it is removed under
+`prefers-reduced-motion`.
 
-## One documented compromise
+## The master
 
-Source clip 03 opens on the same desk as clips 01 and 02 — its first 47% repeats
-the scene the film has already left. It therefore enters at frame 70, the moment
-the camera clears the glass, and runs to the end. Nothing is dropped; the clip is
-joined at the only point where it does not send the viewer backwards.
+| property | value |
+|---|---|
+| source | `khalid-cinematic-master-v3.mp4`, Release `cinematicmasterv3` |
+| duration | 33.529 s |
+| resolution | 1080 × 1448 (portrait, 0.746) |
+| frame rate | 30 fps, 1004 frames |
+| codec | H.264 Main, AAC-LC 44.1 kHz stereo |
+| size | 48.81 MB, 12.08 Mbps |
+| keyframes | every 1.000 s |
 
-## Framing
+### Speaking windows, measured off the master's own audio
 
-The stage is full-viewport, so each clip is cropped to 3:2 for desktop and 9:16
-for mobile with a per-clip offset read off the footage, then CSS covers the real
-viewport from there. Offsets protect, in order: Khalid's face, then the MacBook,
-the boardroom screen, the team, and the skyline.
+| moment | window | line |
+|---|---|---|
+| introduction | 0.25 – 4.95 s | “Hi, I’m Khalid. I’m a performance marketer based in Dubai. Welcome to my portfolio.” |
+| contact | 27.35 – 30.20 s | “Let’s work together. Contact me.” |
+
+Neither is ever scrubbed. Captions live in one `master.en.vtt` keyed to master
+time, because there is one video.
+
+### Two defects repaired in the derivative
+
+The master carries bands of damaged green rows inherited from the source clips:
+`y 1139–1149` between 25.8 s and 30.7 s, and `y 1302–1315` between 16.8 s and
+21.5 s. Both are repaired by interpolation from their own borders. Nothing is
+trimmed, reordered, re-timed or re-edited — the derivative is the same 33.529 s.
+
+### On the requested 1920 × 1080
+
+The master is portrait. Encoding a 1920 × 1080 derivative would mean discarding
+about half the frame height and then upscaling the remaining 1080 px of width by
+1.78×, which adds bytes and no detail. The derivative therefore keeps the master's
+native 1080 × 1448 and the stage crops it per viewport with `object-fit: cover`,
+driven by a timeline of `object-position` keyframes that keep the subject safe.
