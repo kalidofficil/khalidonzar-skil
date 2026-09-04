@@ -42,17 +42,48 @@ the `Range` header and answers `200` with the whole file; Chromium then reports
 the film appears frozen with nothing in the console to explain it. Every real host
 serves ranges. Opening `index.html` off disk fails the same way.
 
-## How the scrubbing works
+## The hero: a gate, then two phases of one film
+
+There is one `<video>` on the page and it is never divided, swapped or reloaded.
+It runs through three states.
+
+**The gate.** On load the film is invisible. An opaque card — eyebrow, *Unlock my
+portfolio*, the supporting line, **Unlock experience**, and the note about sound —
+is painted from the palette, not from the footage, so the master's first frames
+are never on screen. The film preloads behind it; **Unlock experience** stays
+disabled, with a quiet *Preparing the film* line, until either `readyState ≥ 3`
+or the buffer covers `0 → 2.47 s`. Nothing plays and nothing makes a sound before
+that click.
+
+**Phase 1 — the spoken introduction, `0 → 4.880 s`.** The click starts the film
+from zero, unmuted, at `playbackRate = 1`. The gate stays fully opaque over it
+until the playhead reaches **0.867 s** (master frame 26) and then fades out over
+760 ms, so the audio begins at the true start of the sentence while the frames
+that precede a composed one are never shown. This range is played, never scrubbed,
+never reversed, never re-timed. Captions are painted from the `<track>` into the
+page's own caption line. At `4.880 s` the film pauses, mutes, releases the scroll
+lock and offers *Scroll to enter the experience*.
+
+Why those two numbers:
+
+| number | how it was chosen |
+|---|---|
+| reveal at **0.867 s** (frame 26) | frames 0–59 were extracted and inspected as a contact sheet, then the mouth band was cropped and re-inspected. Frames 0–25 catch the mouth mid-vowel — this is the wide-open frame that used to be the poster. Frame 26 is the first with the mouth closed and the eyes to camera. |
+| introduction ends at **4.880 s** | two independent signals agree: the voice envelope falls to the noise floor after "Welcome to my portfolio", and the first visual scene cut lands at the same frame. |
+
+**Phase 2 — the scroll-controlled cinematic, `4.880 → 33.517 s`.** From there
+scroll owns the playhead and the film is silent. The section buys
+`(13 + 1) × 100svh` of scroll; progress is `-rect.top / (offsetHeight -
+innerHeight)`, clamped, and mapped onto the silent range only — scrolling back to
+the very top lands on `4.880 s` and cannot re-enter the speech. The stage stays
+pinned until the final frame, so no page content appears behind or beside the
+film. At the final frame the pin releases and the work follows.
 
 One scroll source of truth — `window.scrollY`. No Lenis, no ScrollTrigger, so
-nothing can disagree about progress.
-
-```
-targetTime = scrollProgress × duration
-```
-
-A single `requestAnimationFrame` loop smooths a displayed time toward that target
-and assigns `currentTime` only when the two differ by more than one frame:
+nothing can disagree about progress. Scroll events are passive; `currentTime` is
+never assigned from a scroll handler. A single `requestAnimationFrame` loop
+smooths a displayed time toward the target and seeks only when the two differ by
+more than one frame:
 
 | parameter | desktop | mobile |
 |---|---|---|
@@ -60,27 +91,48 @@ and assigns `currentTime` only when the two differ by more than one frame:
 | seek threshold | 1/30 s (one frame) | 1/30 s |
 | snap-to-target | within 1/30 s | within 1/30 s |
 
-Both ends are exact rather than merely close: the first scroll position forces
-time 0, and the last forces the complete final frame. Measured drift elsewhere is
-0.03 s — under one frame — and survives fast, reverse and repeated
-direction-change scrolling.
+Only one seek is ever in flight. Asking for a new frame while the decoder is still
+resolving the previous one queues work that is then thrown away, and that is what
+makes a scrub stall; the loop waits for `seeking` to clear before issuing the next
+one. Both ends are exact rather than merely close: the first scroll position forces
+`4.880 s` and the last forces the complete final frame. Measured drift elsewhere is
+**0.000 s across seven sampled positions**, and it survives fast, reverse and
+repeated direction-change scrolling.
 
 The stage is full-viewport, and the master is portrait, so `object-position` is
 keyed along the timeline to keep the face, the boardroom screen, the team and the
-skyline inside the crop as the film moves.
+skyline inside the crop as the film moves. There is no player container, no
+timeline, no seconds counter and no native controls at any point.
 
-## Speaking moments
+### Measured in a browser
 
-| moment | master window | behaviour |
-|---|---|---|
-| introduction | 0.25 – 4.95 s | plays on **Play introduction**; audio enabled by that click |
-| contact | 27.35 – 30.20 s | plays when the journey reaches it, muted with captions unless audio was already unlocked; **Enable sound** is offered |
+Playwright + Chromium, 1440×900 and iPhone 13, against `scripts/serve.js`:
 
-At either, scrubbing suspends and the video plays at `playbackRate = 1` with
-captions, pause and replay. When the sentence ends the page carries the scroll
-forward to that point, so the film continues into what follows rather than
-rewinding. Scrolling away from a speaking moment ends it — the visitor is never
-trapped. Neither line is ever scrubbed, reversed or re-timed.
+| check | result |
+|---|---|
+| drift, 7 scroll positions across the silent range | 0.000 s |
+| lowest time reachable by reverse scrolling | 4.880 s |
+| black or blank frames during a full scrub | none |
+| holds ≥ 0.15 s during a scrub at reading pace | 11 over ~32 s, longest 0.24 s |
+| holds ≥ 0.30 s during a scrub | none |
+| gate opacity while the playhead is under 0.867 s | 1.00 |
+| horizontal overflow, desktop and mobile | 0 px |
+| console errors | none |
+
+The residual sub-quarter-second holds are software video decode on a headless
+container CPU, not the loop; the loop's own drift is zero.
+
+### When it cannot run
+
+| situation | what happens |
+|---|---|
+| `prefers-reduced-motion` | the film section collapses to a static poster hero. The introduction plays only on **Play**, with captions and the same custom controls — never the browser's. Scrolling is free and scrubs nothing. |
+| the film will not load | `networkState` is polled rather than trusting `<source>` error events, which the browser does not fire dependably once it has abandoned the whole list. The poster becomes the hero, carrying the positioning line and a working **Explore my work**. |
+| **Skip cinematic** / **Skip the cinematic…** | the film pauses and mutes, the scroll lock lifts, and the page settles on the first content section. |
+
+Unlock, Play, Pause, Replay, Captions and Skip are all reachable by keyboard with
+a visible 2 px focus outline. Gate copy measures 5.0:1 or better against the
+brightest part of its own ground.
 
 ## Media
 

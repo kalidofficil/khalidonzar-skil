@@ -88,13 +88,6 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
     radial-gradient(124% 82% at 50% 36%,rgba(0,0,0,0) 40%,rgba(40,16,10,.34) 74%,rgba(22,8,5,.64) 100%),
     linear-gradient(to top,rgba(10,10,11,.88) 0%,rgba(20,11,8,.30) 27%,rgba(10,10,11,0) 53%),
     linear-gradient(to bottom,rgba(10,10,11,.76) 0%,rgba(10,10,11,.18) 14%,rgba(10,10,11,0) 27%)}
-.copy-field{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;
-  transition:opacity .9s var(--ease);
-  background:linear-gradient(101deg,rgba(10,10,11,.90) 0%,rgba(28,18,12,.74) 22%,
-    rgba(10,10,11,.34) 40%,rgba(10,10,11,0) 58%)}
-.copy-field.on{opacity:1}
-@media (max-width:900px){.copy-field{background:linear-gradient(to top,
-  rgba(10,10,11,.95) 0%,rgba(28,18,12,.78) 30%,rgba(10,10,11,.26) 56%,rgba(10,10,11,0) 74%)}}
 
 .hud{position:relative;z-index:5;height:100%;pointer-events:none;display:grid;
   grid-template-rows:auto 1fr auto;padding:clamp(74px,10vh,104px) var(--gut) clamp(22px,4vh,40px);
@@ -106,30 +99,12 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
   color:var(--d-text-2);position:relative;padding-left:14px}
 .scene-tag .name::before{content:"";position:absolute;left:0;top:50%;width:8px;height:1px;background:var(--orange)}
 
-.profile{align-self:center;justify-self:start;max-width:min(30ch,42vw);
-  opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
-.profile.on{opacity:1;transform:none}
-.profile .eyebrow{display:block;color:var(--amber);margin-bottom:20px}
-.profile h1{font-family:var(--serif);font-size:clamp(2.9rem,6.4vw,5.4rem);line-height:.94;letter-spacing:-.03em}
-.profile h1 em{font-style:italic}
-.profile .role{margin:20px 0 0;font-size:1rem;color:var(--d-text-2);line-height:1.5}
-.profile .role b{display:block;color:var(--d-text);font-weight:600;font-size:1.08rem;margin-bottom:2px}
-.profile .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(20px,3vh,30px)}
-.profile .eyebrow,.profile h1,.profile .role{text-shadow:0 1px 24px rgba(10,10,11,.55)}
-@media (min-width:1000px){.profile{margin-left:clamp(0px,4vw,80px)}}
-
 .closing{position:absolute;left:0;right:0;top:50%;transform:translateY(-42%);z-index:6;
   text-align:center;padding:0 var(--gut);pointer-events:none;opacity:0;transition:opacity 1.1s var(--ease-out)}
 .closing.on{opacity:1}
 .closing p{font-family:var(--serif);font-size:clamp(1.9rem,4.6vw,3.9rem);color:var(--cream);
   line-height:1.06;letter-spacing:-.02em;text-shadow:0 2px 40px rgba(0,0,0,.6)}
 
-.rail{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
-.track{height:1px;background:rgba(243,235,221,.16);position:relative;margin-bottom:12px}
-.track i{position:absolute;inset:0 auto 0 0;background:var(--orange);width:0%}
-.track b{position:absolute;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--orange);
-  transform:translateX(-50%);left:0%;box-shadow:0 0 0 4px rgba(255,106,26,.18)}
-.clock{font-size:.6rem;font-weight:600;letter-spacing:.14em;color:var(--d-text-3);margin-bottom:8px}
 .stage-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .stage-ctl button{cursor:pointer;font:600 .7rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;
   padding:10px 14px;border-radius:2px;background:rgba(10,10,11,.55);color:var(--d-text);
@@ -143,16 +118,25 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
   text-shadow:0 2px 18px rgba(0,0,0,.9);pointer-events:none}
 .caption:empty{display:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.reel-fallback{position:absolute;inset:0;z-index:4;display:none;place-items:center;text-align:center;
-  padding:24px;background:var(--ink);color:var(--d-text-2);font-size:.9rem}
+/* If the film never arrives the poster still carries the room, the face and
+   the palette; the copy and the way onward sit over it. */
+.reel-fallback{position:absolute;inset:0;z-index:4;display:none;place-items:end start;text-align:left;
+  padding:0 clamp(20px,5vw,64px) clamp(56px,9vh,96px);color:var(--d-text-2);font-size:.95rem;
+  background:linear-gradient(to top,rgba(10,10,11,.94) 0%,rgba(10,10,11,.72) 34%,rgba(10,10,11,.30) 62%,rgba(10,10,11,.42) 100%),
+             url("../cinematic/master-poster.jpg") center 38%/cover no-repeat,var(--ink)}
+@media (max-width:900px){.reel-fallback{background:linear-gradient(to top,rgba(10,10,11,.94) 0%,rgba(10,10,11,.74) 40%,rgba(10,10,11,.34) 66%,rgba(10,10,11,.46) 100%),
+  url("../cinematic/master-poster-m.jpg") center 38%/cover no-repeat,var(--ink)}}
+.reel-fallback>div{max-width:46ch;display:grid;gap:12px;justify-items:start}
+.reel-fallback .fallback-lede{color:var(--d-text);font:400 clamp(1.3rem,2.6vw,1.9rem)/1.2 var(--serif)}
+.reel-fallback p{margin:0}
 .stage.failed .reel-fallback{display:grid}
+/* nothing that steers a film that is not there */
+.stage.failed .scene-tag,.stage.failed .caption,.stage.failed .cue,
+.stage.failed .hud,.stage.failed [data-act]{display:none}
 
 @media (max-width:900px){
   .hud{padding-top:clamp(66px,9vh,86px)}
-  .profile{max-width:none;justify-self:stretch;align-self:end;margin:0 0 clamp(14px,3vh,26px)}
-  .profile h1{font-size:clamp(2.5rem,12vw,3.4rem)}
-  .rail{grid-template-columns:1fr;gap:12px}
-  .stage-ctl{justify-content:flex-start}
+        .stage-ctl{justify-content:flex-start}
   .caption{bottom:calc(clamp(22px,4vh,40px) + 110px);font-size:.92rem}
 }
 
@@ -354,15 +338,11 @@ html.rm .stage{position:static;height:auto}
 html.rm #reel{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1080/1448;
   max-height:80svh;object-fit:contain;margin-inline:auto}
 html.rm .hud{position:static;padding:clamp(28px,5vh,54px) var(--gut);opacity:1}
-html.rm .profile{opacity:1;transform:none}
 html.rm .closing{position:static;transform:none;opacity:1;text-align:left;margin-top:28px}
 html.rm .caption{position:static;transform:none;max-width:none;text-align:left;margin-top:14px;text-shadow:none}
-html.rm .track,html.rm .clock{display:none}
 html.rm .card,html.rm .step,html.rm .stack-card{transform:none!important;filter:none!important}
 html.rm .slot{height:auto;margin-bottom:22px}
 html.rm .stack-card{position:static;top:auto}
-html.rm .copy-field{display:none}
-
 /* the film buys its scroll from --reels; one pinned screen plus the journey */
 .film{height:calc((var(--reels,13) + 1) * 100svh)}
 @media (max-width:900px){.film{height:calc((var(--reels,13) * .8 + 1) * 100svh)}}
@@ -377,3 +357,87 @@ html.rm .copy-field{display:none}
 .stack-card.on-cream .figs .note,
 .stack-card.on-cream .source,
 .stack-card.on-cream .duo h4{color:var(--l-text-3)}
+
+/* ══ the opening gate ═════════════════════════════════════════════════════
+   Opaque until the film reaches a frame worth showing. Nothing of the video
+   is visible behind it — the ground is painted from the palette, not from a
+   video frame. */
+.gate{
+  position:absolute;inset:0;z-index:60;display:grid;place-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 84px) var(--gut)
+          calc(env(safe-area-inset-bottom,0px) + 40px);
+  background:
+    radial-gradient(112% 74% at 50% 34%, rgba(69,20,14,.52) 0%, rgba(24,10,7,.86) 46%, var(--ink) 78%),
+    linear-gradient(180deg, #12100F 0%, var(--ink) 60%, #08070A 100%);
+  opacity:1;transition:opacity 760ms var(--ease-out);
+  overflow-y:auto;
+}
+.gate::after{ /* one soft ember bloom, low and off-centre — not a glow ring */
+  content:"";position:absolute;inset:auto 0 -18% 0;height:56%;pointer-events:none;
+  background:radial-gradient(52% 100% at 50% 100%, rgba(233,69,22,.22), rgba(10,10,11,0) 70%);
+}
+.gate.lifting{opacity:0}
+.gate.gone{display:none}
+.gate-in{position:relative;z-index:2;max-width:min(46ch,92vw);text-align:center}
+.gate-eyebrow{
+  display:block;font-size:.63rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:clamp(22px,4vh,38px);
+}
+.gate-title{
+  font-family:var(--serif);font-size:clamp(2.9rem,8.2vw,5.6rem);line-height:.96;
+  letter-spacing:-.03em;color:var(--cream);
+}
+.gate-sub{
+  margin:clamp(18px,2.6vh,26px) auto 0;max-width:34ch;font-size:1.02rem;
+  color:var(--stone);line-height:1.55;
+}
+.gate-btn{margin-top:clamp(26px,4vh,40px);padding:16px 30px;font-size:.86rem}
+.gate-btn[disabled]{opacity:.42;cursor:progress;transform:none}
+.gate-btn[disabled]:hover{background:var(--ember);border-color:var(--ember)}
+.gate-note{margin:16px 0 0;font-size:.74rem;color:var(--d-text-3);letter-spacing:.02em}
+.gate-load{
+  margin:22px 0 0;font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--d-text-3);display:inline-flex;align-items:center;gap:10px;
+}
+.gate-load[hidden]{display:none}
+.gate-load .dot{
+  width:7px;height:7px;border-radius:50%;background:var(--orange);flex:none;
+  animation:pulse 1.5s var(--ease) infinite;
+}
+@keyframes pulse{0%,100%{opacity:.25;transform:scale(.72)}50%{opacity:1;transform:scale(1)}}
+.gate-skip{
+  display:inline-block;margin-top:clamp(24px,4vh,40px);font-size:.74rem;
+  color:var(--d-text-3);text-decoration:none;border-bottom:1px solid rgba(243,235,221,.18);
+  padding-bottom:2px;transition:color .3s,border-color .3s;
+}
+.gate-skip:hover{color:var(--cream);border-bottom-color:var(--cream)}
+
+/* the veil holds a flat ink field over the film for the handoff, so the reveal
+   is a fade from black rather than a cut into a moving face */
+.veil{position:absolute;inset:0;z-index:3;background:var(--ink);opacity:0;pointer-events:none;
+  transition:opacity 700ms var(--ease-out)}
+.veil.on{opacity:1}
+
+/* ══ hero chrome: only what the film needs ═══════════════════════════════ */
+.hud-foot{display:grid;gap:14px;justify-items:start}
+.cue{
+  margin:0;font-family:var(--serif);font-size:clamp(1.05rem,2vw,1.5rem);color:var(--cream);
+  letter-spacing:-.01em;text-shadow:0 2px 26px rgba(10,10,11,.85);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .6s var(--ease-out),transform .6s var(--ease-out);
+}
+.cue.on{opacity:1;transform:none}
+.cue:empty{display:none}
+.scene-tag .name{padding-left:0}
+.scene-tag .name::before{display:none}
+
+@media (max-width:900px){
+  .gate-in{max-width:none}
+  .gate-title{font-size:clamp(2.5rem,11.5vw,3.6rem)}
+  .gate-sub{font-size:.95rem}
+  .hud-foot{gap:11px}
+}
+
+html.rm .gate{position:relative;min-height:auto;padding-block:clamp(46px,8vh,86px)}
+html.rm .veil{display:none}
+html.rm .cue{opacity:1;transform:none}

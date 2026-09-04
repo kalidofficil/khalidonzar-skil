@@ -106,8 +106,20 @@ with 1.43px blur. Mobile caps rotation at 1.84°. All of it is removed under
 | introduction | 0.25 – 4.95 s | “Hi, I’m Khalid. I’m a performance marketer based in Dubai. Welcome to my portfolio.” |
 | contact | 27.35 – 30.20 s | “Let’s work together. Contact me.” |
 
-Neither is ever scrubbed. Captions live in one `master.en.vtt` keyed to master
-time, because there is one video.
+Captions live in one `master.en.vtt` keyed to master time, because there is one
+video.
+
+### The three timestamps the hero is built on
+
+| name | value | how it was fixed |
+|---|---|---|
+| reveal | **0.867 s** — master frame 26 | frames 0–59 were extracted as a contact sheet and the mouth band cropped and inspected frame by frame. Frames 0–25 catch the mouth mid-vowel; frame 26 is the first composed one, mouth closed, eyes to camera. The gate is fully opaque until the playhead passes it, so nothing before it is ever seen. Frame 26 is also the poster. |
+| introduction ends | **4.880 s** | the voice envelope drops to the noise floor after “Welcome to my portfolio”, and the first visual scene cut lands on the same frame. |
+| scroll range | **4.880 → 33.517 s** | the whole remainder of the master, silent, mapped onto the pinned section’s scroll span. Scroll cannot reach below 4.880 s, so the spoken line is never scrubbed or reversed. |
+
+The master was **not** re-encoded for any of this. All three are read at runtime
+off the existing derivative; only the two poster stills were re-cut, from frame 26
+instead of frame 8.
 
 ### Two defects repaired in the derivative
 

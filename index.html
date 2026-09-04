@@ -45,7 +45,7 @@
 
 <main id="top">
 
-<!-- ══════════ CHAPTER ONE — the master film, one element, uninterrupted ══ -->
+<!-- ══════════ CHAPTER ONE — the master film behind an opening gate ══════ -->
 <section class="film" data-film style="--reels:13" aria-label="Cinematic introduction">
   <div class="stage">
     <video id="reel" playsinline preload="auto" muted disablepictureinpicture
@@ -58,31 +58,24 @@
       <source src="assets/cinematic/khalid-cinematic-master-v3-web.webm" type='video/webm; codecs="vp9"'>
       <track kind="captions" srclang="en" label="English" src="assets/captions/master.en.vtt" default>
     </video>
-    <div class="copy-field" aria-hidden="true"></div>
-    <div class="reel-fallback"><p>The film could not load.<br>Everything it introduces is written out below.</p></div>
+    <div class="veil" aria-hidden="true"></div>
+    <div class="reel-fallback">
+      <div>
+        <p class="fallback-lede">Khalid Ounzar — performance marketer, Dubai.</p>
+        <p>The film could not load. Everything it introduces is written out below.</p>
+        <a class="btn" href="#work" data-skip="#work">Explore my work</a>
+      </div>
+    </div>
 
     <div class="hud">
-      <div class="scene-tag" aria-hidden="true"><span class="num">01</span><span class="name">Introduction</span></div>
-
-      <div class="profile">
-        <span class="label eyebrow">Performance marketing — Dubai, UAE</span>
-        <h1>Khalid<br><em>Ounzar</em></h1>
-        <p class="role"><b>Performance Marketer</b>Media buyer — Meta Ads, e-commerce and cash on delivery. Dubai, UAE.</p>
-        <div class="acts">
-          <button class="btn" type="button" data-act="intro">Play introduction</button>
-          <a class="btn btn-line" href="#work" data-skip="#work">Explore my work</a>
-        </div>
-      </div>
-
-      <div class="rail">
-        <div>
-          <div class="clock" aria-hidden="true">00:00 / 00:33</div>
-          <div class="track" aria-hidden="true"><i></i><b></b></div>
-        </div>
+      <div class="scene-tag" aria-hidden="true"><span class="name">Introduction</span></div>
+      <div></div>
+      <div class="hud-foot">
+        <p class="cue" id="cue" aria-live="polite"></p>
         <div class="stage-ctl">
-          <button type="button" data-act="play" hidden>Play</button>
           <button type="button" data-act="pause" hidden>Pause</button>
-          <button type="button" data-act="replay" hidden>Replay</button>
+          <button type="button" data-act="play" hidden>Play</button>
+          <button type="button" data-act="replay" hidden>Replay intro</button>
           <button type="button" data-act="sound" hidden>Enable sound</button>
           <button type="button" data-act="captions" aria-pressed="true">Captions</button>
           <button type="button" data-skip="#work">Skip cinematic</button>
@@ -92,6 +85,19 @@
 
     <p class="caption" role="status" aria-live="polite"></p>
     <div class="closing"><p>Performance built beyond the click.</p></div>
+
+    <!-- the opening gate: nothing of the film is visible until it lifts -->
+    <div class="gate" id="gate">
+      <div class="gate-in">
+        <span class="gate-eyebrow">Khalid Ounzar · Performance Marketer · Dubai</span>
+        <h1 class="gate-title">Unlock my portfolio</h1>
+        <p class="gate-sub">Scroll through the strategy, campaigns and thinking behind my work.</p>
+        <button class="btn gate-btn" id="unlock" type="button" disabled aria-describedby="gateNote">Unlock experience</button>
+        <p class="gate-note" id="gateNote">Sound is used only for the introduction.</p>
+        <p class="gate-load" id="gateLoad"><span class="dot" aria-hidden="true"></span>Preparing the film</p>
+        <a class="gate-skip" href="#work" data-skip="#work">Skip the cinematic and go straight to the work</a>
+      </div>
+    </div>
   </div>
 
   <p class="sr">Transcript. Hi, I’m Khalid. I’m a performance marketer based in Dubai. Welcome to my portfolio. Later: Let’s work together. Contact me. The cinematic environments are AI-generated visualisations.</p>

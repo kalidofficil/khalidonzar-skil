@@ -47,8 +47,8 @@ ffmpeg -nostdin -v error -y -i "$OUT/khalid-cinematic-master-v3-web-mobile.mp4" 
   -pix_fmt yuv420p -c:a libopus -b:a 96k "$OUT/khalid-cinematic-master-v3-web-mobile.webm"
 
 echo "-- poster --"
-ffmpeg -nostdin -v error -y -i "$SRC" -vf "$REPAIR,select=eq(n\,8),scale=1080:-2" -frames:v 1 -q:v 4 "$OUT/master-poster.jpg"
-ffmpeg -nostdin -v error -y -i "$SRC" -vf "$REPAIR,select=eq(n\,8),scale=720:-2"  -frames:v 1 -q:v 5 "$OUT/master-poster-m.jpg"
+ffmpeg -nostdin -v error -y -i "$SRC" -vf "$REPAIR,select=eq(n\,26),scale=1080:-2" -frames:v 1 -q:v 4 "$OUT/master-poster.jpg"
+ffmpeg -nostdin -v error -y -i "$SRC" -vf "$REPAIR,select=eq(n\,26),scale=720:-2"  -frames:v 1 -q:v 5 "$OUT/master-poster-m.jpg"
 
 echo "-- verifying --"
 M=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$SRC")
