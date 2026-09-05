@@ -48,6 +48,9 @@
 <!-- ══════════ CHAPTER ONE — the master film behind an opening gate ══════ -->
 <section class="film" data-film style="--reels:13" aria-label="Cinematic introduction">
   <div class="stage">
+    <!-- the surround: the same frame, blurred and dimmed, so the film itself
+         never has to be cropped to fill a landscape screen -->
+    <canvas class="reel-bg" id="reelBg" width="32" height="43" aria-hidden="true"></canvas>
     <video id="reel" playsinline preload="auto" muted disablepictureinpicture
            poster="assets/cinematic/master-poster.jpg"
            width="1080" height="1448"

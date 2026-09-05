@@ -54,16 +54,35 @@
       { t: 12.1, s: "Execution"     }, { t: 16.5, s: "Collaboration" },
       { t: 26.0, s: "Contact"       }
     ];
-    var FOCUS = [
-      { t: 0.0,  y: 33 }, { t: 5.0,  y: 40 }, { t: 9.0,  y: 46 },
-      { t: 10.5, y: 38 }, { t: 13.0, y: 48 }, { t: 17.5, y: 46 },
-      { t: 23.5, y: 34 }, { t: 27.0, y: 30 }, { t: 30.8, y: 46 },
-      { t: 33.6, y: 48 }
+    /* The live picture inside the master's 1080x1448 canvas, measured with
+       cropdetect. Everything outside it is letterbox baked in by the edit, and
+       it is symmetric, so the element only needs the height. */
+    var CROP = [
+      { t: 0.00,  h: 1444 }, { t: 12.05, h: 1232 },
+      { t: 16.75, h: 1182 }, { t: 21.55, h: 926  }
     ];
 
-    var SMOOTH = small.matches ? 0.22 : 0.15;
+    /* Pixels of scroll per second of silent cinematic. The pinned section's
+       height is derived from this and the real duration, not from a fixed
+       multiple of the viewport, so every screen travels the film at the same
+       rate and a hard wheel flick can no longer clear a whole scene. */
+    var PPS = 700;
+
+    /* Interpolation strength: the fraction of the remaining gap the rendered
+       time closes each frame. Gentler than a straight follow, so a short wheel
+       or trackpad movement eases across a scene instead of jumping through it.
+       It is a glide, not a delay — the playhead keeps closing every frame and
+       SNAP lands it exactly the moment the gap falls under one frame. */
+    var SMOOTH = small.matches ? 0.10 : 0.085;
     var SNAP   = 1 / 30;
     var SEEK   = 1 / 30;
+
+    /* A gesture cannot open a gap wider than this — the hardest wheel flick
+       measures about 2.1s of film. Anything larger is a scrollbar drag or a
+       jump to an anchor, where the visitor expects to arrive, not to be flown
+       there: the excess is closed at once and only the last stretch glides, so
+       the glide never becomes a wait. */
+    var LEAP = 2.2;
 
     var gate   = document.getElementById("gate");
     var unlock = document.getElementById("unlock");
@@ -73,6 +92,30 @@
     var cue    = document.getElementById("cue");
     var closing= film.querySelector(".closing");
     var capBox = film.querySelector(".caption");
+
+    /* The blurred surround behind the film. It is the same <video> element
+       drawn into a thumbnail-sized canvas — one decode, one source — so it
+       always carries the frame the visitor is actually looking at. It is only
+       needed where the film is contained, i.e. on a landscape screen. */
+    var bg     = document.getElementById("reelBg");
+    var bgCtx  = bg && bg.getContext ? bg.getContext("2d", { alpha: false }) : null;
+    var wide   = matchMedia("(min-aspect-ratio: 1/1)");
+    var bgAt   = -1, bgWhen = 0;
+    /* Repainting the surround re-runs its blur, so it is deliberately coarse
+       and slow: a 32px-wide thumbnail refreshed about ten times a second. It
+       is out of focus by design, so nothing is lost, and the decoder keeps its
+       budget for the film itself. */
+    function paintSurround(now) {
+      if (!bgCtx || !wide.matches || reel.readyState < 2) return;
+      if (now - bgWhen < 96) return;
+      if (Math.abs(reel.currentTime - bgAt) < 0.001) return;
+      bgWhen = now;
+      bgAt = reel.currentTime;
+      var sh = reel.videoHeight * (activeH / 1448);
+      var sy = (reel.videoHeight - sh) / 2;
+      try { bgCtx.drawImage(reel, 0, sy, reel.videoWidth, sh, 0, 0, bg.width, bg.height); }
+      catch (e) { /* not decodable yet */ }
+    }
 
     var phase = "gate";            /* gate | intro | scroll */
     var duration = 0, shown = INTRO_END;
@@ -101,7 +144,32 @@
     });
     if (!RM) lockScroll(true);
 
-    reel.addEventListener("loadedmetadata", function () { duration = reel.duration || 0; });
+    var lastW = innerWidth;
+    function sizeFilm() {
+      if (RM || !duration) return;
+      var silent = (duration - TAIL) - INTRO_END;
+      if (silent <= 0) return;
+      film.style.height = (Math.round(PPS * silent) + innerHeight) + "px";
+    }
+    /* A cached response can have metadata ready before this script parses, and
+       then `loadedmetadata` never fires again — so the duration is claimed
+       wherever it first becomes available, not from one event. */
+    function noteDuration() {
+      if (duration || !reel.duration || !isFinite(reel.duration)) return;
+      duration = reel.duration;
+      sizeFilm();
+    }
+    reel.addEventListener("loadedmetadata", noteDuration);
+    reel.addEventListener("durationchange", noteDuration);
+    noteDuration();
+    /* Width only: on mobile the address bar changes innerHeight mid-scroll, and
+       re-laying out the section from that would move the playhead under the
+       visitor's finger. */
+    addEventListener("resize", function () {
+      if (innerWidth === lastW) return;
+      lastW = innerWidth;
+      sizeFilm();
+    }, { passive: true });
 
     /* With <source> children the element does not fire `error` itself. */
     var failed = false;
@@ -259,13 +327,17 @@
     });
 
     /* ── helpers ──────────────────────────────────────────────────────── */
-    function pickFocus(t) {
-      for (var i = 0; i < FOCUS.length - 1; i++)
-        if (t >= FOCUS[i].t && t <= FOCUS[i + 1].t) {
-          var k = (t - FOCUS[i].t) / (FOCUS[i + 1].t - FOCUS[i].t);
-          return lerp(FOCUS[i].y, FOCUS[i + 1].y, k);
-        }
-      return t < FOCUS[0].t ? FOCUS[0].y : FOCUS[FOCUS.length - 1].y;
+    /* Stepped, never interpolated: the letterbox changes on a hard cut, so the
+       element's shape must change on the same frame rather than easing. */
+    var activeH = 0;
+    function setCrop(t) {
+      var h = CROP[0].h;
+      for (var i = 0; i < CROP.length; i++) if (t >= CROP[i].t) h = CROP[i].h;
+      if (h === activeH) return;
+      activeH = h;
+      film.style.setProperty("--active", h);
+      film.style.setProperty("--over", (1448 / h).toFixed(4));
+      if (bg) { bg.height = Math.round(bg.width * h / 1080); bgAt = -1; }
     }
     function pickLabel(t) {
       var out = LABELS[0];
@@ -280,7 +352,8 @@
     }
 
     /* ── the single loop ──────────────────────────────────────────────── */
-    function frame() {
+    function frame(now) {
+      if (!duration) noteDuration();
       if (duration) {
         if (phase === "intro") {
           shown = reel.currentTime;
@@ -289,6 +362,10 @@
           var p = progress();
           var target = lo + p * (hi - lo);          /* the silent range only */
           var d = target - shown;
+          if (Math.abs(d) > LEAP) {                 /* a jump, not a gesture */
+            shown = target - (d > 0 ? LEAP : -LEAP);
+            d = target - shown;
+          }
           if (Math.abs(d) < SNAP) shown = target;   /* exact when scrolling stops */
           else shown += d * SMOOTH;
           shown = clamp(shown, lo, hi);
@@ -313,7 +390,8 @@
           film.style.setProperty("--hud", (1 - tail).toFixed(3));
         }
 
-        reel.style.setProperty("--focus", pickFocus(shown).toFixed(2) + "%");
+        setCrop(shown);
+        paintSurround(now);
         var L = pickLabel(shown);
         if (tagName && tagName.textContent !== L.s) tagName.textContent = L.s;
       }

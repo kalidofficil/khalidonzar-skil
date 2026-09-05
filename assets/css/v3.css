@@ -80,8 +80,48 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 /* ══ CHAPTER ONE — the master film ════════════════════════════════════════ */
 .film{position:relative;background:#000}
 .stage{position:sticky;top:0;height:100svh;width:100vw;overflow:hidden;background:#000;isolation:isolate}
-#reel{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  object-position:50% var(--focus,42%);background:#000;will-change:object-position}
+/* The master is a 1080x1448 portrait canvas, and its source clips were
+   letterboxed into it: the live picture is 1448 rows tall to 12.05s, then
+   1232, then 1182, then 926 — always centred, so the black is symmetric.
+   `cover` over the whole canvas hid that letterbox but had to magnify the
+   frame ~2.4x on a landscape screen, which is what buried the office around
+   the face; `contain` would show the baked-in black as bars.
+   So the element is given the shape of the LIVE PICTURE (--active, set from
+   the timeline) and `cover` then trims away exactly the letterbox and nothing
+   else. No scale, zoom or transform is applied to the film — the crop is the
+   element's box, and the image inside it is never stretched. */
+/* Both dimensions are stated outright — the largest box of the live picture's
+   shape that fits the stage. Leaving either to `auto` with an aspect-ratio
+   makes the box depend on the video's own intrinsic size, which the browser
+   then re-resolves on every decoded frame; that cost showed up as a stutter
+   during scrubbing. */
+#reel{position:absolute;inset:0;margin:auto;
+  width:min(100vw, 100svh * 1080 / var(--active,1448));
+  height:min(100svh, 100vw * var(--active,1448) / 1080);
+  object-fit:cover;object-position:50% 50%;background:transparent;z-index:1}
+/* The room the live picture leaves on a landscape screen is filled by the same
+   frame, blurred and dimmed — never black bars. */
+.reel-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  object-position:50% 50%;z-index:0;background:#0A0A0B;
+  /* the scale is on the surround only, so its blur cannot bleed an edge in */
+  transform:scale(1.16);filter:blur(16px) saturate(.82) brightness(.62);
+  will-change:filter;contain:paint}
+/* A portrait screen fills instead: the element is sized so the live picture
+   spans the full height (--over = 1448 / active), and the stage crops the
+   sides. Khalid is centred in the master, so a centred crop is the right one
+   and keeps his face and upper body whole. */
+@media (max-aspect-ratio: 1/1){
+  /* The box is deliberately wider and taller than the stage, and an
+     over-constrained `margin:auto` refuses to go negative, so it is centred by
+     hand instead — offsets, not a transform. */
+  #reel{max-width:none;max-height:none;aspect-ratio:auto;
+    inset:50% auto auto 50%;
+    height:calc(100svh * var(--over,1));
+    width:calc(100svh * var(--over,1) * 1080 / 1448);
+    margin:calc(100svh * var(--over,1) / -2) 0 0
+           calc(100svh * var(--over,1) * 1080 / 1448 / -2)}
+  .reel-bg{display:none}
+}
 /* light field derived from the footage: oxblood periphery, untouched centre */
 .stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
   background:
@@ -335,6 +375,7 @@ html:not(.js) .rise{opacity:1;transform:none}
 }
 html.rm .film{height:auto!important}
 html.rm .stage{position:static;height:auto}
+html.rm .reel-bg{display:none}
 html.rm #reel{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1080/1448;
   max-height:80svh;object-fit:contain;margin-inline:auto}
 html.rm .hud{position:static;padding:clamp(28px,5vh,54px) var(--gut);opacity:1}
@@ -343,7 +384,10 @@ html.rm .caption{position:static;transform:none;max-width:none;text-align:left;m
 html.rm .card,html.rm .step,html.rm .stack-card{transform:none!important;filter:none!important}
 html.rm .slot{height:auto;margin-bottom:22px}
 html.rm .stack-card{position:static;top:auto}
-/* the film buys its scroll from --reels; one pinned screen plus the journey */
+/* The film buys its scroll from the length of the silent cinematic: the
+   controller sets an explicit pixel height of PPS x silent-seconds + one
+   screen. These are only the pre-script fallback, for the moment before the
+   duration is known and for a no-JS visitor. */
 .film{height:calc((var(--reels,13) + 1) * 100svh)}
 @media (max-width:900px){.film{height:calc((var(--reels,13) * .8 + 1) * 100svh)}}
 
