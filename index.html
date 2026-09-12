@@ -18,6 +18,7 @@
 <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/v3.css">
+<link rel="stylesheet" href="assets/css/case-studies.css">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org","@type":"Person","name":"Khalid Ounzar",
@@ -37,7 +38,7 @@
   <ul class="nav-links">
     <li><a href="#capabilities">Capabilities</a></li>
     <li><a href="#process">Process</a></li>
-    <li><a href="#evidence">Evidence</a></li>
+    <li><a href="#evidence">Case studies</a></li>
     <li><a href="#about">About</a></li>
     <li class="nav-cta"><a href="#contact">Contact</a></li>
   </ul>
@@ -181,132 +182,153 @@
   </div>
 </section>
 
-<!-- the stacked sequence: evidence, two cases, the analysis, two concepts -->
-<section class="band dark" id="evidence">
-  <div class="band-in">
-    <header class="head rise">
-      <div><span class="label">Evidence</span><h2>Campaigns, read <em>honestly</em>.</h2></div>
-      <p class="sub">Every figure is a metric reported by Meta Ads Manager for a campaign I ran. Nothing here
-        is modelled, projected or rounded in my favour.</p>
-    </header>
+<!-- ══════════ CASE STUDIES — one environment, three disciplines ══════════ -->
+<section class="band dark cs" id="evidence" aria-labelledby="cs-h">
+  <div class="cs-in" id="case-studies">
 
-    <div class="stack">
-      <div class="slot"><article class="stack-card" style="--i:0">
-        <span class="label">What the numbers are</span>
-        <h3>A reported purchase is not a delivered order.</h3>
-        <div class="callout">
-          <p><b>What a “purchase” is, and is not.</b> A reported purchase in Ads Manager is not automatically a
-            delivered or profitable cash-on-delivery order. On COD a share of reported orders are never
-            confirmed, never delivered, or returned at the door.</p>
-          <p>So this page shows <b>no revenue, no profit, no ROAS, no delivery rate and no confirmation
-            rate</b> — I do not hold verified data for those, and inventing them would make everything else
-            here worthless. Client names, account names, campaign names and business identifiers are withheld.</p>
-        </div>
-      </article></div>
-
-      <div class="slot"><article class="stack-card on-cream" style="--i:1">
-        <span class="label">Case study A</span>
-        <h3>Volume at a low reported cost</h3>
-        <p class="kicker">An e-commerce COD campaign run to reported purchase volume. The interesting number
-          is not the count — it is that the cost held while the count grew.</p>
-        <dl class="figs">
-          <div class="lead"><dt>Reported purchases</dt><dd class="tnum">1,064</dd></div>
-          <div class="lead"><dt>Cost / reported purchase</dt><dd class="tnum">$0.56</dd></div>
-          <div><dt>Spend</dt><dd class="tnum">$596.63</dd></div>
-          <div><dt>Impressions</dt><dd class="tnum">246,404</dd></div>
-          <div><dt>CTR</dt><dd class="tnum">2.87%</dd></div>
-          <div><dt>Hook rate</dt><dd class="tnum">22.05%</dd></div>
-          <div><dt>Frequency</dt><dd class="tnum">2.18</dd></div>
-          <div><dt>CPM</dt><dd class="tnum">$2.42<span class="note">derived from spend ÷ impressions</span></dd></div>
-        </dl>
-        <p class="source"><span>Meta Ads Manager, reported metrics</span><span>Screenshots available on request</span></p>
-      </article></div>
-
-      <div class="slot"><article class="stack-card" style="--i:2">
-        <span class="label">Case study B</span>
-        <h3>Efficiency at a very low CPM</h3>
-        <p class="kicker">A smaller budget on the same model. Cheap delivery did the work: a $0.95 CPM put the
-          campaign in front of enough people that a modest click rate still produced volume.</p>
-        <dl class="figs">
-          <div class="lead"><dt>Reported purchases</dt><dd class="tnum">441</dd></div>
-          <div class="lead"><dt>Cost / reported purchase</dt><dd class="tnum">$0.28</dd></div>
-          <div><dt>Spend</dt><dd class="tnum">$125.02</dd></div>
-          <div><dt>Impressions</dt><dd class="tnum">131,120</dd></div>
-          <div><dt>CTR</dt><dd class="tnum">3.24%</dd></div>
-          <div><dt>CPM</dt><dd class="tnum">$0.95</dd></div>
-          <div><dt>Frequency</dt><dd class="tnum">2.38</dd></div>
-          <div><dt>Reach</dt><dd class="tnum">55,092<span class="note">derived from impressions ÷ frequency</span></dd></div>
-        </dl>
-        <p class="source"><span>Meta Ads Manager, reported metrics</span><span>Screenshots available on request</span></p>
-      </article></div>
-
-      <div class="slot"><article class="stack-card on-cream" style="--i:3">
-        <span class="label">Campaign analysis</span>
-        <h3>The hook and click gap</h3>
-        <p class="kicker">Over a million impressions and a 61% hook rate — and only 2.29% of them clicked the
-          link. This is the campaign I learned the most from, because the failure is legible.</p>
-        <dl class="figs">
-          <div><dt>Impressions</dt><dd class="tnum">1,068,666</dd></div>
-          <div class="lead"><dt>Hook rate</dt><dd class="tnum">61.08%</dd></div>
-          <div class="lead"><dt>Link CTR</dt><dd class="tnum">2.29%</dd></div>
-          <div><dt>CPM</dt><dd class="tnum">$0.46</dd></div>
-          <div><dt>CPC — all clicks</dt><dd class="tnum">$0.01</dd></div>
-          <div><dt>Reported purchases</dt><dd class="tnum">229</dd></div>
-          <div><dt>Cost / reported purchase</dt><dd class="tnum">$2.14</dd></div>
-          <div><dt>Spend</dt><dd class="tnum">$491.15</dd></div>
-        </dl>
-        <div class="gap" role="img" aria-label="Of every hundred people reached, about 61 watched past the hook, about 2.3 clicked the link, and about 0.02 recorded a purchase.">
-          <div class="row"><span class="k">Watched hook</span><span class="bar"><i data-w="61.08%"></i></span><span class="v tnum">61.08%</span></div>
-          <div class="row"><span class="k">Clicked link</span><span class="bar"><i data-w="2.29%"></i></span><span class="v tnum">2.29%</span></div>
-          <div class="row"><span class="k">Reported buy</span><span class="bar mute"><i data-w="0.4%"></i></span><span class="v tnum">0.02%</span></div>
-        </div>
-        <div class="duo">
-          <div><h4>The reading</h4><p class="kicker">The creative worked; the promise did not carry. A 61.08%
-            hook rate says the first frames earned attention at scale. A 2.29% link CTR against that says the
-            ad never converted attention into intent.</p></div>
-          <div><h4>What I changed</h4><p class="kicker">Shorten the distance between the hook and the offer,
-            put price and guarantee in the creative rather than on the page, and tighten placements even at a
-            higher CPM. Case A and case B are that discipline applied.</p></div>
-        </div>
-        <p class="source"><span>Meta Ads Manager, reported metrics</span><span>CPC shown is cost per <em>all</em> clicks, which is why it sits below what the link CTR implies</span></p>
-      </article></div>
-
-      <div class="slot"><article class="stack-card" style="--i:4">
-        <span class="tag">Campaign concept</span>
-        <h3>Hair salon</h3>
-        <p class="kicker">This has not run. It shows how I think about a brief before any money is spent — not
-          a result. A local service business with a fixed chair count: the constraint is not reach, it is
-          calendar capacity. An ad that fills Saturday and leaves Tuesday empty has not worked.</p>
-        <div class="duo">
-          <div><h4>Approach</h4><ul>
-            <li>Radius tight enough that travel time never becomes the objection</li>
-            <li>Offer built on a first-visit service, not a discount on everything</li>
-            <li>Creative shot in the chair — the result, not the premises</li></ul></div>
-          <div><h4>How it would be judged</h4><ul>
-            <li>Cost per booking against the average first-visit value</li>
-            <li>Rebooking rate at eight weeks — a salon lives on the second visit</li>
-            <li>Weekday fill rate as its own line, never blended into the total</li></ul></div>
-        </div>
-      </article></div>
-
-      <div class="slot"><article class="stack-card on-cream" style="--i:5">
-        <span class="tag">Sample strategy</span>
-        <h3>Real estate</h3>
-        <p class="kicker">Also unrun. Long consideration, high value, and a lead a human has to call. The
-          question is not how to get leads cheaply — it is how to get leads an agent will still return calls
-          to in week three.</p>
-        <div class="duo">
-          <div><h4>Approach</h4><ul>
-            <li>Browsing intent and viewing intent split, never one blended cost per lead</li>
-            <li>Qualification inside the form, accepting a higher cost per lead on purpose</li>
-            <li>Creative leading with the specific unit, price band and handover date</li></ul></div>
-          <div><h4>How it would be judged</h4><ul>
-            <li>Cost per <em>qualified</em> lead, defined with the agent before launch</li>
-            <li>Contact rate and viewing rate, reported back from the agent's CRM</li>
-            <li>Cost per viewing as the real number; cost per lead is diagnostic only</li></ul></div>
-        </div>
-      </article></div>
+    <!-- 01 · overture ─────────────────────────────────────────────────── -->
+    <div class="cs-overture rise">
+      <div>
+        <span class="label">Case studies</span>
+        <h2 id="cs-h">Strategy is only useful when it <em>produces results</em>.</h2>
+      </div>
+      <p class="cs-lines"><span>Real products.</span><span>Real decisions.</span><span>Real performance data.</span></p>
+      <div class="cs-doctrine">
+        <p><b>What a “purchase” is, and is not.</b> A reported purchase in Ads Manager is not automatically a
+          delivered or profitable cash-on-delivery order. On COD a share of reported orders are never
+          confirmed, never delivered, or returned at the door.</p>
+        <p>So nothing here shows <b>revenue, profit, ROAS, delivery rate or confirmation rate</b> — I do not
+          hold verified data for those, and inventing them would make everything else here worthless. Client
+          names, account names, campaign names and business identifiers are withheld.</p>
+      </div>
     </div>
+
+    <!-- 02 · three disciplines ────────────────────────────────────────── -->
+    <div class="rise">
+      <div class="cs-cats" data-cs-cats>
+
+        <button class="cs-cat" type="button" data-category="ecommerce">
+          <span class="cs-cat-n">01</span>
+          <span class="cs-badge is-verified">Verified campaign data</span>
+          <h3>E-commerce Media Buying</h3>
+          <p>Six real products, from validation to performance. Reported Meta figures, shown with their
+            labels.</p>
+        </button>
+
+        <button class="cs-cat" type="button" data-category="creative" aria-disabled="true">
+          <span class="cs-cat-n">02</span>
+          <span class="cs-badge is-pending">In preparation</span>
+          <h3>Creative Strategy</h3>
+          <p>Reels, hooks, concepts, scripts and performance creative. Being prepared — it stays empty until
+            there is something real to show.</p>
+        </button>
+
+        <button class="cs-cat" type="button" data-category="concepts">
+          <span class="cs-cat-n">03</span>
+          <span class="cs-badge is-concept">Concept — not a result</span>
+          <h3>Other &amp; Concept Work</h3>
+          <p>Speculative briefs for businesses I have not run campaigns for. Kept apart from verified results
+            on purpose.</p>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- 03/04/05 · the e-commerce world ───────────────────────────────── -->
+    <div class="cs-world" data-cs-world>
+      <button class="cs-back" type="button" data-back="cats">
+        <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M15 5H1M5 1L1 5l4 4"/></svg>
+        Back to disciplines
+      </button>
+
+      <div class="cs-worldhead">
+        <h3>Six products. <em>One full-funnel approach.</em></h3>
+        <p class="sub">From rapid product validation to creative development, landing-page work, paid
+          acquisition and cash-on-delivery reality.</p>
+        <dl class="cs-totals" data-cs-totals></dl>
+        <p class="cs-shotcap"><span data-cs-totalnote></span></p>
+      </div>
+
+      <div class="cs-track" data-cs-track>
+        <div class="cs-pin">
+          <div class="cs-deck" data-cs-deck></div>
+        </div>
+      </div>
+
+      <div class="cs-study" data-cs-study></div>
+
+      <div class="cs-bridge">
+        <span class="label">Next</span>
+        <p>Performance tells us what worked. Creative strategy decides what we test next.</p>
+        <p class="sub" style="max-width:46ch;font-size:.95rem;color:var(--d-text-3)">That work is being
+          prepared. I would rather show you nothing than show you placeholder projects.</p>
+      </div>
+    </div>
+
+    <!-- concept work, deliberately separate ───────────────────────────── -->
+    <div class="cs-concepts" data-cs-concepts>
+      <button class="cs-back" type="button" data-back="cats">
+        <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M15 5H1M5 1L1 5l4 4"/></svg>
+        Back to disciplines
+      </button>
+
+      <div class="cs-worldhead">
+        <h3>Concept work.</h3>
+        <p class="sub">Neither of these has run. They show how I think about a brief before any money is
+          spent — not a result. No figures appear because there are none to report.</p>
+      </div>
+
+      <div class="cs-conceptgrid">
+        <article class="cs-conceptcard">
+          <span class="tag">Campaign concept</span>
+          <h4>Hair salon</h4>
+          <p class="kicker">A local service business with a fixed chair count: the constraint is not reach, it
+            is calendar capacity. An ad that fills Saturday and leaves Tuesday empty has not worked.</p>
+          <div class="duo">
+            <div><h4>Approach</h4><ul>
+              <li>Radius tight enough that travel time never becomes the objection</li>
+              <li>Offer built on a first-visit service, not a discount on everything</li>
+              <li>Creative shot in the chair — the result, not the premises</li></ul></div>
+            <div><h4>How it would be judged</h4><ul>
+              <li>Cost per booking against the average first-visit value</li>
+              <li>Rebooking rate at eight weeks — a salon lives on the second visit</li>
+              <li>Weekday fill rate as its own line, never blended into the total</li></ul></div>
+          </div>
+        </article>
+
+        <article class="cs-conceptcard">
+          <span class="tag">Sample strategy</span>
+          <h4>Real estate</h4>
+          <p class="kicker">Long consideration, high value, and a lead a human has to call. The question is not
+            how to get leads cheaply — it is how to get leads an agent will still return calls to in week
+            three.</p>
+          <div class="duo">
+            <div><h4>Approach</h4><ul>
+              <li>Browsing intent and viewing intent split, never one blended cost per lead</li>
+              <li>Qualification inside the form, accepting a higher cost per lead on purpose</li>
+              <li>Creative leading with the specific unit, price band and handover date</li></ul></div>
+            <div><h4>How it would be judged</h4><ul>
+              <li>Cost per <em>qualified</em> lead, defined with the agent before launch</li>
+              <li>Contact rate and viewing rate, reported back from the agent's CRM</li>
+              <li>Cost per viewing as the real number; cost per lead is diagnostic only</li></ul></div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="cs-doctrine" style="margin-top:40px">
+        <p><b>The six campaigns, without JavaScript.</b> All figures are metrics reported by Meta Ads Manager.
+          CTR is labelled because the two ad accounts report different columns.</p>
+        <p>كرسي دوار مريح — 1,064 reported purchases, $0.56 each, $596.63 spend, 246,404 impressions, 2.87% CTR (all clicks).<br>
+           كرسي الاسترخاء المحمول — 441 purchases, $0.28 each, $125.02 spend, 131,120 impressions, 3.24% CTR (all clicks).<br>
+           شريط الإضاءة 5 أمتار — performance data not yet added.<br>
+           اكسسوار أنيق للسيارة — 328 purchases, $1.47 each, $480.93 spend, 608,805 impressions, 1.81% link CTR.<br>
+           سيف الليزر المضيء — 229 purchases, $2.14 each, $491.15 spend, 1,068,666 impressions, 2.29% link CTR, 61.08% hook rate.<br>
+           أكودوار مع أكواب جانبية — 173 purchases, $1.77 each, $306.00 spend, 168,620 impressions, 2.02% link CTR.</p>
+      </div>
+    </noscript>
+
   </div>
 </section>
 
@@ -389,6 +411,8 @@
 
 </div>
 </main>
+<script src="assets/data/case-studies.js" defer></script>
 <script src="assets/js/v3.js" defer></script>
+<script src="assets/js/case-studies.js" defer></script>
 </body>
 </html>

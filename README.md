@@ -185,6 +185,95 @@ Unlock, Play, Pause, Replay, Captions and Skip are all reachable by keyboard wit
 a visible 2 px focus outline. Gate copy measures 5.0:1 or better against the
 brightest part of its own ground.
 
+## Case Studies
+
+`#evidence` is now a Case Studies environment rather than a list of cards. Three
+categories — **E-commerce Media Buying** (six real products), **Creative
+Strategy** (in preparation), **Other & Concept Work** (the two unrun briefs) —
+and selecting one carries the visitor *through* the card rather than navigating
+away from it.
+
+Verified results and speculative work never share a surface. The hair salon and
+real estate briefs live in category 03 with their `Campaign concept` and
+`Sample strategy` markers intact, and that category renders no figures at all.
+
+| file | what it holds |
+|---|---|
+| `assets/data/case-studies.js` | the single source of truth. Unverified fields are `null`, never `0` |
+| `assets/js/case-studies.js` | scenes, routing, the unpack, the portal transition |
+| `assets/css/case-studies.css` | scene styling; every token comes from `v3.css` |
+
+### Rules the data file enforces
+
+**A missing number cannot become an invented one.** Components render a section
+only where its branch is non-null. Product 03 has `metrics: null`, so its card
+shows the product and a plain sentence saying data has not been added — no
+zeroes, no placeholders, and it is excluded from every total.
+
+**CTR carries its own label.** The six campaigns come from two ad accounts whose
+Ads Manager columns are different metrics — *all clicks* for products 01–03,
+*link clicks* for 04–06. `ctr.kind` is stored beside the value, so a card
+physically cannot render an unlabelled CTR and the six are never ranked on it.
+
+**Totals are computed, never typed.** 2,235 reported purchases, $1,999.73 spend
+and 2,223,615 impressions are summed from the data at runtime, with a note
+saying how many campaigns they cover. The account-level footer figures in the
+screenshots ($23,331.55 across 262 campaigns) are whole accounts and are never
+shown.
+
+**No verdict without the business data.** No product carries a scale / iterate /
+kill decision, because none of them has confirmation rate, delivery rate or
+margin behind it.
+
+### Motion
+
+No new animation library and no second loop. Per-frame work registers into
+`v3.js`'s existing `tick()` through `window.__csFrame`; tilt reuses the same
+4°/2° caps as the grid cards; reduced motion rides the existing `html.rm`
+branch.
+
+| moment | mechanism |
+|---|---|
+| category tilt | cursor parallax, ±4° desktop / ±2° mobile, image plane leading text |
+| entering a category | a fixed plate scales from the card's own rect to beyond the viewport, 640 ms |
+| the unpack | six cards travel from a stacked centre to their grid slots, staggered 0.085 of progress apart, with a small overshoot |
+| opening a product | the card's plate flies to the case-study position, 640 ms |
+
+The unpack is driven by the deck's travel through the viewport rather than by a
+pinned scene. Six cards at a readable size are taller than a laptop viewport, so
+pinning pushed half the grid off-screen and under the nav — the same reason the
+existing card stack is not pinned either.
+
+Base positions come from `offsetLeft`/`offsetTop`, not `getBoundingClientRect`.
+Reading the rect would feed each frame's own transform into the next one and the
+cards would converge on a fixed point instead of travelling.
+
+### Routing
+
+Hash routes: `#/case-studies`, `#/ecommerce`, `#/ecommerce/product-01`,
+`#/concepts`. The site is one static document on GitHub Pages with no server to
+rewrite paths, so real paths would need six duplicated HTML files with rewritten
+relative asset URLs. A hash reloads, shares and deep-links on any host — and,
+the reason it matters here, never swaps the document, which is what lets the
+card survive its flight into the hero.
+
+A shared link points at a case study, not at the film, so a case-studies hash on
+load skips the cinematic the way the Skip control does and lands the visitor
+where the link pointed.
+
+### Product images
+
+Each product reserves a slot. `image.src: null` renders a warm-lit empty frame
+carrying the number and name — obviously a reserved slot, never a stand-in
+photograph. The card geometry is already final, so dropping a file into
+`assets/products/` and setting that one field fills it without shifting the
+layout or touching the animation.
+
+The same is true of the Ads Manager captures: chapter 05 renders a slot for a
+cropped, masked screenshot per product. Account names, account and business
+identifiers, the address bar and unrelated campaigns are removed before any
+capture ships; the campaign row's own metrics are never altered.
+
 ## Media
 
 The master is **not** committed. To rebuild the derivatives:

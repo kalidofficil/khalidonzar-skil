@@ -437,6 +437,11 @@
   });
 
   /* ── card systems ─────────────────────────────────────────────────────── */
+  /* Anything else on the page that needs per-frame work registers here rather
+     than starting its own requestAnimationFrame. One loop, one clock — the
+     rule the hero was built on. */
+  var FRAME = window.__csFrame = [];
+
   if (!RM) (function () {
     var TILT   = small.matches ? 2 : 4;     /* degrees, grid cards */
     var STACK_RX = small.matches ? 2 : 6;   /* degrees, entering stack card */
@@ -503,6 +508,10 @@
         c.style.filter = cover > 0.004 ? "blur(" + bl + "px) brightness(" + br.toFixed(3) + ")" : "";
         c.style.setProperty("--sheen", ((1 - enter) * 0.9).toFixed(2));
         c.style.zIndex = String(10 + k);
+      }
+
+      for (var f = 0; f < FRAME.length; f++) {
+        try { FRAME[f](h); } catch (e) { /* one bad guest must not stop the loop */ }
       }
       requestAnimationFrame(tick);
     }
