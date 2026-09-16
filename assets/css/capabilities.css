@@ -16,8 +16,11 @@
    its own. It now reads from the shared tokens like everything else, and sits
    on the mist ground so the four white cards separate from it cleanly. */
 #capabilities{
-  background:var(--mist);
-  color:var(--body);
+  background:
+    radial-gradient(60% 48% at 8% 2%, rgba(139,95,214,.34), rgba(139,95,214,0) 70%),
+    radial-gradient(54% 46% at 94% 96%, rgba(233,107,200,.26), rgba(233,107,200,0) 72%),
+    linear-gradient(180deg, rgba(196,169,238,.90) 0%, rgba(184,158,236,.86) 100%);
+  color:var(--ink-2);
   /* room under the fixed nav so the heading can never meet it */
   padding:clamp(132px,16vh,208px) var(--gut) clamp(92px,13vh,150px);
   /* the cards fly in from beyond the right edge; clipped here so the page
@@ -26,43 +29,52 @@
 }
 #capabilities .head{margin-bottom:clamp(38px,6vh,72px)}
 #capabilities .head h2{color:var(--ink)}
-#capabilities .head h2 em{color:var(--cobalt)}
-#capabilities .head .label{color:var(--cobalt)}
-#capabilities .head .sub{color:var(--body);max-width:44ch}
+#capabilities .head h2 em{color:var(--accent)}
+#capabilities .head .label{color:var(--accent)}
+#capabilities .head .sub{color:var(--ink-2);max-width:44ch}
 
 /* ── the row ─────────────────────────────────────────────────────────────── */
 .loom{display:grid;gap:clamp(14px,1.6vw,22px);
   grid-template-columns:repeat(4,minmax(0,1fr));
   perspective:1300px;perspective-origin:50% 42%}
+/* A live 3D rendering context is the single most expensive thing in this
+   section: measured 44 fps while scrolling past, and 61 with the perspective
+   gone. The arrival needs it — rotateY and translateZ are meaningless without
+   it — so it is released the moment the last card lands, along with the
+   per-card 3D context. Browsers without :has() simply keep it. */
+.loom:has(.cap-card.is-done){perspective:none}
+.cap-card.is-done{transform-style:flat}
 @media (max-width:1100px){.loom{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
 @media (max-width:620px){.loom{grid-template-columns:minmax(0,1fr);gap:14px}}
 
 /* ── the card ────────────────────────────────────────────────────────────── */
 .cap-card{position:relative;
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:14px;
+  /* dense content, so the denser glass — #5B4285 reads 6.03:1 here against
+     4.00:1 on the bare lavender underneath */
+  background:var(--glass-l3);
+  border:1px solid var(--glass-edge-ink);
+  border-radius:18px;
   padding:clamp(20px,2vw,26px);
   display:grid;align-content:start;
   transform-style:preserve-3d;
-  box-shadow:var(--sh-2);
+  box-shadow:var(--sh-2),inset 0 1px 0 var(--glass-edge-lit);
   transition:box-shadow .45s var(--ease),transform .35s var(--ease),border-color .35s var(--ease)}
 html:not(.js) .cap-card:hover,html.rm .cap-card:hover{box-shadow:var(--sh-3)}
 
 .cap-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .cap-n{font-family:var(--serif);font-size:clamp(2rem,2.7vw,2.6rem);line-height:.9;
-  color:var(--cobalt);font-variant-numeric:tabular-nums}
-.cap-mark{flex:none;width:34px;height:34px;color:var(--cobalt);opacity:.9}
+  color:var(--accent);font-variant-numeric:tabular-nums}
+.cap-mark{flex:none;width:34px;height:34px;color:var(--accent);opacity:.9}
 .cap-mark svg{width:100%;height:100%;display:block;stroke-linecap:round;stroke-linejoin:round}
 
 .cap-card h3{font-size:1.02rem;font-weight:600;letter-spacing:-.01em;line-height:1.25;
   color:var(--ink);margin-bottom:.5em}
-.cap-card p{font-size:.855rem;line-height:1.52;color:var(--body);margin:0}
+.cap-card p{font-size:.855rem;line-height:1.52;color:var(--ink-2);margin:0}
 .cap-card ul{margin:.95em 0 0;padding:.95em 0 0;list-style:none;display:grid;gap:.42em;
-  border-top:1px solid var(--line)}
-.cap-card li{position:relative;padding-left:15px;font-size:.79rem;line-height:1.45;color:var(--muted)}
+  border-top:1px solid var(--glass-edge-ink)}
+.cap-card li{position:relative;padding-left:15px;font-size:.79rem;line-height:1.45;color:var(--ink-3)}
 .cap-card li::before{content:"";position:absolute;left:0;top:.56em;width:7px;height:1.5px;
-  background:var(--cobalt)}
+  background:var(--accent)}
 
 /* ── the arrival ─────────────────────────────────────────────────────────
    One horizontal axis, as in the reference. Each card starts more than a
@@ -80,7 +92,8 @@ html.js .cap-card{
   opacity:0;
   transform:translate3d(var(--fx),var(--fy),var(--fz))
             rotate(var(--frot)) rotateY(var(--fturn)) scale(var(--fscale));
-  box-shadow:0 2px 4px rgba(24,42,59,.05),0 40px 70px -30px rgba(24,42,59,.5);
+  box-shadow:0 2px 4px rgba(42,22,80,.06),0 40px 70px -30px rgba(42,22,80,.52),
+             inset 0 1px 0 var(--glass-edge-lit);
   transition:transform var(--dur,1000ms) var(--ease-out) var(--d,0ms),
              opacity calc(var(--dur,1000ms) * .45) var(--ease) var(--d,0ms),
              box-shadow var(--dur,1000ms) var(--ease-out) var(--d,0ms)}
@@ -88,10 +101,19 @@ html.js .cap-card{
 html.js .cap-card.is-in{
   opacity:1;
   transform:translate3d(0,0,0) rotate(0deg) rotateY(0deg) scale(1);
-  box-shadow:var(--sh-2)}
+  box-shadow:var(--sh-2),inset 0 1px 0 var(--glass-edge-lit)}
 
 /* whichever card is still in flight rides over the ones already down */
 html.js .cap-card{z-index:var(--z,1)}
+
+/* The real blur is spent only where it can be seen: while the four cards cross
+   over one another on the way in, a card's frosted face genuinely refracts the
+   card beneath it. Once the row has landed there is nothing behind them but a
+   smooth gradient, where a blur is invisible and measured 47 fps against 61
+   without it — so `.is-done` takes it away again. */
+html.js .cap-card:not(.is-done){
+  -webkit-backdrop-filter:blur(var(--blur-2)) saturate(1.5);
+  backdrop-filter:blur(var(--blur-2)) saturate(1.5)}
 
 /* Hover is deferred to .is-done, added once the whole row has landed.
    A `transition` declared on .is-in would be the one the browser uses for the
@@ -100,12 +122,12 @@ html.js .cap-card{z-index:var(--z,1)}
 html.js .cap-card:hover{transform:none}
 html.js .cap-card.is-done{transition:transform .35s var(--ease),box-shadow .45s var(--ease)}
 html.js .cap-card.is-done:hover{transform:translateY(-3px);
-  box-shadow:var(--sh-3);border-color:#C9D3DE}
+  box-shadow:var(--sh-3),inset 0 1px 0 var(--glass-edge-lit);border-color:var(--line-ui)}
 
 /* ── mobile: same sequence, a throw that suits the width ─────────────────── */
 @media (max-width:620px){
   html.js .cap-card{--fx:150px;--fy:26px;--fz:-110px;--frot:5deg;--fturn:-10deg;--fscale:.93}
-  .cap-card{padding:20px;border-radius:12px}
+  .cap-card{padding:20px;border-radius:16px}
   .cap-top{margin-bottom:14px}
 }
 @media (min-width:621px) and (max-width:1100px){
