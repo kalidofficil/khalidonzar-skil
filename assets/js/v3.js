@@ -549,7 +549,7 @@
     if (!under) return;
     if (nav) {
       nav.classList.toggle("on-light", under.classList.contains("light"));
-      /* a light band can set its own bar tone; cream is not right over pearl */
+      /* a light band can set its own bar tone: bone is not right over mist */
       var tone = under.getAttribute("data-nav");
       if (tone) nav.setAttribute("data-nav", tone); else nav.removeAttribute("data-nav");
     }

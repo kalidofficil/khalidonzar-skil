@@ -21,7 +21,7 @@ window.CASE_STUDIES = (function () {
   "use strict";
 
   /* Every product reserves an image slot. `image: null` renders the empty
-     plate — a warm-lit frame carrying the number and name, obviously a slot
+     plate — a reserved frame carrying the number and name, obviously a slot
      rather than a photograph. Dropping a file in assets/products/ and setting
      this one field fills it; no layout or animation code changes. */
   function slot(n) {

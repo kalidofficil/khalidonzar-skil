@@ -189,7 +189,7 @@
       'altered.</p>' +
       '<div class="cs-shotwrap"><div class="cs-shot is-placeholder" data-shot="' + esc(p.evidence.shot) + '">' +
         '<span class="cs-slotl">Masked screenshot — slot ' + esc(p.evidence.shot) + '</span>' +
-        '<span style="font-size:.82rem;color:var(--d-text-3);max-width:44ch">Cropped capture of the row ' +
+        '<span style="font-size:.82rem;color:var(--muted);max-width:44ch">Cropped capture of the row ' +
         "“" + esc(p.evidence.row) + "” goes here.</span>" +
       "</div></div>" +
       '<p class="cs-shotcap"><span>Meta Ads Manager, reported metrics</span>' +

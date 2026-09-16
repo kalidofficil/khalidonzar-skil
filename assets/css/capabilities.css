@@ -12,19 +12,12 @@
    real travel, rotation and depth, one after another.
    ========================================================================== */
 
+/* This section used to carry a private sage palette — a fifth colour system of
+   its own. It now reads from the shared tokens like everything else, and sits
+   on the mist ground so the four white cards separate from it cleanly. */
 #capabilities{
-  --cap-bg:#F4F5F0;        /* pearl */
-  --cap-card:#E3EADF;      /* pale sage */
-  --cap-card-alt:#D3DFCF;  /* deeper sage — Creative Strategist */
-  --cap-ink:#293C40;       /* dark slate, headings */
-  --cap-ink-2:#526260;     /* body */
-  --cap-ink-3:#5F6F6C;     /* supporting points, AA on both sages */
-  --cap-line:#C6D1C2;      /* borders */
-  --cap-accent:var(--l-accent);
-  --cap-accent-lg:var(--l-accent-lg);
-
-  background:var(--cap-bg);
-  color:var(--cap-ink);
+  background:var(--mist);
+  color:var(--body);
   /* room under the fixed nav so the heading can never meet it */
   padding:clamp(132px,16vh,208px) var(--gut) clamp(92px,13vh,150px);
   /* the cards fly in from beyond the right edge; clipped here so the page
@@ -32,16 +25,10 @@
   overflow-x:clip;
 }
 #capabilities .head{margin-bottom:clamp(38px,6vh,72px)}
-#capabilities .head h2{color:var(--cap-ink)}
-#capabilities .head h2 em{color:var(--cap-accent)}
-#capabilities .head .label{color:var(--cap-accent)}
-#capabilities .head .sub{color:var(--cap-ink-2);max-width:44ch}
-
-/* the nav sits over pearl here, not over the site's cream light bands */
-.nav[data-nav="pearl"]{background:rgba(244,245,240,.94);color:var(--cap-ink,#293C40);
-  border-bottom-color:#C6D1C2}
-.nav[data-nav="pearl"] .nav-cta a{border-color:#293C40;color:#293C40}
-.nav[data-nav="pearl"] .nav-cta a:hover{background:#293C40;color:#F4F5F0}
+#capabilities .head h2{color:var(--ink)}
+#capabilities .head h2 em{color:var(--cobalt)}
+#capabilities .head .label{color:var(--cobalt)}
+#capabilities .head .sub{color:var(--body);max-width:44ch}
 
 /* ── the row ─────────────────────────────────────────────────────────────── */
 .loom{display:grid;gap:clamp(14px,1.6vw,22px);
@@ -52,34 +39,30 @@
 
 /* ── the card ────────────────────────────────────────────────────────────── */
 .cap-card{position:relative;
-  background:var(--cap-card);
-  border:1px solid var(--cap-line);
+  background:var(--surface);
+  border:1px solid var(--line);
   border-radius:14px;
   padding:clamp(20px,2vw,26px);
   display:grid;align-content:start;
   transform-style:preserve-3d;
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
-             0 10px 26px -18px rgba(41,60,64,.5);
-  transition:box-shadow .45s var(--ease),transform .35s var(--ease)}
-.cap-card:nth-child(2){background:var(--cap-card-alt)}
-html:not(.js) .cap-card:hover,html.rm .cap-card:hover{
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
-             0 22px 44px -22px rgba(41,60,64,.55)}
+  box-shadow:var(--sh-2);
+  transition:box-shadow .45s var(--ease),transform .35s var(--ease),border-color .35s var(--ease)}
+html:not(.js) .cap-card:hover,html.rm .cap-card:hover{box-shadow:var(--sh-3)}
 
 .cap-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .cap-n{font-family:var(--serif);font-size:clamp(2rem,2.7vw,2.6rem);line-height:.9;
-  color:var(--cap-accent-lg);font-variant-numeric:tabular-nums}
-.cap-mark{flex:none;width:34px;height:34px;color:var(--cap-accent);opacity:.85}
+  color:var(--cobalt);font-variant-numeric:tabular-nums}
+.cap-mark{flex:none;width:34px;height:34px;color:var(--cobalt);opacity:.9}
 .cap-mark svg{width:100%;height:100%;display:block;stroke-linecap:round;stroke-linejoin:round}
 
 .cap-card h3{font-size:1.02rem;font-weight:600;letter-spacing:-.01em;line-height:1.25;
-  color:var(--cap-ink);margin-bottom:.5em}
-.cap-card p{font-size:.855rem;line-height:1.52;color:var(--cap-ink-2);margin:0}
+  color:var(--ink);margin-bottom:.5em}
+.cap-card p{font-size:.855rem;line-height:1.52;color:var(--body);margin:0}
 .cap-card ul{margin:.95em 0 0;padding:.95em 0 0;list-style:none;display:grid;gap:.42em;
-  border-top:1px solid var(--cap-line)}
-.cap-card li{position:relative;padding-left:15px;font-size:.79rem;line-height:1.45;color:var(--cap-ink-3)}
+  border-top:1px solid var(--line)}
+.cap-card li{position:relative;padding-left:15px;font-size:.79rem;line-height:1.45;color:var(--muted)}
 .cap-card li::before{content:"";position:absolute;left:0;top:.56em;width:7px;height:1.5px;
-  background:var(--cap-accent)}
+  background:var(--cobalt)}
 
 /* ── the arrival ─────────────────────────────────────────────────────────
    One horizontal axis, as in the reference. Each card starts more than a
@@ -97,8 +80,7 @@ html.js .cap-card{
   opacity:0;
   transform:translate3d(var(--fx),var(--fy),var(--fz))
             rotate(var(--frot)) rotateY(var(--fturn)) scale(var(--fscale));
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
-             0 40px 70px -30px rgba(41,60,64,.62);
+  box-shadow:0 2px 4px rgba(24,42,59,.05),0 40px 70px -30px rgba(24,42,59,.5);
   transition:transform var(--dur,1000ms) var(--ease-out) var(--d,0ms),
              opacity calc(var(--dur,1000ms) * .45) var(--ease) var(--d,0ms),
              box-shadow var(--dur,1000ms) var(--ease-out) var(--d,0ms)}
@@ -106,8 +88,7 @@ html.js .cap-card{
 html.js .cap-card.is-in{
   opacity:1;
   transform:translate3d(0,0,0) rotate(0deg) rotateY(0deg) scale(1);
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
-             0 10px 26px -18px rgba(41,60,64,.5)}
+  box-shadow:var(--sh-2)}
 
 /* whichever card is still in flight rides over the ones already down */
 html.js .cap-card{z-index:var(--z,1)}
@@ -119,8 +100,7 @@ html.js .cap-card{z-index:var(--z,1)}
 html.js .cap-card:hover{transform:none}
 html.js .cap-card.is-done{transition:transform .35s var(--ease),box-shadow .45s var(--ease)}
 html.js .cap-card.is-done:hover{transform:translateY(-3px);
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
-             0 22px 44px -22px rgba(41,60,64,.55)}
+  box-shadow:var(--sh-3);border-color:#C9D3DE}
 
 /* ── mobile: same sequence, a throw that suits the width ─────────────────── */
 @media (max-width:620px){
