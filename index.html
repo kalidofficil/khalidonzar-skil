@@ -47,13 +47,13 @@
 
 <main id="top">
 
-<!-- ══════════ CHAPTER ONE — the master film behind an opening gate ══════ -->
-<section class="film" data-film style="--reels:13" aria-label="Cinematic introduction">
+<!-- ══════════ CHAPTER ONE — the master film, full screen, playing ══════ -->
+<section class="film" data-film aria-label="Cinematic introduction">
   <div class="stage">
     <!-- the surround: the same frame, blurred and dimmed, so the film itself
          never has to be cropped to fill a landscape screen -->
     <canvas class="reel-bg" id="reelBg" width="32" height="43" aria-hidden="true"></canvas>
-    <video id="reel" playsinline preload="auto" muted disablepictureinpicture
+    <video id="reel" playsinline autoplay muted preload="auto" disablepictureinpicture
            poster="assets/cinematic/master-poster.jpg"
            width="1080" height="1448"
            aria-label="Khalid Ounzar's cinematic introduction: a Dubai office, a boardroom presentation, a project room, a corridor, and the city from above.">
@@ -64,6 +64,13 @@
       <track kind="captions" srclang="en" label="English" src="assets/captions/master.en.vtt" default>
     </video>
     <div class="veil" aria-hidden="true"></div>
+    <!-- shown only when the browser refuses to start the film on its own -->
+    <button class="big-play" type="button" data-act="play" hidden>
+      <span class="big-play-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+      </span>
+      <span>Play the introduction</span>
+    </button>
     <div class="reel-fallback">
       <div>
         <p class="fallback-lede">Khalid Ounzar — performance marketer, Dubai.</p>
@@ -78,31 +85,24 @@
       <div class="hud-foot">
         <p class="cue" id="cue" aria-live="polite"></p>
         <div class="stage-ctl">
-          <button type="button" data-act="pause" hidden>Pause</button>
+          <button type="button" data-act="pause">Pause</button>
           <button type="button" data-act="play" hidden>Play</button>
-          <button type="button" data-act="replay" hidden>Replay intro</button>
-          <button type="button" data-act="sound" hidden>Enable sound</button>
+          <button type="button" data-act="sound" aria-pressed="false">Sound on</button>
           <button type="button" data-act="captions" aria-pressed="true">Captions</button>
-          <button type="button" data-skip="#work">Skip cinematic</button>
+          <button type="button" data-act="replay">Replay</button>
+          <button type="button" data-act="info" aria-expanded="false" aria-controls="filmNote">About this film</button>
         </div>
+        <p class="film-note" id="filmNote" hidden>The cinematic environments are AI-generated
+          visualisations. The company, office and team shown are not a real employer.</p>
       </div>
     </div>
 
     <p class="caption" role="status" aria-live="polite"></p>
-    <div class="closing"><p>Performance built beyond the click.</p></div>
+    <a class="scroll-cue" href="#work" data-skip="#work">
+      <span>Scroll</span>
+      <span class="scroll-cue-line" aria-hidden="true"></span>
+    </a>
 
-    <!-- the opening gate: nothing of the film is visible until it lifts -->
-    <div class="gate" id="gate">
-      <div class="gate-in">
-        <span class="gate-eyebrow">Khalid Ounzar · Performance Marketer · Dubai</span>
-        <h1 class="gate-title">Unlock my portfolio</h1>
-        <p class="gate-sub">Scroll through the strategy, campaigns and thinking behind my work.</p>
-        <button class="btn gate-btn" id="unlock" type="button" disabled aria-describedby="gateNote">Unlock experience</button>
-        <p class="gate-note" id="gateNote">Sound is used only for the introduction.</p>
-        <p class="gate-load" id="gateLoad"><span class="dot" aria-hidden="true"></span>Preparing the film</p>
-        <a class="gate-skip" href="#work" data-skip="#work">Skip the cinematic and go straight to the work</a>
-      </div>
-    </div>
   </div>
 
   <p class="sr">Transcript. Hi, I’m Khalid. I’m a performance marketer based in Dubai. Welcome to my portfolio. Later: Let’s work together. Contact me. The cinematic environments are AI-generated visualisations.</p>

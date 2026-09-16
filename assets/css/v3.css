@@ -220,7 +220,7 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 
 /* ══ CHAPTER ONE — the master film ════════════════════════════════════════ */
 .film{position:relative;background:var(--void)}
-.stage{position:sticky;top:0;height:100svh;width:100vw;overflow:hidden;
+.stage{position:relative;height:100svh;width:100vw;overflow:hidden;
   background:var(--void);isolation:isolate}
 /* The master is a 1080x1448 portrait canvas, and its source clips were
    letterboxed into it: the live picture is 1448 rows tall to 12.05s, then
@@ -240,7 +240,7 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 #reel{position:absolute;inset:0;margin:auto;
   width:min(100vw, 100svh * 1080 / var(--active,1448));
   height:min(100svh, 100vw * var(--active,1448) / 1080);
-  object-fit:cover;object-position:50% 50%;background:transparent;z-index:1}
+  object-fit:cover;object-position:50% 50%;background:transparent;z-index:2}
 /* The room the live picture leaves on a landscape screen is filled by the same
    frame, blurred and dimmed — never black bars. */
 .reel-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
@@ -264,7 +264,16 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
            calc(100svh * var(--over,1) * 1080 / 1448 / -2)}
   .reel-bg{display:none}
 }
-/* a navy light field: the periphery is drawn down, the centre of the frame is
+/* The surround — and only the surround — is washed toward the palette, so the
+   film sits inside the site rather than on top of it. The wash is at z-index 1
+   and the film at 2, so not one pixel of the picture is tinted. */
+.stage::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(70% 60% at 50% 45%, rgba(107,63,184,0) 38%, rgba(107,63,184,.34) 78%, rgba(42,22,80,.62) 100%),
+    linear-gradient(180deg, rgba(42,22,80,.30), rgba(27,15,46,.52))}
+@media (max-aspect-ratio: 1/1){.stage::before{display:none}}
+
+/* a violet light field: the periphery is drawn down, the centre of the frame is
    left exactly as the camera shot it */
 .stage::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
   background:
@@ -284,13 +293,6 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
   text-shadow:0 1px 10px rgba(27,15,46,.85)}
 .scene-tag .name::before{content:"";position:absolute;left:0;top:50%;width:8px;height:1px;background:var(--accent)}
 
-.closing{position:absolute;left:0;right:0;top:50%;transform:translateY(-42%);z-index:6;
-  text-align:center;padding:0 var(--gut);pointer-events:none;opacity:0;transition:opacity 1.1s var(--ease-out)}
-.closing::before{content:"";position:absolute;inset:-70% -6%;z-index:-1;pointer-events:none;
-  background:radial-gradient(54% 100% at 50% 50%,rgba(27,15,46,.78) 0%,rgba(27,15,46,.42) 52%,rgba(27,15,46,0) 78%)}
-.closing.on{opacity:1}
-.closing p{font-family:var(--serif);font-size:clamp(1.9rem,4.6vw,3.9rem);color:var(--on-dark);
-  line-height:1.06;letter-spacing:-.02em;text-shadow:0 2px 30px rgba(27,15,46,.9)}
 
 .stage-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .stage-ctl button{cursor:pointer;font:600 .7rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;
@@ -551,18 +553,13 @@ html.rm .reel-bg{display:none}
 html.rm #reel{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:1080/1448;
   max-height:80svh;object-fit:contain;margin-inline:auto}
 html.rm .hud{position:static;padding:clamp(28px,5vh,54px) var(--gut);opacity:1}
-html.rm .closing{position:static;transform:none;opacity:1;text-align:left;margin-top:28px}
-html.rm .closing::before{display:none}
-html.rm .caption{position:static;transform:none;max-width:none;text-align:left;margin-top:14px;text-shadow:none}
+html.rm html.rm .caption{position:static;transform:none;max-width:none;text-align:left;margin-top:14px;text-shadow:none}
 html.rm .card,html.rm .step,html.rm .stack-card{transform:none!important;filter:none!important}
 html.rm .slot{height:auto;margin-bottom:22px}
 html.rm .stack-card{position:static;top:auto}
-/* The film buys its scroll from the length of the silent cinematic: the
-   controller sets an explicit pixel height of PPS x silent-seconds + one
-   screen. These are only the pre-script fallback, for the moment before the
-   duration is known and for a no-JS visitor. */
-.film{height:calc((var(--reels,13) + 1) * 100svh)}
-@media (max-width:900px){.film{height:calc((var(--reels,13) * .8 + 1) * 100svh)}}
+/* One viewport. The film plays at its own speed and the page scrolls past it
+   whenever the visitor decides to — there is nothing to finish first. */
+.film{height:100svh}
 
 /* Tertiary type sits on the card face rather than the page ground; --muted is
    5.31:1 there, so one value covers both. */
@@ -575,65 +572,53 @@ html.rm .stack-card{position:static;top:auto}
 .stack-card.on-surface .source,
 .stack-card.on-surface .duo h4{color:var(--ink-3)}
 
-/* ══ the opening gate ═════════════════════════════════════════════════════
-   Opaque until the film reaches a frame worth showing. Nothing of the video
-   is visible behind it — the ground is painted from the palette, not from a
-   video frame. */
-.gate{
-  position:absolute;inset:0;z-index:60;display:grid;place-items:center;
-  padding:calc(env(safe-area-inset-top,0px) + 84px) var(--gut)
-          calc(env(safe-area-inset-bottom,0px) + 40px);
-  background:
-    radial-gradient(112% 74% at 50% 34%, rgba(61,30,109,.55) 0%, rgba(42,22,80,.88) 46%, var(--void) 78%),
-    linear-gradient(180deg, var(--night) 0%, var(--void) 100%);
-  opacity:1;transition:opacity 760ms var(--ease-out);
-  overflow-y:auto;
-}
-.gate::after{ /* one low cobalt lift at the foot — a hint of the accent, not a glow */
-  content:"";position:absolute;inset:auto 0 -18% 0;height:56%;pointer-events:none;
-  background:radial-gradient(52% 100% at 50% 100%, rgba(233,107,200,.14), rgba(27,15,46,0) 70%);
-}
-.gate.lifting{opacity:0}
-.gate.gone{display:none}
-.gate-in{position:relative;z-index:2;max-width:min(46ch,92vw);text-align:center}
-.gate-eyebrow{
-  display:block;font-size:.63rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:clamp(22px,4vh,38px);
-}
-.gate-title{
-  font-family:var(--serif);font-size:clamp(2.9rem,8.2vw,5.6rem);line-height:.96;
-  letter-spacing:-.03em;color:var(--on-dark);
-}
-.gate-sub{
-  margin:clamp(18px,2.6vh,26px) auto 0;max-width:34ch;font-size:1.02rem;
-  color:var(--on-dark-2);line-height:1.55;
-}
-.gate-btn{margin-top:clamp(26px,4vh,40px);padding:16px 30px;font-size:.86rem}
-.gate-btn[disabled]{opacity:.42;cursor:progress;transform:none}
-.gate-btn[disabled]:hover{background:var(--accent);border-color:var(--accent);box-shadow:none}
-.gate-note{margin:16px 0 0;font-size:.74rem;color:var(--on-dark-3);letter-spacing:.02em}
-.gate-load{
-  margin:22px 0 0;font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--on-dark-3);display:inline-flex;align-items:center;gap:10px;
-}
-.gate-load[hidden]{display:none}
-.gate-load .dot{
-  width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;
-  animation:pulse 1.5s var(--ease) infinite;
-}
-@keyframes pulse{0%,100%{opacity:.25;transform:scale(.72)}50%{opacity:1;transform:scale(1)}}
-.gate-skip{
-  display:inline-block;margin-top:clamp(24px,4vh,40px);font-size:.74rem;
-  color:var(--on-dark-3);text-decoration:none;border-bottom:1px solid var(--glass-edge);
-  padding-bottom:2px;transition:color .3s,border-color .3s;
-}
-.gate-skip:hover{color:var(--on-dark);border-bottom-color:var(--on-dark)}
+/* ══ the autoplay fallback ════════════════════════════════════════════════
+   A muted autoplay is permitted almost everywhere, but Low Power Mode and
+   Data Saver both refuse it. When the promise is rejected the poster is
+   already on screen and this is the only thing that needs to appear. */
+.big-play{position:absolute;inset:0;margin:auto;z-index:8;
+  width:max-content;height:max-content;
+  display:inline-flex;align-items:center;gap:14px;cursor:pointer;
+  padding:16px 26px 16px 18px;border-radius:999px;
+  font:600 .9rem/1 var(--sans);letter-spacing:.01em;
+  color:var(--on-dark);background:var(--glass-2);
+  border:1px solid var(--glass-edge-lit);
+  -webkit-backdrop-filter:blur(var(--blur-2)) saturate(1.4);
+  backdrop-filter:blur(var(--blur-2)) saturate(1.4);
+  box-shadow:0 20px 50px -24px rgba(10,4,24,.9);
+  transition:background .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease)}
+.big-play[hidden]{display:none}
+.big-play:hover{background:var(--glass-3);border-color:var(--pink-300);transform:scale(1.02)}
+.big-play-mark{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+  background:var(--btn);color:var(--paper)}
+.big-play-mark svg{width:20px;height:20px}
+.stage.autoplay-blocked .hud{opacity:.5}
+.stage.failed .big-play{display:none}
 
-/* the veil holds a flat ink field over the film for the handoff, so the reveal
-   is a fade from black rather than a cut into a moving face */
-.veil{position:absolute;inset:0;z-index:3;background:var(--void);opacity:0;pointer-events:none;
-  transition:opacity 700ms var(--ease-out)}
-.veil.on{opacity:1}
+/* ══ the disclosure, beside the controls rather than in the copy ══════════ */
+.film-note{margin:12px 0 0;max-width:46ch;font-size:.78rem;line-height:1.5;
+  color:var(--on-dark-2);padding:12px 15px;border-radius:12px;
+  background:var(--glass-1);border:1px solid var(--glass-edge);
+  -webkit-backdrop-filter:blur(var(--blur-1));backdrop-filter:blur(var(--blur-1))}
+.film-note[hidden]{display:none}
+
+/* ══ the way out ═════════════════════════════════════════════════════════ */
+.scroll-cue{position:absolute;right:var(--gut);
+  bottom:calc(clamp(22px,4vh,40px) + 4px);z-index:7;
+  display:grid;justify-items:center;gap:9px;text-decoration:none;
+  font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--on-dark-2);transition:color .3s var(--ease)}
+.scroll-cue:hover{color:var(--on-dark)}
+.scroll-cue-line{display:block;width:1px;height:36px;border-radius:1px;
+  background:linear-gradient(to bottom,var(--pink-300),rgba(247,168,226,0));
+  transform-origin:top;animation:cue-fall 2.4s var(--ease) infinite}
+@keyframes cue-fall{
+  0%{transform:scaleY(0);opacity:0}
+  35%{transform:scaleY(1);opacity:1}
+  70%{transform:scaleY(1);opacity:1}
+  100%{transform:scaleY(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.scroll-cue-line{animation:none;opacity:.8}}
+@media (max-width:900px){.scroll-cue{display:none}}
 
 /* ══ hero chrome: only what the film needs ═══════════════════════════════ */
 .hud-foot{display:grid;gap:14px;justify-items:start}
@@ -649,12 +634,8 @@ html.rm .stack-card{position:static;top:auto}
 .scene-tag .name::before{display:none}
 
 @media (max-width:900px){
-  .gate-in{max-width:none}
-  .gate-title{font-size:clamp(2.5rem,11.5vw,3.6rem)}
-  .gate-sub{font-size:.95rem}
-  .hud-foot{gap:11px}
+        .hud-foot{gap:11px}
 }
 
-html.rm .gate{position:relative;min-height:auto;padding-block:clamp(46px,8vh,86px)}
-html.rm .veil{display:none}
+html.rm html.rm .veil{display:none}
 html.rm .cue{opacity:1;transform:none}

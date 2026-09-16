@@ -499,19 +499,15 @@
      while the page is simply scrolling. Layout changes go through resize(). */
 
   /* ── first paint ───────────────────────────────────────────────────────── */
-  /* A shared link points at a case study, not at the film. Landing on the
-     opening gate with the page locked would strand the visitor, so a
-     case-studies hash skips the cinematic the same way the Skip control does
-     and takes them where the link pointed. */
+  /* A shared link points at a case study, not at the film. There is no gate
+     and no scroll lock any more, so honouring it is simply a matter of
+     painting the route and going there — and of pausing the film, which is
+     not what the visitor followed the link for. */
   function honourDeepLink() {
     var want = location.hash;
     if (!/^#\//.test(want || "")) return;
-    /* The skip control in the HUD is a <button>; the one in the gate is an
-       <a href="#work">, and following it would overwrite the route we are
-       trying to honour. Use the button, and restore the hash regardless. */
-    var skip = document.querySelector(".stage-ctl button[data-skip]") ||
-               document.querySelector("button[data-skip]");
-    if (skip) skip.click();
+    var reel = document.getElementById("reel");
+    if (reel && !reel.paused) { reel.pause(); reel.muted = true; }
     requestAnimationFrame(function () {
       if (location.hash !== want) history.replaceState(null, "", want);
       paint(parseHash(), { silent: true });

@@ -45,12 +45,10 @@
 
   if (film && reel) (function () {
 
-    var REVEAL    = 0.867;
-    var INTRO_END = 4.880;
-    var TAIL      = 0.02;          /* stop a hair short of duration */
+    var INTRO_END = 4.880;         /* where the voice stops and the shot cuts */
 
     var LABELS = [
-      { t: 4.88, s: "Introduction"  }, { t: 9.5,  s: "Strategy" },
+      { t: 0.0,  s: "Introduction"  }, { t: 9.5,  s: "Strategy" },
       { t: 12.1, s: "Execution"     }, { t: 16.5, s: "Collaboration" },
       { t: 26.0, s: "Contact"       }
     ];
@@ -58,53 +56,59 @@
        cropdetect. Everything outside it is letterbox baked in by the edit, and
        it is symmetric, so the element only needs the height. */
     var CROP = [
-      { t: 0.00,  h: 1444 }, { t: 12.05, h: 1232 },
+      { t: 0,     h: 1444 }, { t: 12.05, h: 1232 },
       { t: 16.75, h: 1182 }, { t: 21.55, h: 926  }
     ];
 
-    /* Pixels of scroll per second of silent cinematic. The pinned section's
-       height is derived from this and the real duration, not from a fixed
-       multiple of the viewport, so every screen travels the film at the same
-       rate and a hard wheel flick can no longer clear a whole scene. */
-    var PPS = 700;
-
-    /* Interpolation strength: the fraction of the remaining gap the rendered
-       time closes each frame. Gentler than a straight follow, so a short wheel
-       or trackpad movement eases across a scene instead of jumping through it.
-       It is a glide, not a delay — the playhead keeps closing every frame and
-       SNAP lands it exactly the moment the gap falls under one frame. */
-    var SMOOTH = small.matches ? 0.10 : 0.085;
-    var SNAP   = 1 / 30;
-    var SEEK   = 1 / 30;
-
-    /* A gesture cannot open a gap wider than this — the hardest wheel flick
-       measures about 2.1s of film. Anything larger is a scrollbar drag or a
-       jump to an anchor, where the visitor expects to arrive, not to be flown
-       there: the excess is closed at once and only the last stretch glides, so
-       the glide never becomes a wait. */
-    var LEAP = 2.2;
-
-    var gate   = document.getElementById("gate");
-    var unlock = document.getElementById("unlock");
-    var loadEl = document.getElementById("gateLoad");
-    var veil   = film.querySelector(".veil");
-    var tagName= film.querySelector(".scene-tag .name");
-    var cue    = document.getElementById("cue");
-    var closing= film.querySelector(".closing");
-    var capBox = film.querySelector(".caption");
-
-    /* The blurred surround behind the film. It is the same <video> element
-       drawn into a thumbnail-sized canvas — one decode, one source — so it
-       always carries the frame the visitor is actually looking at. It is only
-       needed where the film is contained, i.e. on a landscape screen. */
     var bg     = document.getElementById("reelBg");
     var bgCtx  = bg && bg.getContext ? bg.getContext("2d", { alpha: false }) : null;
     var wide   = matchMedia("(min-aspect-ratio: 1/1)");
     var bgAt   = -1, bgWhen = 0;
-    /* Repainting the surround re-runs its blur, so it is deliberately coarse
-       and slow: a 32px-wide thumbnail refreshed about ten times a second. It
-       is out of focus by design, so nothing is lost, and the decoder keeps its
-       budget for the film itself. */
+    var capBox = film.querySelector(".caption");
+    var cueEl  = document.getElementById("cue");
+    var tagName = film.querySelector(".scene-tag .name");
+    var ctlBox = film.querySelector(".stage-ctl");
+    var bigPlay = film.querySelector(".big-play");
+    var note   = document.getElementById("filmNote");
+
+    var capOff = false, failed = false, started = false, userAsked = false;
+
+    /* The `autoplay` attribute is on the element so the film starts at the
+       earliest possible moment and still plays with JavaScript off. That also
+       means it starts without asking this script — including for a visitor who
+       asked not to be moved. Disarm it here, and hold the line with a guard,
+       because the attribute can win the race against a deferred script. */
+    if (RM) {
+      reel.autoplay = false;
+      reel.removeAttribute("autoplay");
+      reel.addEventListener("play", function () {
+        if (!userAsked) { reel.pause(); try { reel.currentTime = 0; } catch (e) {} }
+      });
+      try { reel.pause(); } catch (e) {}
+    }
+
+    function setCue(t) { if (cueEl && cueEl.textContent !== t) cueEl.textContent = t; }
+
+    /* ── framing ──────────────────────────────────────────────────────────
+       Stepped, never interpolated: the letterbox changes on a hard cut, so the
+       element's shape must change on the same frame rather than easing. The
+       film itself is never scaled, tinted or filtered — the crop is the box. */
+    var activeH = 0;
+    function setCrop(t) {
+      var h = CROP[0].h;
+      for (var i = 0; i < CROP.length; i++) if (t >= CROP[i].t) h = CROP[i].h;
+      if (h === activeH) return;
+      activeH = h;
+      film.style.setProperty("--active", h);
+      film.style.setProperty("--over", (1448 / h).toFixed(4));
+      if (bg) { bg.height = Math.round(bg.width * h / 1080); bgAt = -1; }
+    }
+    setCrop(0);
+
+    /* The room the live picture leaves on a landscape screen is filled with the
+       same frame, blurred: a 32px thumbnail refreshed about ten times a second.
+       It is out of focus by design, so nothing is lost, and the decoder keeps
+       its budget for the film. */
     function paintSurround(now) {
       if (!bgCtx || !wide.matches || reel.readyState < 2) return;
       if (now - bgWhen < 96) return;
@@ -117,74 +121,43 @@
       catch (e) { /* not decodable yet */ }
     }
 
-    var phase = "gate";            /* gate | intro | scroll */
-    var duration = 0, shown = INTRO_END;
-    var audioUnlocked = false, capOff = false, visible = false;
-    var scrollLocked = false, lockY = 0;
-
-    /* The page must not move until the introduction has had its turn.
-       overflow:hidden stops the wheel and touch, but not programmatic
-       scrollTo, anchor jumps or the keyboard — so a guard re-pins the
-       scroll position for anything that gets past it. */
-    function lockScroll(on) {
-      if (on === scrollLocked) return;
-      scrollLocked = on;
-      if (on) { lockY = scrollY; document.body.style.overflow = "hidden"; }
-      else    { document.body.style.overflow = ""; }
+    /* ── captions ─────────────────────────────────────────────────────────
+       Painted from the real <track> into the page's own line, so they are
+       styled with the site and announced by a live region. The film starts
+       muted, which is exactly when captions matter most. */
+    var cues = [], track = reel.textTracks && reel.textTracks[0];
+    if (track) {
+      track.mode = "hidden";
+      var readCues = function () {
+        if (!track.cues) return;
+        cues = [];
+        for (var i = 0; i < track.cues.length; i++) cues.push(track.cues[i]);
+      };
+      readCues();
+      track.addEventListener("load", readCues);
+      reel.addEventListener("loadeddata", readCues);
     }
-    addEventListener("scroll", function () {
-      if (scrollLocked && Math.abs(scrollY - lockY) > 1) scrollTo(0, lockY);
-    }, { passive: true });
-    addEventListener("wheel",     function (e) { if (scrollLocked) e.preventDefault(); }, { passive: false });
-    addEventListener("touchmove", function (e) { if (scrollLocked) e.preventDefault(); }, { passive: false });
-    addEventListener("keydown",   function (e) {
-      if (!scrollLocked) return;
-      if (/^(Arrow(Up|Down)|Page(Up|Down)|Home|End| )$/.test(e.key) &&
-          !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) e.preventDefault();
-    });
-    if (!RM) lockScroll(true);
-
-    var lastW = innerWidth;
-    function sizeFilm() {
-      if (RM || !duration) return;
-      var silent = (duration - TAIL) - INTRO_END;
-      if (silent <= 0) return;
-      film.style.height = (Math.round(PPS * silent) + innerHeight) + "px";
+    function paintCaption(t) {
+      if (!capBox) return;
+      if (capOff) { if (capBox.textContent) capBox.textContent = ""; return; }
+      var out = "";
+      for (var i = 0; i < cues.length; i++)
+        if (t >= cues[i].startTime && t <= cues[i].endTime) { out = cues[i].text; break; }
+      if (capBox.textContent !== out) capBox.textContent = out;
     }
-    /* A cached response can have metadata ready before this script parses, and
-       then `loadedmetadata` never fires again — so the duration is claimed
-       wherever it first becomes available, not from one event. */
-    function noteDuration() {
-      if (duration || !reel.duration || !isFinite(reel.duration)) return;
-      duration = reel.duration;
-      sizeFilm();
-    }
-    reel.addEventListener("loadedmetadata", noteDuration);
-    reel.addEventListener("durationchange", noteDuration);
-    noteDuration();
-    /* Width only: on mobile the address bar changes innerHeight mid-scroll, and
-       re-laying out the section from that would move the playhead under the
-       visitor's finger. */
-    addEventListener("resize", function () {
-      if (innerWidth === lastW) return;
-      lastW = innerWidth;
-      sizeFilm();
-    }, { passive: true });
 
-    /* With <source> children the element does not fire `error` itself. */
-    var failed = false;
+    /* ── failure ──────────────────────────────────────────────────────────
+       With <source> children the element does not fire `error` itself, and the
+       children's own error events are not dependable once the browser has
+       given up on the whole list — so watch networkState instead.
+       NETWORK_NO_SOURCE (3) means every candidate has been tried and failed. */
     function markFailed() {
       if (failed) return;
       failed = true;
       if (stage) stage.classList.add("failed");
-      if (gate) { gate.classList.add("gone"); }
-      lockScroll(false);
+      setCue("");
     }
     reel.addEventListener("error", markFailed);
-    /* With <source> children the element does not fire `error` itself, and the
-       children's own error events are not dependable once the browser has
-       already given up on the whole list — so watch networkState instead.
-       NETWORK_NO_SOURCE (3) means every candidate has been tried and failed. */
     (function watchSources(waited) {
       if (failed || reel.readyState > 0) return;
       if (reel.networkState === 3) return markFailed();
@@ -192,207 +165,104 @@
       setTimeout(function () { watchSources(waited + 300); }, 300);
     })(0);
 
-    /* ── gate ─────────────────────────────────────────────────────────── */
-    function ready() {
-      /* enough of the opening to play through the reveal without stalling */
-      if (reel.readyState >= 3) return true;
-      for (var i = 0; i < reel.buffered.length; i++) {
-        if (reel.buffered.start(i) <= 0.05 && reel.buffered.end(i) >= REVEAL + 1.6) return true;
-      }
-      return false;
-    }
-    function pollReady() {
-      if (!unlock || !unlock.disabled) return;
-      if (ready()) {
-        unlock.disabled = false;
-        if (loadEl) loadEl.hidden = true;
-      } else setTimeout(pollReady, 220);
-    }
-    ["loadeddata", "canplay", "canplaythrough", "progress"].forEach(function (e) {
-      reel.addEventListener(e, pollReady);
-    });
-    setTimeout(pollReady, 300);
-
-    function startIntro() {
-      if (phase !== "gate") return;
-      phase = "intro";
-      audioUnlocked = true;
-      reel.muted = false;
-      reel.playbackRate = 1;
-      try { reel.currentTime = 0; } catch (e) {}
-      var pr = reel.play();
-      if (pr && pr.catch) pr.catch(function () {
-        reel.muted = true;
-        var b = film.querySelector('[data-act="sound"]'); if (b) b.hidden = false;
-        var again = reel.play(); if (again && again.catch) again.catch(function () { finishIntro(); });
-      });
-      syncCtl();
-      /* the gate stays opaque until a frame worth showing arrives */
-      var watch = setInterval(function () {
-        if (reel.currentTime >= REVEAL || reel.ended) {
-          clearInterval(watch);
-          if (gate) {
-            gate.classList.add("lifting");
-            setTimeout(function () { gate.classList.add("gone"); }, 820);
-          }
-        }
-      }, 40);
-    }
-    if (unlock) unlock.addEventListener("click", startIntro);
-
-    function finishIntro() {
-      if (phase !== "intro") return;
-      phase = "scroll";
-      if (!reel.paused) reel.pause();
-      reel.muted = true;
-      shown = INTRO_END;
-      try { reel.currentTime = INTRO_END; } catch (e) {}
-      if (capBox) capBox.textContent = "";
-      lockScroll(false);
-      setCue(RM ? "Scroll on to the work." : "Scroll to enter the experience");
+    /* ── autoplay, and what to do when it is refused ──────────────────────
+       The film starts muted at normal speed and nothing holds the visitor
+       here: they can scroll away at any moment. A muted autoplay is allowed
+       almost everywhere, but not everywhere — Low Power Mode and Data Saver
+       both refuse it — so the returned promise is honoured rather than
+       assumed, and a refusal puts one obvious control over the poster. */
+    function blocked(on) {
+      if (stage) stage.classList.toggle("autoplay-blocked", on);
+      if (bigPlay) bigPlay.hidden = !on;
       syncCtl();
     }
-    reel.addEventListener("timeupdate", function () {
-      if (phase !== "intro") return;
-      paintCue(reel.currentTime);
-      if (reel.currentTime >= INTRO_END) finishIntro();
+    function tryPlay() {
+      if (RM || failed) return;
+      var p = reel.play();
+      if (p && p.catch) p.catch(function () { blocked(true); });
+      else started = true;
+    }
+    reel.addEventListener("playing", function () {
+      started = true;
+      blocked(false);
     });
-    reel.addEventListener("ended", function () { if (phase === "intro") finishIntro(); });
-
-    function setCue(text) {
-      if (!cue) return;
-      if (cue.textContent !== text) cue.textContent = text;
-      cue.classList.toggle("on", !!text);
+    if (!RM) {
+      if (reel.readyState >= 2) tryPlay();
+      reel.addEventListener("loadeddata", tryPlay, { once: true });
+      reel.addEventListener("canplay", tryPlay, { once: true });
     }
 
-    /* ── captions ─────────────────────────────────────────────────────── */
-    var cues = [];
-    (function () {
-      var tt = reel.textTracks && reel.textTracks[0];
-      if (!tt) return;
-      tt.mode = "hidden";
-      var grab = function () { if (tt.cues) cues = Array.prototype.slice.call(tt.cues); };
-      reel.addEventListener("loadeddata", grab);
-      setTimeout(grab, 600); setTimeout(grab, 1800);
-    })();
-    function paintCue(t) {
-      if (!capBox) return;
-      if (capOff || (phase !== "intro" && !RM)) { if (capBox.textContent) capBox.textContent = ""; return; }
-      var out = "";
-      for (var i = 0; i < cues.length; i++)
-        if (t >= cues[i].startTime && t <= cues[i].endTime) { out = cues[i].text; break; }
-      if (capBox.textContent !== out) capBox.textContent = out;
-    }
-
-    /* ── the few controls that remain ─────────────────────────────────── */
+    /* ── controls ─────────────────────────────────────────────────────── */
     function syncCtl() {
-      var box = film.querySelector(".stage-ctl"); if (!box) return;
-      var pl = box.querySelector('[data-act="play"]');
-      var pa = box.querySelector('[data-act="pause"]');
-      var rp = box.querySelector('[data-act="replay"]');
-      var inIntro = phase === "intro" || RM;
-      if (pa) pa.hidden = !inIntro || reel.paused;
-      if (pl) pl.hidden = !inIntro || !reel.paused;
-      if (rp) rp.hidden = phase === "gate" && !RM;
+      if (!ctlBox) return;
+      var pl = ctlBox.querySelector('[data-act="play"]');
+      var pa = ctlBox.querySelector('[data-act="pause"]');
+      var sd = ctlBox.querySelector('[data-act="sound"]');
+      if (pl) pl.hidden = !reel.paused;
+      if (pa) pa.hidden = reel.paused;
+      if (sd) {
+        sd.textContent = reel.muted ? "Sound on" : "Mute";
+        sd.setAttribute("aria-pressed", String(!reel.muted));
+      }
     }
     reel.addEventListener("play", syncCtl);
     reel.addEventListener("pause", syncCtl);
+    reel.addEventListener("volumechange", syncCtl);
+    reel.addEventListener("ended", function () { setCue(""); syncCtl(); });
 
     document.addEventListener("click", function (e) {
       var b = e.target.closest("[data-act]"); if (!b) return;
       var a = b.dataset.act;
-      if (a === "play")        {
-        if (phase === "gate") { startIntro(); }
-        else { reel.playbackRate = 1; reel.play(); }
+      if (a === "play") {
+        userAsked = true;
+        blocked(false);
+        reel.playbackRate = 1;
+        var p = reel.play();
+        if (p && p.catch) p.catch(function () { blocked(true); });
       }
-      else if (a === "pause")  reel.pause();
+      else if (a === "pause") reel.pause();
       else if (a === "replay") {
-        phase = "intro"; setCue("");
-        reel.muted = !audioUnlocked; reel.playbackRate = 1;
+        userAsked = true;
         try { reel.currentTime = 0; } catch (err) {}
-        if (!RM) {
-          /* back to the top of the film first, then pin it there */
-          scrollTo({ top: film.getBoundingClientRect().top + scrollY, behavior: "instant" });
-          lockScroll(true);
-        }
-        reel.play(); syncCtl();
+        reel.playbackRate = 1;
+        blocked(false);
+        reel.play();
       }
-      else if (a === "sound")  { reel.muted = false; audioUnlocked = true; b.hidden = true;
-                                 if (reel.paused && phase === "intro") reel.play(); }
-      else if (a === "captions"){ capOff = !capOff; b.setAttribute("aria-pressed", String(!capOff));
-                                  if (capOff && capBox) capBox.textContent = ""; }
-    });
-    addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && scrollLocked) { lockScroll(false); setCue("Scroll to enter the experience"); }
+      else if (a === "sound") {
+        userAsked = true;
+        reel.muted = !reel.muted;
+        /* The introduction is spoken in the first five seconds. Unmuting after
+           that would hand over silence, so say where it is rather than jumping
+           the playhead out from under them. */
+        if (!reel.muted && reel.currentTime > INTRO_END)
+          setCue("The introduction is spoken in the first five seconds — press Replay to hear it.");
+        else setCue("");
+        if (!reel.muted && reel.paused) reel.play();
+        syncCtl();
+      }
+      else if (a === "captions") {
+        capOff = !capOff;
+        b.setAttribute("aria-pressed", String(!capOff));
+        if (capOff && capBox) capBox.textContent = "";
+      }
+      else if (a === "info") {
+        if (!note) return;
+        var open = note.hidden;
+        note.hidden = !open;
+        b.setAttribute("aria-expanded", String(open));
+      }
     });
 
-    /* ── helpers ──────────────────────────────────────────────────────── */
-    /* Stepped, never interpolated: the letterbox changes on a hard cut, so the
-       element's shape must change on the same frame rather than easing. */
-    var activeH = 0;
-    function setCrop(t) {
-      var h = CROP[0].h;
-      for (var i = 0; i < CROP.length; i++) if (t >= CROP[i].t) h = CROP[i].h;
-      if (h === activeH) return;
-      activeH = h;
-      film.style.setProperty("--active", h);
-      film.style.setProperty("--over", (1448 / h).toFixed(4));
-      if (bg) { bg.height = Math.round(bg.width * h / 1080); bgAt = -1; }
-    }
-    function pickLabel(t) {
-      var out = LABELS[0];
-      for (var i = 0; i < LABELS.length; i++) if (t >= LABELS[i].t) out = LABELS[i];
-      return out;
-    }
-    function progress() {
-      var r = film.getBoundingClientRect();
-      var span = film.offsetHeight - innerHeight;
-      if (span <= 0) return 0;
-      return clamp(-r.top / span, 0, 1);
-    }
-
-    /* ── the single loop ──────────────────────────────────────────────── */
+    /* ── per-frame work, on the page's single loop ────────────────────── */
+    var visible = true;
     function frame(now) {
-      if (!duration) noteDuration();
-      if (duration) {
-        if (phase === "intro") {
-          shown = reel.currentTime;
-        } else if (phase === "scroll" && visible) {
-          var lo = INTRO_END, hi = duration - TAIL;
-          var p = progress();
-          var target = lo + p * (hi - lo);          /* the silent range only */
-          var d = target - shown;
-          if (Math.abs(d) > LEAP) {                 /* a jump, not a gesture */
-            shown = target - (d > 0 ? LEAP : -LEAP);
-            d = target - shown;
-          }
-          if (Math.abs(d) < SNAP) shown = target;   /* exact when scrolling stops */
-          else shown += d * SMOOTH;
-          shown = clamp(shown, lo, hi);
-          /* One seek in flight at a time. Asking for a new frame while the
-             decoder is still resolving the last one queues work it then
-             throws away, which is what makes a scrub stall; letting each
-             seek land keeps the picture moving. */
-          var exact = p <= 0.0005 ? lo : (p >= 0.9995 ? hi : null);
-          if (exact !== null) shown = exact;
-          var want = exact !== null ? exact : shown;
-          var tol  = exact !== null ? 0.004 : SEEK;
-          if (reel.readyState >= 1 && !reel.seeking &&
-              Math.abs(reel.currentTime - want) > tol) {
-            try { reel.currentTime = want; } catch (e) { /* seek races are harmless */ }
-          }
-          if (!reel.paused) reel.pause();
-          if (!reel.muted) reel.muted = true;
-
-          if (p > 0.012) setCue("");
-          var tail = clamp((shown - (hi - 3.1)) / 2.2, 0, 1);
-          if (closing) closing.classList.toggle("on", tail > 0.45);
-          film.style.setProperty("--hud", (1 - tail).toFixed(3));
-        }
-
-        setCrop(shown);
+      if (!RM && visible && !failed) {
+        var t = reel.currentTime || 0;
+        setCrop(t);
         paintSurround(now);
-        var L = pickLabel(shown);
+        paintCaption(t);
+        var L = LABELS[0];
+        for (var i = 0; i < LABELS.length; i++) if (t >= LABELS[i].t) L = LABELS[i];
         if (tagName && tagName.textContent !== L.s) tagName.textContent = L.s;
       }
       requestAnimationFrame(frame);
@@ -400,36 +270,29 @@
 
     if (!RM) {
       new IntersectionObserver(function (es) {
-        es.forEach(function (e) { visible = e.isIntersecting; });
-      }, { rootMargin: "-2% 0px -2% 0px" }).observe(film);
+        es.forEach(function (e) {
+          visible = e.isIntersecting;
+          /* Nothing is gained by decoding frames nobody can see, and a paused
+             film off-screen leaves the decoder free for the rest of the page. */
+          if (!visible && !reel.paused && started) reel.pause();
+          else if (visible && reel.paused && started && !reel.ended) reel.play();
+        });
+      }, { rootMargin: "0px", threshold: 0.15 }).observe(film);
       requestAnimationFrame(frame);
     } else {
-      /* reduced motion: a still hero, the introduction on request, no scrubbing */
-      lockScroll(false);
-      if (gate) gate.classList.add("gone");
-      var rmPlay = film.querySelector('[data-act="play"]');
-      if (rmPlay) rmPlay.hidden = false;
-      if (closing) closing.classList.add("on");
-      setCue("Press play for the introduction, or scroll to the work.");
+      /* reduced motion: a still hero, the introduction only on request */
+      setCrop(0);
       syncCtl();
+      setCue("Press play for the introduction, or scroll to the work.");
     }
-
-    /* skip must always leave the page usable */
-    document.querySelectorAll("[data-skip]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        if (!reel.paused) reel.pause();
-        reel.muted = true;
-        phase = "scroll";
-        lockScroll(false);
-        if (gate) gate.classList.add("gone");
-        setCue("");
-      });
-    });
   })();
 
   /* ── skip ─────────────────────────────────────────────────────────────── */
   document.querySelectorAll("[data-skip]").forEach(function (b) {
-    b.addEventListener("click", function () {
+    b.addEventListener("click", function (e) {
+      /* The anchor's own jump would land instantly and then fight the smooth
+         scroll below, so it is taken over rather than allowed to race. */
+      if (b.tagName === "A") e.preventDefault();
       if (reel && !reel.paused) reel.pause();
       var t = document.querySelector(b.dataset.skip || "#work");
       if (t) t.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "start" });
