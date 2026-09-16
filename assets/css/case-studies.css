@@ -18,6 +18,7 @@
 /* ── the section ─────────────────────────────────────────────────────────── */
 .cs{padding:clamp(84px,13vh,168px) var(--gut) 0;position:relative;
   background:
+    var(--grain-img),
     radial-gradient(58% 42% at 90% 2%, rgba(233,107,200,.28), rgba(233,107,200,0) 70%),
     radial-gradient(52% 44% at 6% 90%, rgba(139,95,214,.24), rgba(139,95,214,0) 72%),
     linear-gradient(180deg, rgba(196,169,238,.90) 0%, rgba(184,158,236,.84) 100%)}

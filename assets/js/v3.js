@@ -299,11 +299,168 @@
     });
   });
 
+  /* ── the introduction ───────────────────────────────────────────────────
+     Three stages driven by the section's own travel through the viewport.
+     There is no scroll lock anywhere in here: no preventDefault, no
+     scrollTo, no overflow:hidden on the body. The panel is sticky in CSS and
+     the page scrolls through it at whatever speed the visitor chooses.
+
+     Each stage gets an enter, a hold and an exit inside its own span, and the
+     hold is the largest of the three — the point of the section is that the
+     sentence can be read, not that it moves.
+
+     The two halves of stages 1 and 2 travel at different rates and cross
+     mid-flight, which is the one movement carried over from the reference
+     clip. On a phone they travel together: at that width the crossing reads
+     as a collision rather than a composition.
+  --------------------------------------------------------------------- */
+  (function () {
+    var intro = document.querySelector("[data-intro]");
+    if (!intro || RM) return;
+
+    var pin   = intro.querySelector(".intro-pin");
+    var lines = Array.prototype.slice.call(intro.querySelectorAll(".intro-line"));
+    if (!pin || lines.length !== 3) return;
+
+    var narrow = matchMedia("(max-width: 900px)");
+    /* Of each stage's own span: a third to arrive, 42% held still, the rest to
+       leave. The hold is the biggest share on purpose — the section exists to
+       be read, not to move. */
+    var ENTER = 0.34, HOLD = 0.76;
+    var SPANS = [[0, 0.34], [0.34, 0.66], [0.66, 1]];
+
+    var outCubic = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var inCubic  = function (t) { return t * t * t; };
+
+    /* sub-progress within a stage, and which of the three phases it is in */
+    function phase(p, i) {
+      var a = SPANS[i][0], b = SPANS[i][1];
+      var u = clamp((p - a) / (b - a), 0, 1);
+      if (u < ENTER) return { k: "in",   t: u / ENTER };
+      if (u < HOLD)  return { k: "hold", t: 1 };
+      return { k: "out", t: (u - HOLD) / (1 - HOLD) };
+    }
+
+    function put(el, x, y, sc, o) {
+      el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)" +
+                           (sc === 1 ? "" : " scale(" + sc.toFixed(3) + ")");
+      el.style.opacity = o.toFixed(3);
+    }
+
+    var halves = lines.map(function (l) {
+      return { a: l.querySelector(".wa"), b: l.querySelector(".wb"), one: l.querySelector(".w") };
+    });
+
+    function draw() {
+      var r = intro.getBoundingClientRect();
+      var travel = intro.offsetHeight - innerHeight;
+      if (travel <= 0) return;
+      var p = clamp(-r.top / travel, 0, 1);
+      var fast = narrow.matches ? 1 : 1.38;   /* the second half's rate */
+
+      for (var i = 0; i < 3; i++) {
+        var ph = phase(p, i), h = halves[i], line = lines[i];
+
+        /* Before its turn and after it, a line is off — not merely translated
+           out behind its clip. It keeps the transform it will enter from, so
+           nothing jumps when its turn comes. */
+        var before = p < SPANS[i][0];
+        var after  = p >= SPANS[i][1] && i < 2;
+        if (before || after) {
+          line.style.opacity = "0";
+          line.style.transform = "none";
+          continue;
+        }
+
+        if (ph.k === "hold") {
+          line.style.opacity = "1";
+          line.style.transform = "none";
+          if (h.a) put(h.a, 0, 0, 1, 1);
+          if (h.b) put(h.b, 0, 0, 1, 1);
+          if (h.one) put(h.one, 0, 0, 1, 1);
+          continue;
+        }
+
+        if (ph.k === "in") {
+          var e  = outCubic(ph.t);
+          var ef = outCubic(clamp(ph.t * fast, 0, 1));   /* arrives first, so they cross */
+          line.style.opacity = "1";
+          line.style.transform = "none";
+          if (i === 0) {
+            if (h.a) put(h.a, 0, (1 - e) * -64, 1, e);
+            if (h.b) put(h.b, (1 - ef) * -170, 0, 1, ef);
+          } else if (i === 1) {
+            /* both halves rise through their own clip edge */
+            if (h.a) put(h.a, 0, (1 - e) * 110, 1, 1);
+            if (h.b) put(h.b, 0, (1 - ef) * 110, 1, 1);
+          } else {
+            if (h.one) put(h.one, 0, (1 - e) * 46, 0.94 + 0.06 * e, e);
+          }
+          continue;
+        }
+
+        /* out: the pair clears at two rates, the way it arrived */
+        var x  = inCubic(ph.t);
+        var xf = inCubic(clamp(ph.t * 1.3, 0, 1));
+        var fade = 1 - clamp(ph.t * 1.25, 0, 1);
+        line.style.opacity = "1";
+        if (i === 0) {
+          if (h.a) put(h.a, 0, x * -90, 1, fade);
+          if (h.b) put(h.b, xf * -300, 0, 1, fade);
+        } else if (i === 1) {
+          if (h.a) put(h.a, x * -220, 0, 1, fade);
+          if (h.b) put(h.b, xf * -340, 0, 1, fade);
+        } else if (h.one) {
+          put(h.one, 0, 0, 1, 1);
+        }
+      }
+    }
+
+    /* Per-frame work goes on the page's one loop, and only while the section
+       is actually on screen. */
+    var live = false;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { live = e.isIntersecting; if (live) draw(); });
+    }, { rootMargin: "10% 0px 10% 0px" }).observe(intro);
+
+    (window.__csFrame = window.__csFrame || []).push(function () { if (live) draw(); });
+    addEventListener("resize", function () { if (live) draw(); }, { passive: true });
+    draw();
+  })();
+
+  /* ── a heading that arrives one word at a time ──────────────────────────
+     The capability cards must not start moving while the heading is still
+     assembling, or the two readings compete. The heading announces when it
+     has settled and capabilities.js waits for that before it fires.
+  --------------------------------------------------------------------- */
+  (function () {
+    var heads = document.querySelectorAll("[data-seq]");
+    if (!heads.length) return;
+    /* last word starts at 360ms and runs 520ms, then the row holds 600ms */
+    var SETTLED = 360 + 520 + 600;
+
+    function announce() {
+      window.__seqDone = true;
+      document.dispatchEvent(new CustomEvent("seq:done"));
+    }
+    if (RM) { heads.forEach(function (h) { h.classList.add("is-in"); }); announce(); return; }
+
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("is-in");
+        io.unobserve(e.target);
+        if (e.target.closest("#capabilities")) setTimeout(announce, SETTLED);
+      });
+    }, { rootMargin: "0px 0px -25% 0px", threshold: 0 });
+    heads.forEach(function (h) { io.observe(h); });
+  })();
+
   /* ── card systems ─────────────────────────────────────────────────────── */
   /* Anything else on the page that needs per-frame work registers here rather
      than starting its own requestAnimationFrame. One loop, one clock — the
      rule the hero was built on. */
-  var FRAME = window.__csFrame = [];
+  var FRAME = window.__csFrame = window.__csFrame || [];
 
   if (!RM) (function () {
     var TILT   = small.matches ? 2 : 4;     /* degrees, grid cards */

@@ -90,7 +90,7 @@
   --sh-dark:0 30px 68px -36px rgba(10,4,24,.88);
 
   /* ── grain ──────────────────────────────────────────────────────────── */
-  --grain:.035;
+  --grain-img:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* ── type ───────────────────────────────────────────────────────────── */
   --serif:"Instrument Serif",Iowan Old Style,Palatino,Georgia,serif;
@@ -129,23 +129,16 @@ img,video{display:block;max-width:100%}
    scroll frame and the card sections measured 39 fps; here they hold 60. */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
+    var(--grain-img),
     radial-gradient(78% 52% at 18% 8%, rgba(233,107,200,.20), rgba(233,107,200,0) 62%),
     radial-gradient(70% 58% at 86% 32%, rgba(139,95,214,.26), rgba(139,95,214,0) 66%),
     linear-gradient(176deg, var(--lav-200) 0%, var(--lav-100) 44%, var(--lav-200) 100%)}
-/* One grain plate for the whole interface — a single composited layer, where
-   grain applied per card would cost one per card.
-
-   It is scoped to `.work` rather than fixed over the viewport for two reasons,
-   one measured and one editorial. Measured: as a fixed layer with
-   `mix-blend-mode` it blended the entire viewport every frame, including the
-   video the hero is seeking, and the scrub's worst drift went from 0.000s to
-   0.183s. Editorial: the footage keeps its own colour, and grain laid over it
-   is not the interface's to add. */
-.work::after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
-  opacity:var(--grain);mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:160px 160px}
-@media (prefers-reduced-motion:reduce){.work::after{opacity:calc(var(--grain) * .6)}}
+/* Grain is a background LAYER on each ground, not a plate over the page.
+   Measured on this machine, a fixed full-viewport noise layer cost 17 fps with
+   `mix-blend-mode:overlay` and 6-11 fps with plain opacity, because either way
+   it is one more surface to composite every frame. Folded into the gradient
+   stack the bands already paint, it costs nothing — and its strength is baked
+   into the tile's own alpha rather than applied afterwards. */
 a{color:inherit}
 h1,h2,h3,h4{margin:0;font-weight:400;line-height:1.02;letter-spacing:-.022em;color:var(--ink)}
 /* the cinematic bands carry the light type instead */
@@ -220,6 +213,13 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 
 /* ══ CHAPTER ONE — the master film ════════════════════════════════════════ */
 .film{position:relative;background:var(--void)}
+/* The film bleeds into the page rather than ending on a cut. The wash sits at
+   z-index 4 — above the footage and its scrim, below the HUD — so the controls
+   stay on top of it rather than under it. */
+.film::after{content:"";position:absolute;left:0;right:0;bottom:0;z-index:4;
+  height:13svh;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(220,200,245,0) 0%, rgba(220,200,245,.48) 62%, rgba(220,200,245,.88) 100%)}
+html.rm .film::after{display:none}
 .stage{position:relative;height:100svh;width:100vw;overflow:hidden;
   background:var(--void);isolation:isolate}
 /* The master is a 1080x1448 portrait canvas, and its source clips were
@@ -296,7 +296,7 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 
 .stage-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .stage-ctl button{cursor:pointer;font:600 .7rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;
-  padding:10px 14px;border-radius:2px;background:rgba(42,22,80,.55);color:var(--on-dark);
+  padding:10px 14px;border-radius:999px;background:rgba(27,15,46,.80);color:var(--on-dark);
   border:1px solid var(--glass-edge);backdrop-filter:blur(8px);transition:border-color .3s,color .3s}
 .stage-ctl button:hover{border-color:var(--accent);color:var(--accent)}
 .stage-ctl button[hidden]{display:none}
@@ -329,6 +329,56 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
   .caption{bottom:calc(clamp(22px,4vh,40px) + 110px);font-size:.92rem}
 }
 
+/* ══ THE INTRODUCTION ═════════════════════════════════════════════════════
+   Three stages, driven by where the page has been scrolled to rather than by
+   a timer — so the visitor sets the pace and can leave at any point. The
+   section is tall and its inner panel is sticky: the page scrolls normally
+   the whole way through, nothing is pinned by script, nothing is prevented.
+   ══════════════════════════════════════════════════════════════════════════ */
+.intro{position:relative;height:250svh}
+.intro-pin{position:sticky;top:0;height:100svh;display:grid;place-items:center;
+  padding-inline:var(--gut);overflow:hidden}
+.intro-stack{position:relative;width:min(1180px,100%);display:grid}
+/* every line occupies the same cell, so they hand over in place */
+.intro-line{grid-area:1/1;margin:0;align-self:center;will-change:transform,opacity}
+
+/* the horizon each half rises through */
+.intro-clip{display:block;overflow:hidden;padding-block:.06em;margin-block:-.06em}
+.intro-clip .w{display:block;will-change:transform,opacity}
+
+.intro-line[data-stage="1"]{font-family:var(--serif);font-size:var(--t-display);
+  line-height:.92;letter-spacing:var(--track-display);color:var(--ink)}
+.intro-line[data-stage="1"] .wa{font-size:.46em;letter-spacing:-.01em;color:var(--ink-2)}
+
+.intro-role{font-family:var(--serif);font-size:clamp(2.1rem,5.6vw,5rem);
+  line-height:1.0;letter-spacing:-.03em;color:var(--ink)}
+.intro-role em{font-style:italic;color:var(--pink-ink)}
+
+.intro-thesis{font-family:var(--serif);font-size:clamp(1.9rem,4.6vw,3.9rem);
+  line-height:1.12;letter-spacing:-.026em;color:var(--ink);max-width:26ch}
+.intro-thesis .w{display:block;will-change:transform,opacity}
+
+/* Before the script runs, and if it never does, all three read as plain
+   stacked text — nothing is parked at opacity 0 waiting on an observer. */
+html:not(.js) .intro{height:auto}
+html:not(.js) .intro-pin{position:static;height:auto;padding-block:var(--s-7)}
+html:not(.js) .intro-stack{display:grid;gap:clamp(28px,5vh,60px)}
+html:not(.js) .intro-line{grid-area:auto}
+
+/* Reduced motion: the same three lines, laid out and still. No tall section,
+   no sticky panel, no transform. */
+html.rm .intro{height:auto}
+html.rm .intro-pin{position:static;height:auto;padding-block:var(--s-7);overflow:visible}
+html.rm .intro-stack{display:grid;gap:clamp(28px,5vh,60px)}
+html.rm .intro-line{grid-area:auto;opacity:1!important;transform:none!important}
+html.rm .intro-clip .w,html.rm .intro-thesis .w{opacity:1!important;transform:none!important}
+
+@media (max-width:900px){
+  .intro{height:200svh}
+  .intro-line[data-stage="1"]{font-size:clamp(2.6rem,12vw,4.2rem)}
+  .intro-thesis{max-width:none}
+}
+
 /* ══ CHAPTER TWO — the work ═══════════════════════════════════════════════ */
 .work{position:relative;z-index:2;background:transparent}
 .band{padding:clamp(84px,13vh,168px) var(--gut);position:relative}
@@ -339,15 +389,18 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
    reads through them; the deep end of each gradient sits behind glass panels,
    never behind body copy. */
 .light{background:
+  var(--grain-img),
   radial-gradient(64% 50% at 88% 0%, rgba(233,107,200,.30), rgba(233,107,200,0) 68%),
   radial-gradient(58% 52% at 4% 94%, rgba(139,95,214,.26), rgba(139,95,214,0) 70%),
   linear-gradient(180deg, rgba(220,200,245,.88) 0%, rgba(196,169,238,.82) 100%);
   color:var(--ink-2)}
 .light.mist{background:
+  var(--grain-img),
   radial-gradient(60% 48% at 8% 2%, rgba(139,95,214,.34), rgba(139,95,214,0) 70%),
   radial-gradient(54% 46% at 94% 96%, rgba(233,107,200,.26), rgba(233,107,200,0) 72%),
   linear-gradient(180deg, rgba(196,169,238,.90) 0%, rgba(184,158,236,.86) 100%)}
 .dark{background:
+  var(--grain-img),
   radial-gradient(70% 55% at 50% 100%, rgba(107,63,184,.42), rgba(42,22,80,0) 72%),
   linear-gradient(180deg, var(--night) 0%, var(--void) 100%);
   color:var(--on-dark-2)}
@@ -357,6 +410,29 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 @media (min-width:980px){.head{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);
   gap:clamp(32px,5vw,88px);align-items:end}}
 .head .label{display:block;margin-bottom:24px}
+
+/* A heading that arrives one word at a time. The words are inline-block so
+   they keep their place in the line; only the transform moves. */
+.seq-w{display:inline-block;will-change:transform,opacity}
+html.js [data-seq] .seq-w{opacity:0;transform:translateY(-.46em)}
+html.js [data-seq] .label,html.js [data-seq] .sub{opacity:0;transform:translateY(10px)}
+html.js [data-seq].is-in .seq-w{opacity:1;transform:none;
+  /* a little past the mark and back — the word settles rather than stopping */
+  transition:transform 520ms cubic-bezier(.22,1.28,.36,1) var(--d,0ms),
+             opacity 320ms var(--ease-out) var(--d,0ms)}
+html.js [data-seq].is-in .label,html.js [data-seq].is-in .sub{opacity:1;transform:none;
+  transition:transform 520ms var(--ease-out) var(--d,0ms),opacity 420ms var(--ease) var(--d,0ms)}
+html.js [data-seq] .seq-w:nth-child(1){--d:0ms}
+html.js [data-seq] .seq-w:nth-child(2){--d:180ms}
+html.js [data-seq] .seq-w:nth-child(3){--d:360ms}
+html.js [data-seq] .label{--d:0ms}
+html.js [data-seq] .sub{--d:520ms}
+html.rm [data-seq] .seq-w,html.rm [data-seq] .label,html.rm [data-seq] .sub{
+  opacity:1!important;transform:none!important;transition:none}
+@media (prefers-reduced-motion:reduce){
+  html.js [data-seq] .seq-w,html.js [data-seq] .label,html.js [data-seq] .sub{
+    opacity:1;transform:none;transition:none}
+}
 .head h2{font-family:var(--serif);font-size:clamp(2.4rem,5.4vw,4.4rem);line-height:.99;
   letter-spacing:-.026em;max-width:17ch;text-wrap:balance}
 .head h2 em{font-style:italic;color:var(--accent)}

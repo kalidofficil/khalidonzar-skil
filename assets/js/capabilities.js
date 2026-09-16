@@ -62,19 +62,36 @@
       if (!e.isIntersecting || fired) return;
       fired = true;
       io.disconnect();
-      cards.forEach(function (c) { c.classList.add("is-in"); });
-      /* Hover only takes over once every card has landed. A shorter transition
-         declared any earlier becomes the one the arrival itself uses, and
-         silently discards its per-card delay — which is exactly what made all
-         four cards move as one in the previous version. */
-      setTimeout(function () {
-        cards.forEach(function (c) {
-          c.style.willChange = "auto";
-          c.classList.add("is-done");
-        });
-      }, DUR + STAGGER * (cards.length - 1) + 150);
+      /* The heading above is still assembling itself word by word. Two
+         readings competing for the same moment is worse than either alone,
+         so the row waits for the heading to say it has settled. */
+      whenHeadingSettled(launch);
     });
   }, { rootMargin: "0px 0px -22% 0px", threshold: 0 });
+
+  function whenHeadingSettled(go) {
+    if (window.__seqDone) return go();
+    var done = false;
+    var run = function () { if (done) return; done = true; go(); };
+    document.addEventListener("seq:done", run, { once: true });
+    /* If the heading never reports — no such heading on the page, or it was
+       already past when the script loaded — the row still arrives. */
+    setTimeout(run, 1600);
+  }
+
+  function launch() {
+    cards.forEach(function (c) { c.classList.add("is-in"); });
+    /* Hover only takes over once every card has landed. A shorter transition
+       declared any earlier becomes the one the arrival itself uses, and
+       silently discards its per-card delay — which is exactly what made all
+       four cards move as one in the previous version. */
+    setTimeout(function () {
+      cards.forEach(function (c) {
+        c.style.willChange = "auto";
+        c.classList.add("is-done");
+      });
+    }, DUR + STAGGER * (cards.length - 1) + 150);
+  }
 
   io.observe(row);
 
