@@ -535,7 +535,10 @@
 
   var nav = document.querySelector(".nav");
   var links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a[href^='#']"));
-  var sections = Array.prototype.slice.call(document.querySelectorAll("main > section[id], main > div[id]"));
+  /* The bands live inside <div class="work">, so a direct-child selector only
+     ever matched that wrapper — which is why the bar never flipped over a
+     light band. Any section with an id, at any depth, is a band. */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main section[id]"));
   function paintNav() {
     if (!sections.length) return;
     var line = 32, under = null;
@@ -544,7 +547,12 @@
       if (r.top <= line && r.bottom > line) under = sections[i];
     }
     if (!under) return;
-    if (nav) nav.classList.toggle("on-light", under.classList.contains("light"));
+    if (nav) {
+      nav.classList.toggle("on-light", under.classList.contains("light"));
+      /* a light band can set its own bar tone; cream is not right over pearl */
+      var tone = under.getAttribute("data-nav");
+      if (tone) nav.setAttribute("data-nav", tone); else nav.removeAttribute("data-nav");
+    }
     for (var k = 0; k < links.length; k++) {
       if (links[k].getAttribute("href") === "#" + under.id) links[k].setAttribute("aria-current", "true");
       else links[k].removeAttribute("aria-current");

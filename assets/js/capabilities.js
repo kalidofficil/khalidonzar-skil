@@ -1,120 +1,89 @@
 /* ==========================================================================
-   Khalid Ounzar — Capabilities: the loom, run forwards
+   Khalid Ounzar — Capabilities: four cards arriving
    --------------------------------------------------------------------------
-   Reference: tympanus.net/Development/Unwoven (three.js / webgl / marquee).
-   There, an infinite leftward marquee unravels each card into ~50 horizontal
-   threads as it leaves the centre — no entrance, no rotation, no depth, no
-   final placement, and the picture is destroyed in the process.
+   Reference: tympanus.net/Development/Unwoven — an infinite LEFTWARD drift in
+   which cards travel along one horizontal axis and pass across one another.
 
-   Here the same mechanism runs the other way: threads start displaced along
-   the one horizontal axis and knit together as the card arrives, then lock.
-   Cards weave one after another, left to right.
+   Two things carry over. The axis: every card comes from off the right edge
+   and moves left. And the crossing: all four launch from the SAME point beyond
+   the right edge and arrive right-to-left — 04 first, 01 last — so each card
+   sweeps over the ones already in place. Giving every card its own equal
+   offset, as the previous version did, makes them slide in parallel and cross
+   nothing.
 
-   No library, no second animation loop. The threads are built once, the
-   entrance is a CSS transition fired by the same IntersectionObserver pattern
-   the rest of the site already uses for .rise.
+   The whole card is the moving object: background, border, shadow and content
+   together. This file only measures the launch distance, sets each card's
+   delay and stacking order, and fires the arrival. The motion is a CSS
+   transition.
    ========================================================================== */
 
 (function () {
   "use strict";
 
   var cards = Array.prototype.slice.call(document.querySelectorAll("[data-cap]"));
-  if (!cards.length) return;
+  var row = document.querySelector("[data-loom]");
+  if (!cards.length || !row) return;
 
-  var RM = document.documentElement.classList.contains("rm");
+  if (document.documentElement.classList.contains("rm")) return;  /* CSS has it */
+
+  var DUR = 1000;
+  var STAGGER = 190;
   var small = matchMedia("(max-width: 620px)");
 
-  /* Read off the reference: the fray reads as roughly fifty threads across a
-     560px card, so a little under 2% of the card's height each. Fewer on a
-     phone, where the card is shorter and the throw is smaller. */
-  var STRIPS = small.matches ? 16 : 26;
-  var THROW  = small.matches ? 90 : 190;   /* px the furthest thread starts out */
-  var DUR    = 900;                        /* per-card weave */
-  var STAGGER = 140;                       /* cards arrive one after another */
-
-  /* Deterministic jitter: the reference's threads reach visibly different
-     distances, but a random() would make the four cards disagree between
-     reloads and make the effect impossible to judge. */
-  function jitter(i, seed) {
-    var x = Math.sin((i + 1) * 12.9898 + seed * 78.233) * 43758.5453;
-    return x - Math.floor(x);
+  /* Distance from each card's own slot out to a single launch point past the
+     right edge. offsetLeft is a layout value, so it stays correct whatever
+     transform the card happens to be carrying at the time. */
+  function place() {
+    var stacked = small.matches;
+    var launch = row.offsetWidth + 70;
+    cards.forEach(function (c, i) {
+      /* stacked on a phone, every card shares one column and there is nothing
+         to cross; there the throw is a shorter slide in reading order */
+      var order = stacked ? i : (cards.length - 1 - i);
+      if (stacked) c.style.removeProperty("--fx");
+      else c.style.setProperty("--fx", (launch - c.offsetLeft) + "px");
+      c.style.setProperty("--d", (order * STAGGER) + "ms");
+      c.style.setProperty("--dur", DUR + "ms");
+      /* whichever card is still travelling rides over the ones already down */
+      c.style.setProperty("--z", String(order + 1));
+    });
   }
 
-  function build(card, index) {
-    var weave = card.querySelector(".cap-weave");
-    if (!weave) return;
-    weave.textContent = "";
+  place();
+  cards.forEach(function (c) { c.style.willChange = "transform, opacity"; });
 
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < STRIPS; i++) {
-      var s = document.createElement("i");
-      var top = (i / STRIPS) * 100;
-      var h = (1 / STRIPS) * 100;
-      s.style.top = top.toFixed(4) + "%";
-      /* a hair of overlap, so no hairline gap shows between threads once the
-         card has settled */
-      s.style.height = (h + 0.35).toFixed(4) + "%";
-
-      var r = jitter(i, index);
-      /* every thread travels the same way — the reference has one axis — but
-         a long way apart, which is what makes it read as fabric */
-      s.style.setProperty("--tx0", (THROW * (0.28 + r * 0.72)).toFixed(1) + "px");
-      s.style.setProperty("--o0", (0.38 + r * 0.34).toFixed(2));
-      /* the threads nearest the top and bottom edges arrive last, so the card
-         knits from its middle outward rather than as a block */
-      var edge = Math.abs(i - (STRIPS - 1) / 2) / ((STRIPS - 1) / 2);
-      s.style.setProperty("--d", Math.round(index * STAGGER + edge * 150 + r * 90) + "ms");
-      s.style.setProperty("--dur", DUR + "ms");
-      frag.appendChild(s);
-    }
-    weave.appendChild(frag);
-
-    card.style.setProperty("--d", (index * STAGGER) + "ms");
-    card.style.setProperty("--dur", DUR + "ms");
-  }
-
-  function buildAll() { cards.forEach(build); }
-
-  if (RM) {
-    /* nothing to weave: the CSS has already put every card in its settled
-       state, and building threads would only add nodes for no reason */
-    return;
-  }
-
-  buildAll();
-
-  /* Fires automatically when the row enters the viewport — the reference plays
-     on its own rather than following the scrollbar, so this does too. Observing
-     the row (not each card) is what keeps the four in one sequence instead of
-     four independent entrances. */
-  var row = document.querySelector("[data-loom]");
+  /* The reference plays on its own rather than following the scrollbar, so
+     this does too. The trigger is the row's top crossing 78% of the viewport
+     height — a bottom root margin rather than an area threshold, because on a
+     phone the row is one tall column and an area ratio may never be reached. */
+  var fired = false;
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      cards.forEach(function (c) { c.classList.add("is-woven"); });
+      if (!e.isIntersecting || fired) return;
+      fired = true;
       io.disconnect();
-      /* The threads stay — they are the card's fill, not an overlay, so
-         removing them would leave a transparent card. What does get dropped is
-         `will-change`, which otherwise keeps 104 layers promoted on the
-         compositor for the rest of the session. */
+      cards.forEach(function (c) { c.classList.add("is-in"); });
+      /* Hover only takes over once every card has landed. A shorter transition
+         declared any earlier becomes the one the arrival itself uses, and
+         silently discards its per-card delay — which is exactly what made all
+         four cards move as one in the previous version. */
       setTimeout(function () {
-        cards.forEach(function (c) { c.classList.add("is-settled"); });
-      }, DUR + STAGGER * cards.length + 400);
+        cards.forEach(function (c) {
+          c.style.willChange = "auto";
+          c.classList.add("is-done");
+        });
+      }, DUR + STAGGER * (cards.length - 1) + 150);
     });
-  }, { rootMargin: "0px 0px -12%" });
+  }, { rootMargin: "0px 0px -22% 0px", threshold: 0 });
 
-  if (row) io.observe(row); else cards.forEach(function (c) { io.observe(c); });
+  io.observe(row);
 
-  /* Rebuild only when the breakpoint actually changes — the strip count and
-     throw differ either side of it, and rebuilding on every resize tick would
-     thrash the DOM for no visible gain. */
-  var wasSmall = small.matches;
+  /* Re-measure on a width change: the launch distance comes from layout, and a
+     column that changed width would throw the card the wrong distance. */
+  var lastW = innerWidth;
   addEventListener("resize", function () {
-    if (small.matches === wasSmall) return;
-    wasSmall = small.matches;
-    STRIPS = small.matches ? 16 : 26;
-    THROW  = small.matches ? 90 : 190;
-    if (cards[0] && cards[0].classList.contains("is-woven")) return;  /* already knitted */
-    buildAll();
+    if (innerWidth === lastW || fired) return;
+    lastW = innerWidth;
+    place();
   }, { passive: true });
 })();

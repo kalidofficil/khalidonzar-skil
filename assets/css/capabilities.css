@@ -1,139 +1,141 @@
 /* ==========================================================================
    Khalid Ounzar — Capabilities
    --------------------------------------------------------------------------
-   The reference (tympanus.net/Development/Unwoven — three.js, webgl, marquee)
-   is an infinite leftward marquee in which each card UNRAVELS into ~50
-   horizontal threads as it leaves the centre. It has no entrance, no rotation,
-   no depth and no final placement, and it works by destroying the picture —
-   which would shred a card carrying a number, a title and two bullets.
+   Reference: tympanus.net/Development/Unwoven (three.js / webgl / marquee) —
+   an infinite leftward drift in which cards travel along one horizontal axis
+   and pass across one another.
 
-   So the mechanism is run forwards instead: each card WEAVES ITSELF TOGETHER
-   from horizontal threads as it arrives, drifting in from the right on the
-   same leftward axis, then locks crisp. Same vocabulary — horizontal strands,
-   per-row displacement, one directional axis — turned into the sequential
-   entrance four text cards actually need.
-
-   The threads are decorative surface only (empty divs carrying the card's
-   fill). The real content is a single node above them, so nothing readable is
-   ever distorted and nothing is duplicated for a screen reader.
+   The first attempt moved only the card's fill, in bands the same colour as
+   the card, over a near-identical ground: the transforms ran but nothing was
+   visible. Here the WHOLE CARD is the moving object — background, border,
+   shadow and content together — arriving along that same horizontal axis with
+   real travel, rotation and depth, one after another.
    ========================================================================== */
 
 #capabilities{
-  /* the section's own palette, per brief */
-  --cap-bg:#EDF3F8;      /* pale ice blue */
-  --cap-card:#FAFCFF;    /* soft white */
-  --cap-ink:#25364A;     /* deep slate */
-  --cap-ink-2:#4A5A6E;   /* secondary text, slate lightened */
-  --cap-ink-3:#5C6E85;   /* supporting points — 4.9:1 on the card, AA */
-  --cap-line:#D2DEE9;    /* fine border */
-  --cap-line-2:#E2EAF2;
-  --cap-accent:var(--l-accent);      /* the site's orange-red, light-band value */
+  --cap-bg:#F4F5F0;        /* pearl */
+  --cap-card:#E3EADF;      /* pale sage */
+  --cap-card-alt:#D3DFCF;  /* deeper sage — Creative Strategist */
+  --cap-ink:#293C40;       /* dark slate, headings */
+  --cap-ink-2:#526260;     /* body */
+  --cap-ink-3:#5F6F6C;     /* supporting points, AA on both sages */
+  --cap-line:#C6D1C2;      /* borders */
+  --cap-accent:var(--l-accent);
   --cap-accent-lg:var(--l-accent-lg);
 
   background:var(--cap-bg);
   color:var(--cap-ink);
+  /* room under the fixed nav so the heading can never meet it */
+  padding:clamp(132px,16vh,208px) var(--gut) clamp(92px,13vh,150px);
+  /* the cards fly in from beyond the right edge; clipped here so the page
+     itself never gains a horizontal scrollbar */
+  overflow-x:clip;
 }
+#capabilities .head{margin-bottom:clamp(38px,6vh,72px)}
 #capabilities .head h2{color:var(--cap-ink)}
 #capabilities .head h2 em{color:var(--cap-accent)}
 #capabilities .head .label{color:var(--cap-accent)}
-#capabilities .head .sub{color:var(--cap-ink-2);max-width:46ch}
+#capabilities .head .sub{color:var(--cap-ink-2);max-width:44ch}
 
-/* ── the loom ────────────────────────────────────────────────────────────── */
-.loom{display:grid;gap:clamp(16px,1.9vw,26px);
+/* the nav sits over pearl here, not over the site's cream light bands */
+.nav[data-nav="pearl"]{background:rgba(244,245,240,.94);color:var(--cap-ink,#293C40);
+  border-bottom-color:#C6D1C2}
+.nav[data-nav="pearl"] .nav-cta a{border-color:#293C40;color:#293C40}
+.nav[data-nav="pearl"] .nav-cta a:hover{background:#293C40;color:#F4F5F0}
+
+/* ── the row ─────────────────────────────────────────────────────────────── */
+.loom{display:grid;gap:clamp(14px,1.6vw,22px);
   grid-template-columns:repeat(4,minmax(0,1fr));
-  /* the threads reach past the card while it weaves; the row must not clip
-     them, but the page must never scroll sideways because of it */
-  overflow:visible}
-@media (max-width:1100px){.loom{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:620px){.loom{grid-template-columns:minmax(0,1fr)}}
-/* the section clips the overshoot so the threads cannot widen the document */
-#capabilities{overflow-x:clip}
+  perspective:1300px;perspective-origin:50% 42%}
+@media (max-width:1100px){.loom{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
+@media (max-width:620px){.loom{grid-template-columns:minmax(0,1fr);gap:14px}}
 
-/* The card itself is transparent: the woven threads are its fill, so that the
-   surface can arrive in pieces. Where there are no threads — no JavaScript, or
-   reduced motion — the card paints its own fill instead (see the bottom). */
-.cap-card{position:relative;isolation:isolate;
-  border-radius:6px;background:transparent;
-  padding:0;overflow:visible}
-.cap-card.is-settled .cap-weave i{will-change:auto}
-
-/* the woven surface: one strip per thread, each carrying the card's fill */
-.cap-weave{position:absolute;inset:0;z-index:0;pointer-events:none;
-  border-radius:inherit}
-/* --tx0 / --o0 are the per-thread START values, written inline by the script.
-   An inline custom property cannot be overridden by a stylesheet rule, so the
-   animated properties are transform and opacity themselves — the variables only
-   feed the from-state. */
-.cap-weave i{position:absolute;left:0;right:0;display:block;
+/* ── the card ────────────────────────────────────────────────────────────── */
+.cap-card{position:relative;
   background:var(--cap-card);
-  transform:translate3d(var(--tx0,0px),0,0);
-  opacity:var(--o0,1);
-  will-change:transform,opacity}
-/* the card's real edge and shadow sit on a single element, so the threads
-   never draw 26 separate borders */
-.cap-card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
-  border-radius:inherit;border:1px solid var(--cap-line);
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,
-             0 18px 38px -26px rgba(37,54,74,.42),
-             0 2px 6px -3px rgba(37,54,74,.10);
-  /* the edge arrives with its own card, not with the first one — otherwise
-     cards three and four sit as empty outlined boxes waiting their turn */
-  opacity:var(--edge,1);
-  transition:opacity .55s var(--ease) calc(var(--d,0ms) + 120ms),box-shadow .4s var(--ease)}
-.cap-card:hover::after{box-shadow:0 1px 0 rgba(255,255,255,.9) inset,
-             0 26px 52px -26px rgba(37,54,74,.5),
-             0 3px 10px -4px rgba(37,54,74,.16)}
+  border:1px solid var(--cap-line);
+  border-radius:14px;
+  padding:clamp(20px,2vw,26px);
+  display:grid;align-content:start;
+  transform-style:preserve-3d;
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
+             0 10px 26px -18px rgba(41,60,64,.5);
+  transition:box-shadow .45s var(--ease),transform .35s var(--ease)}
+.cap-card:nth-child(2){background:var(--cap-card-alt)}
+html:not(.js) .cap-card:hover,html.rm .cap-card:hover{
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
+             0 22px 44px -22px rgba(41,60,64,.55)}
 
-.cap-body{position:relative;z-index:2;
-  padding:clamp(22px,2.3vw,32px);
-  display:grid;gap:0;align-content:start}
-
-.cap-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px}
-.cap-n{font-family:var(--serif);font-size:clamp(1.6rem,2.2vw,2rem);line-height:1;
+.cap-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.cap-n{font-family:var(--serif);font-size:clamp(2rem,2.7vw,2.6rem);line-height:.9;
   color:var(--cap-accent-lg);font-variant-numeric:tabular-nums}
-.cap-mark{flex:none;width:30px;height:30px;color:var(--cap-accent);opacity:.72}
+.cap-mark{flex:none;width:34px;height:34px;color:var(--cap-accent);opacity:.85}
 .cap-mark svg{width:100%;height:100%;display:block;stroke-linecap:round;stroke-linejoin:round}
 
-.cap-card h3{font-size:1.1rem;font-weight:600;letter-spacing:-.012em;line-height:1.28;
-  color:var(--cap-ink);margin-bottom:.6em}
-.cap-card p{font-size:.9rem;line-height:1.6;color:var(--cap-ink-2);margin:0}
-.cap-card ul{margin:1.05em 0 0;padding:0;list-style:none;display:grid;gap:.5em;
-  border-top:1px solid var(--cap-line-2);padding-top:1.05em}
-.cap-card li{position:relative;padding-left:17px;font-size:.845rem;line-height:1.5;color:var(--cap-ink-3)}
-.cap-card li::before{content:"";position:absolute;left:0;top:.58em;width:7px;height:1.5px;
-  background:var(--cap-accent);opacity:.75}
+.cap-card h3{font-size:1.02rem;font-weight:600;letter-spacing:-.01em;line-height:1.25;
+  color:var(--cap-ink);margin-bottom:.5em}
+.cap-card p{font-size:.855rem;line-height:1.52;color:var(--cap-ink-2);margin:0}
+.cap-card ul{margin:.95em 0 0;padding:.95em 0 0;list-style:none;display:grid;gap:.42em;
+  border-top:1px solid var(--cap-line)}
+.cap-card li{position:relative;padding-left:15px;font-size:.79rem;line-height:1.45;color:var(--cap-ink-3)}
+.cap-card li::before{content:"";position:absolute;left:0;top:.56em;width:7px;height:1.5px;
+  background:var(--cap-accent)}
 
-/* ── the weave-in ────────────────────────────────────────────────────────
-   Threads start displaced to the right by a per-row amount and converge; the
-   body follows on the same axis, a beat behind, and is never displaced far
-   enough to be unreadable mid-flight. */
-.cap-card{--edge:0}
-.cap-body{opacity:0;transform:translate3d(38px,0,0)}
-html:not(.js) .cap-card{--edge:1;background:var(--cap-card)}
-html:not(.js) .cap-body{opacity:1;transform:none}
+/* ── the arrival ─────────────────────────────────────────────────────────
+   One horizontal axis, as in the reference. Each card starts more than a
+   column to the right of its slot, so while it travels it passes across its
+   neighbour's position — that crossing is the overlap. It also sits back in
+   depth, turned away from the viewer and tipped, and resolves all four at
+   once: translate, rotate, scale, opacity. */
+html.js .cap-card{
+  --fx:480px;     /* fallback only — the script measures each card's own launch distance */
+  --fy:34px;
+  --fz:-170px;
+  --frot:7deg;    /* in-plane tip */
+  --fturn:-14deg; /* turned away, swinging to face the viewer */
+  --fscale:.9;
+  opacity:0;
+  transform:translate3d(var(--fx),var(--fy),var(--fz))
+            rotate(var(--frot)) rotateY(var(--fturn)) scale(var(--fscale));
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
+             0 40px 70px -30px rgba(41,60,64,.62);
+  transition:transform var(--dur,1000ms) var(--ease-out) var(--d,0ms),
+             opacity calc(var(--dur,1000ms) * .45) var(--ease) var(--d,0ms),
+             box-shadow var(--dur,1000ms) var(--ease-out) var(--d,0ms)}
 
-html.js .cap-card.is-woven{--edge:1}
-html.js .cap-card .cap-weave i{
-  transition:transform var(--dur,900ms) var(--ease-out) var(--d,0ms),
-             opacity calc(var(--dur,900ms) * .55) var(--ease) var(--d,0ms)}
-html.js .cap-card .cap-body{
-  transition:transform var(--dur,900ms) var(--ease-out) calc(var(--d,0ms) + 110ms),
-             opacity calc(var(--dur,900ms) * .5) var(--ease) calc(var(--d,0ms) + 110ms)}
-html.js .cap-card.is-woven .cap-body{opacity:1;transform:none}
-html.js .cap-card.is-woven .cap-weave i{transform:translate3d(0,0,0);opacity:1}
+html.js .cap-card.is-in{
+  opacity:1;
+  transform:translate3d(0,0,0) rotate(0deg) rotateY(0deg) scale(1);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
+             0 10px 26px -18px rgba(41,60,64,.5)}
 
-/* ── mobile: the same sequence, a shorter throw ──────────────────────────── */
+/* whichever card is still in flight rides over the ones already down */
+html.js .cap-card{z-index:var(--z,1)}
+
+/* Hover is deferred to .is-done, added once the whole row has landed.
+   A `transition` declared on .is-in would be the one the browser uses for the
+   arrival itself — a short hover duration there silently replaced the arrival's
+   timing and its per-card delay, and all four cards moved as one. */
+html.js .cap-card:hover{transform:none}
+html.js .cap-card.is-done{transition:transform .35s var(--ease),box-shadow .45s var(--ease)}
+html.js .cap-card.is-done:hover{transform:translateY(-3px);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,
+             0 22px 44px -22px rgba(41,60,64,.55)}
+
+/* ── mobile: same sequence, a throw that suits the width ─────────────────── */
 @media (max-width:620px){
-  .cap-body{transform:translate3d(22px,0,0)}
-  .cap-top{margin-bottom:16px}
+  html.js .cap-card{--fx:150px;--fy:26px;--fz:-110px;--frot:5deg;--fturn:-10deg;--fscale:.93}
+  .cap-card{padding:20px;border-radius:12px}
+  .cap-top{margin-bottom:14px}
+}
+@media (min-width:621px) and (max-width:1100px){
+  html.js .cap-card{--fx:360px}
 }
 
-/* ── reduced motion: everything present, nothing choreographed ───────────── */
-html.rm .cap-card{--edge:1;background:var(--cap-card)}
-html.rm .cap-body{opacity:1;transform:none}
-html.rm .cap-weave i{transform:none!important;opacity:1!important;transition:none}
-html:not(.js) .cap-weave i{transform:none;opacity:1}
+/* ── never leave the content behind ──────────────────────────────────────── */
+html:not(.js) .cap-card{opacity:1;transform:none}
+html.rm .cap-card{opacity:1!important;transform:none!important;transition:none}
+html.rm .cap-card:hover{transform:none!important}
 @media (prefers-reduced-motion:reduce){
-  html.js .cap-card .cap-weave i,
-  html.js .cap-card .cap-body{transition-duration:1ms;transition-delay:0ms}
+  html.js .cap-card{transition-duration:1ms;transition-delay:0ms}
 }
