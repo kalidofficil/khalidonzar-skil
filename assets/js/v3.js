@@ -524,7 +524,7 @@
     /* Beat boundaries as fractions of the section's travel. The scrub gets
        most of it: it is the only stretch where the visitor is doing the
        acting, and the push reads better fast. */
-    var B = { hold: 0.06, scrub: 0.62, dolly: 0.86 };
+    var B = { hold: 0.05, scrub: 0.64, dolly: 0.88 };
     var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
     var span = function (p, a, b) { return clamp((p - a) / (b - a), 0, 1); };
 
@@ -626,23 +626,27 @@
       pin.style.setProperty("--scr-s", (0.965 + ease(sIn) * 0.035 + Math.pow(sThru, 2.2) * 6).toFixed(3));
       /* Once we are passing through it, what should fill the frame is the
          screen's own light — not four-foot letterforms sliding past. */
-      pin.style.setProperty("--scr-copy", (1 - span(p, B.dolly + 0.01, B.dolly + 0.08)).toFixed(3));
+      pin.style.setProperty("--scr-copy", (1 - span(p, B.dolly + 0.005, B.dolly + 0.055)).toFixed(3));
 
       /* ── focus falls off as the camera closes ──
          Only in the last third of the push, by which point his face has long
          left the frame. Nothing here grades or tints the footage. */
-      pin.style.setProperty("--film-o", (1 - span(p, B.dolly + 0.005, B.dolly + 0.085)).toFixed(3));
+      pin.style.setProperty("--film-o", (1 - span(p, B.dolly + 0.005, B.dolly + 0.07)).toFixed(3));
       /* A vignette belongs to the wide shot. It has to be gone by the time we
          are reading the screen, because its flat tint sits over the panel too
          and was costing the headline four stops of contrast. */
       pin.style.setProperty("--vig", (1 - span(p, B.scrub, B.scrub + (B.dolly - B.scrub) * 0.6)).toFixed(3));
 
       /* ── the wash, and its retreat upward into About ── */
-      var f = span(p, B.dolly, B.dolly + 0.07);
-      var out = span(p, 0.92, 1);
+      /* The wash rises late and retreats immediately, because About is already
+         climbing into frame underneath it by p=0.90 (see #about in the
+         stylesheet). Held any longer, the two spend half a screen doing
+         nothing but being the same colour. */
+      var f = span(p, B.dolly, B.dolly + 0.06);
+      var out = span(p, 0.945, 1);
       pin.style.setProperty("--flash", (f * (1 - out * 0.15)).toFixed(3));
       pin.style.setProperty("--flash-y", (-out * 100).toFixed(1) + "%");
-      pin.style.setProperty("--handover", span(p, B.dolly, 0.99).toFixed(3));
+      pin.style.setProperty("--handover", span(p, B.dolly, 0.97).toFixed(3));
       pin.style.setProperty("--cue", (1 - span(p, 0.03, 0.14)).toFixed(3));
 
       /* The bar is painted for whatever band is under it, and this section is

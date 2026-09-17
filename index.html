@@ -461,25 +461,34 @@
   </div>
 </section>
 
+<!-- ══════════ ABOUT ══════════════════════════════════════════════════════
+     No portrait: the film and the laptop sequence have already shown him, and
+     a third likeness here only competed with them. What the space is used for
+     instead is the one line worth reading slowly, then the account and the
+     index of what he actually does, side by side.
+     This section overlaps the tail of the laptop section (see .lap in the
+     stylesheet) so it rises into frame while the hand-over wash is still
+     clearing, rather than after it. -->
 <section class="band light" id="about">
   <div class="band-in">
-    <header class="head rise"><div><span class="label">About</span><h2>Khalid Ounzar</h2></div></header>
+    <div class="about-top">
+      <header class="head rise"><div><span class="label">About</span><h2>Khalid Ounzar</h2></div></header>
+      <p class="about-lede rise">My work is hands-on, including when the numbers say the campaign
+        is not working.</p>
+    </div>
+
     <div class="about">
-      <figure class="rise" style="margin:0">
-        <div class="shot">
-          <img src="assets/cinematic/master-poster.jpg" width="1080" height="1448" loading="lazy" decoding="async"
-               alt="Khalid Ounzar, seated beside an open MacBook in a Dubai office at dusk.">
-        </div>
-        <figcaption>A frame from the film above — an AI-generated visualisation, not a photograph of a real workplace.</figcaption>
-      </figure>
       <div class="rise">
-        <p class="lede" style="max-width:30ch">My work is hands-on, including when the numbers say the campaign is not working.</p>
-        <p class="prose" style="margin-top:26px">Most of what I run is Meta Ads for physical products sold cash
+        <p class="prose">Most of what I run is Meta Ads for physical products sold cash
           on delivery. That market rewards a particular kind of care: the platform will happily report purchases
           that never arrive, so the job does not end at the dashboard. I spend as much time on product research,
           competitor teardowns and post-purchase analysis as on the buying itself.</p>
         <p class="prose">Google Ads and TikTok Ads are supporting skills. I use them where a campaign calls for
           them; I would not present myself as a specialist in either.</p>
+      </div>
+
+      <div class="rise">
+        <h3 class="about-h">What I do</h3>
         <ul class="stack-list">
           <li><b>Meta Ads — campaign strategy &amp; media buying</b><span>Primary</span></li>
           <li><b>E-commerce &amp; COD campaigns</b><span>Primary</span></li>
@@ -494,33 +503,47 @@
   </div>
 </section>
 
+<!-- ══════════ CONTACT ════════════════════════════════════════════════════
+     Two ways to reach him, ranked: email first, WhatsApp second. LinkedIn and
+     the copy control stay reachable but quiet, so the ranking means something.
+     The enquiry form sits below the buttons at every width. -->
 <section class="band contact dark" id="contact">
   <div class="band-in">
     <span class="label rise">Contact</span>
     <h2 class="rise">Let’s build <em>what performs</em>.</h2>
+
     <div class="c-grid">
-      <div class="rise">
-        <ul class="direct">
+      <div class="c-lead">
+        <ul class="direct rise">
           <li><span class="label">Name</span><span>Khalid Ounzar</span></li>
-          <li><span class="label">Role</span><span>Performance Marketer — Media Buyer</span></li>
+          <li><span class="label">Role</span><span>Performance Marketer &amp; Creative Strategist</span></li>
           <li><span class="label">Based</span><span>Dubai, United Arab Emirates</span></li>
           <li><span class="label">Email</span><a href="mailto:ounzar.khalid1999@gmail.com">ounzar.khalid1999@gmail.com</a></li>
           <li><span class="label">WhatsApp</span><a href="https://wa.me/971589680262" target="_blank" rel="noopener noreferrer">+971 58 968 0262</a></li>
           <li><span class="label">LinkedIn</span><a href="https://www.linkedin.com/in/khalid-ounzar-664bbb424" target="_blank" rel="noopener noreferrer">linkedin.com/in/khalid-ounzar</a></li>
         </ul>
-        <div class="c-acts">
-          <a class="btn" href="mailto:ounzar.khalid1999@gmail.com?subject=Portfolio%20enquiry">Email Khalid</a>
-          <a class="btn btn-line" href="https://wa.me/971589680262" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          <a class="btn btn-line" href="https://www.linkedin.com/in/khalid-ounzar-664bbb424" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <button class="btn btn-line" type="button" data-copy>Copy email address</button>
+
+        <div class="rise">
+          <div class="c-acts">
+            <a class="btn btn-lg" href="mailto:ounzar.khalid1999@gmail.com?subject=Portfolio%20enquiry">Email me</a>
+            <a class="btn btn-line btn-lg" href="https://wa.me/971589680262" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+          </div>
+          <div class="c-more">
+            <a href="https://www.linkedin.com/in/khalid-ounzar-664bbb424" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <button type="button" data-copy>Copy email address</button>
+          </div>
+          <span class="disclose">Only verified contact details are shown. Every channel here reaches Khalid directly.</span>
         </div>
-        <span class="disclose">Only verified contact details are shown. Every channel here reaches Khalid directly.</span>
       </div>
+
       <form id="enquiry" class="rise" novalidate>
-        <div class="f-row"><label for="f-name">Your name</label>
-          <input id="f-name" name="name" type="text" required autocomplete="name"></div>
-        <div class="f-row"><label for="f-email">Email</label>
-          <input id="f-email" name="email" type="email" required autocomplete="email"></div>
+        <h3 class="c-formh">Or send the details</h3>
+        <div class="f-duo">
+          <div class="f-row"><label for="f-name">Your name</label>
+            <input id="f-name" name="name" type="text" required autocomplete="name"></div>
+          <div class="f-row"><label for="f-email">Email</label>
+            <input id="f-email" name="email" type="email" required autocomplete="email"></div>
+        </div>
         <div class="f-row"><label for="f-budget">Monthly ad spend</label>
           <select id="f-budget" name="budget"><option value="">Prefer not to say</option>
             <option>Under $500</option><option>$500 – $2,000</option>
@@ -531,8 +554,9 @@
         <p class="f-note" id="formNote" role="status" aria-live="polite"></p>
       </form>
     </div>
+
     <div class="foot">
-      <span>© <span class="tnum">2026</span> Khalid Ounzar — Performance Marketer, Dubai, UAE.</span>
+      <span>© <span class="tnum">2026</span> Khalid Ounzar — Performance Marketer &amp; Creative Strategist, Dubai, UAE.</span>
       <span>The cinematic is an AI-generated visualisation. Campaign figures are Meta Ads Manager reported metrics.</span>
     </div>
   </div>
