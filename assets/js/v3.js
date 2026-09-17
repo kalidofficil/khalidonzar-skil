@@ -456,6 +456,41 @@
     heads.forEach(function (h) { io.observe(h); });
   })();
 
+  /* ── the process rail ───────────────────────────────────────────────────
+     The line fills and each node lights as its step reaches the middle of the
+     screen. Scroll-linked, on the page's one loop, and purely decorative —
+     the four steps read the same with it switched off.
+  --------------------------------------------------------------------- */
+  (function () {
+    var rail = document.querySelector("[data-rail]");
+    if (!rail) return;
+    var steps = Array.prototype.slice.call(rail.querySelectorAll(".rail-step"));
+    if (!steps.length) return;
+    if (RM) { steps.forEach(function (s) { s.classList.add("is-live"); });
+              rail.style.setProperty("--rail", "1"); return; }
+
+    var live = false, lastFill = -1;
+    function draw() {
+      var line = innerHeight * 0.58;          /* the reading line */
+      var reached = 0;
+      for (var i = 0; i < steps.length; i++) {
+        var r = steps[i].getBoundingClientRect();
+        var on = r.top <= line;
+        steps[i].classList.toggle("is-live", on);
+        if (on) reached = i + 1;
+      }
+      /* the line is drawn to the last node reached, not past it */
+      var fill = steps.length < 2 ? (reached ? 1 : 0)
+                                  : clamp((reached - 1) / (steps.length - 1), 0, 1);
+      if (fill !== lastFill) { lastFill = fill; rail.style.setProperty("--rail", fill.toFixed(3)); }
+    }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { live = e.isIntersecting; if (live) draw(); });
+    }, { rootMargin: "20% 0px 20% 0px" }).observe(rail);
+    (window.__csFrame = window.__csFrame || []).push(function () { if (live) draw(); });
+    draw();
+  })();
+
   /* ── card systems ─────────────────────────────────────────────────────── */
   /* Anything else on the page that needs per-frame work registers here rather
      than starting its own requestAnimationFrame. One loop, one clock — the

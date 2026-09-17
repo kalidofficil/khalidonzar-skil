@@ -4,7 +4,6 @@
    Extends the existing system rather than replacing any of it:
 
      · per-frame work registers into v3.js's single tick() via window.__csFrame
-     · tilt is capped at the same 4°/2° the grid cards already use
      · the unpack reuses the stack's enter/cover progress maths
      · entrances go through the existing .rise IntersectionObserver
      · reduced motion rides the existing html.rm branch
@@ -26,7 +25,6 @@
 
   var RM = document.documentElement.classList.contains("rm");
   var small = matchMedia("(max-width: 900px)");
-  var TILT = small.matches ? 2 : 4;          /* same cap as the existing grid cards */
   var DEPTH = small.matches ? 120 : 420;     /* stack depth, shallower on a phone */
 
   var $ = function (sel, el) { return (el || root).querySelector(sel); };
@@ -54,7 +52,6 @@
   }
 
   /* ── views ─────────────────────────────────────────────────────────────── */
-  var cats    = $("[data-cs-cats]");
   var world   = $("[data-cs-world]");
   var deck    = $("[data-cs-deck]");
   var track   = $("[data-cs-track]");
@@ -275,29 +272,34 @@
   }
 
   /* ── routing ───────────────────────────────────────────────────────────── */
-  var view = { name: "categories", product: null };
+  var view = { name: "overview", product: null };
 
+  /* Two scenes now, not four. The overview IS the page: every campaign and
+     every concept is on it. A product's detail is the only thing that replaces
+     it, and the old routes still resolve so shared links keep working. */
   function hashFor(v) {
     if (v.name === "study") return "#/ecommerce/" + v.product;
-    if (v.name === "deck") return "#/ecommerce";
-    if (v.name === "concepts") return "#/concepts";
     return "#/case-studies";
   }
   function parseHash() {
     var h = (location.hash || "").replace(/^#\/?/, "").split("/").filter(Boolean);
-    if (h[0] === "ecommerce") return h[1] ? { name: "study", product: h[1] } : { name: "deck", product: null };
-    if (h[0] === "concepts") return { name: "concepts", product: null };
-    return { name: "categories", product: null };
+    if (h[0] === "ecommerce" && h[1]) return { name: "study", product: h[1] };
+    return { name: "overview", product: null };
   }
 
   function paint(v, opts) {
     opts = opts || {};
     view = v;
-    cats.parentNode.hidden = v.name !== "categories";
-    world.classList.toggle("is-open", v.name === "deck" || v.name === "study");
-    concepts.classList.toggle("is-open", v.name === "concepts");
-    track.hidden = v.name !== "deck";
-    study.classList.toggle("is-open", v.name === "study");
+    var overview = v.name === "overview";
+    world.classList.add("is-open");
+    concepts.classList.toggle("is-open", overview);
+    track.hidden = !overview;
+    study.classList.toggle("is-open", !overview);
+    /* the group heading and the back control swap places with the detail */
+    var ghead = world.querySelector("[data-cs-grouphead]");
+    if (ghead) ghead.hidden = !overview;
+    var back = world.querySelector(".cs-back");
+    if (back) back.hidden = overview;
 
     if (v.name === "study") {
       var p = D.byId(v.product);
@@ -308,7 +310,7 @@
         requestAnimationFrame(function () { i.style.width = i.dataset.w; });
       });
       if (!opts.silent) focusFirst(study);
-    } else if (v.name === "deck" && !opts.silent) {
+    } else if (!opts.silent) {
       focusFirst(deck);
     }
     resize();
@@ -355,26 +357,6 @@
     setTimeout(function () { el.remove(); }, 1000);
   }
 
-  /* ── entering the e-commerce world ─────────────────────────────────────── */
-  $$("[data-category]", cats).forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var id = btn.dataset.category;
-      var cat = D.categories.filter(function (c) { return c.id === id; })[0];
-      if (!cat || !cat.open) return;
-
-      if (RM) { go({ name: id === "concepts" ? "concepts" : "deck", product: null }); return; }
-
-      cats.classList.add("is-leaving");
-      btn.classList.add("is-chosen");
-      portal(btn, function () {
-        cats.classList.remove("is-leaving");
-        btn.classList.remove("is-chosen");
-        go({ name: id === "concepts" ? "concepts" : "deck", product: null });
-        toSection();
-      });
-    });
-  });
-
   /* ── opening a product ─────────────────────────────────────────────────── */
   root.addEventListener("click", function (e) {
     var b = e.target.closest("[data-product]");
@@ -390,7 +372,7 @@
     }
     var back = e.target.closest("[data-back]");
     if (back) {
-      go({ name: back.dataset.back === "cats" ? "categories" : "deck", product: null });
+      go({ name: "overview", product: null });
       toSection();
     }
   });
@@ -426,7 +408,7 @@
   }
 
   function unpack() {
-    if (view.name !== "deck" || !cards.length) return;
+    if (view.name !== "overview" || !cards.length) return;
     /* Progress is the deck's travel through the viewport: 0 when its top is
        still a screen below the fold, 1 once it has climbed far enough that the
        last card has settled. Same shape as the existing stack's `enter`. */
@@ -459,40 +441,13 @@
     }
   }
 
-  /* ── cursor tilt, same cap as the existing grid cards ──────────────────── */
-  var pointer = { x: -1, y: -1, live: false };
-  if (!RM && matchMedia("(hover:hover)").matches) {
-    addEventListener("pointermove", function (e) {
-      pointer.x = e.clientX; pointer.y = e.clientY; pointer.live = true;
-    }, { passive: true });
-    addEventListener("pointerleave", function () { pointer.live = false; }, { passive: true });
-  }
-
-  function tilt() {
-    if (!pointer.live || view.name === "study") return;
-    var els = view.name === "categories" ? $$(".cs-cat", cats) : [];
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i], r = el.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) { el.style.transform = ""; continue; }
-      var nx = clamp(((pointer.x - (r.left + r.width / 2)) / (r.width / 2)), -1, 1);
-      var ny = clamp(((pointer.y - (r.top + r.height / 2)) / (r.height / 2)), -1, 1);
-      var near = Math.abs(nx) < 1.25 && Math.abs(ny) < 1.25;
-      var g = near ? 1 : 0;
-      el.style.transform = "rotateY(" + (nx * TILT * g).toFixed(2) + "deg) rotateX(" +
-        (-ny * TILT * g).toFixed(2) + "deg) translateZ(" + (g * 8).toFixed(1) + "px)";
-      el.style.setProperty("--mx", (((pointer.x - r.left) / r.width) * 100).toFixed(1) + "%");
-      el.style.setProperty("--my", (((pointer.y - r.top) / r.height) * 100).toFixed(1) + "%");
-    }
-  }
-
-  /* one loop for the whole page — register, never start a second */
   if (!RM && window.__csFrame) {
-    window.__csFrame.push(function () { unpack(); tilt(); });
+    window.__csFrame.push(function () { unpack(); });
   }
 
   var lastW = innerWidth;
   addEventListener("resize", function () {
-    if (innerWidth !== lastW) { lastW = innerWidth; TILT = small.matches ? 2 : 4; DEPTH = small.matches ? 120 : 420; }
+    if (innerWidth !== lastW) { lastW = innerWidth; DEPTH = small.matches ? 120 : 420; }
     resize();
   }, { passive: true });
   /* No measure() on scroll: offsetLeft forces layout, and nothing here reflows

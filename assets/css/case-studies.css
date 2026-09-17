@@ -37,33 +37,19 @@
   font-size:.95rem;color:var(--ink-2)}
 .cs-doctrine b{color:var(--ink);font-weight:600}
 
-/* ── 02 categories ───────────────────────────────────────────────────────── */
-.cs-cats{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(3,1fr);
-  perspective:1500px;perspective-origin:50% 44%;padding-bottom:clamp(80px,12vh,150px)}
-.cs-cat{position:relative;display:grid;align-content:end;gap:14px;min-height:clamp(330px,44vh,470px);
-  padding:clamp(24px,2.6vw,34px);text-align:left;cursor:pointer;
-  background:var(--cs-surface);
-  border:1px solid var(--glass-edge-ink);color:inherit;font:inherit;
-  border-radius:18px;
-  box-shadow:var(--sh-1),inset 0 1px 0 var(--glass-edge-lit);
-  transform-style:preserve-3d;will-change:transform;
-  transition:border-color .4s var(--ease),box-shadow .4s var(--ease),opacity .5s var(--ease)}
-.cs-cat::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(120% 80% at var(--mx,50%) var(--my,30%),
-    rgba(233,107,200,.07) 0%,rgba(233,107,200,0) 58%);
-  opacity:0;transition:opacity .4s var(--ease)}
-.cs-cat:hover::before,.cs-cat:focus-visible::before{opacity:1}
-.cs-cat:hover,.cs-cat:focus-visible{border-color:var(--cs-rim);box-shadow:var(--sh-3)}
-.cs-cat > *{transform:translateZ(var(--z,0px))}
-.cs-cat .cs-cat-n{--z:26px;position:absolute;top:clamp(22px,2.4vw,30px);left:clamp(24px,2.6vw,34px);
-  font-family:var(--serif);font-size:clamp(1.6rem,2.4vw,2.1rem);color:var(--ink-3);line-height:1}
-.cs-cat h3{--z:34px;font-family:var(--serif);font-size:clamp(1.5rem,2.5vw,2.15rem);line-height:1.04;
-  letter-spacing:-.022em;max-width:14ch}
-.cs-cat p{--z:22px;margin:0;font-size:.9rem;color:var(--ink-2);max-width:32ch}
-.cs-cat .cs-badge{--z:22px;justify-self:start}
-.cs-cat[aria-disabled="true"]{cursor:default}
-.cs-cat[aria-disabled="true"]:hover{border-color:var(--glass-edge-ink);box-shadow:var(--sh-1)}
-.cs-cat[aria-disabled="true"]:hover::before{opacity:0}
+/* ── the group heading ────────────────────────────────────────────────── */
+/* The categories used to be a gate you clicked through. They are labels now:
+   the work is on the page and the label only says which kind it is. */
+.cs-group{display:inline-flex;align-items:center;gap:9px;justify-self:start;
+  font-size:.62rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);padding:7px 13px;border-radius:999px;
+  background:var(--pink-wash);border:1px solid rgba(233,107,200,.34)}
+.cs-group::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.cs-group.is-concept{color:var(--ink-3);background:var(--glass-l2);border-color:var(--glass-edge-ink)}
+.cs-concepts{margin-top:clamp(70px,11vh,130px);
+  padding-top:clamp(50px,8vh,90px);border-top:1px solid var(--glass-edge-ink)}
+.cs-back[hidden]{display:none}
+[data-cs-grouphead][hidden]{display:none}
 
 .cs-badge{display:inline-flex;align-items:center;gap:7px;font-size:.6rem;font-weight:700;
   letter-spacing:.13em;text-transform:uppercase;padding:5px 10px;border:1px solid}
@@ -74,11 +60,6 @@
 .cs-badge.is-pending{color:var(--ink-3);border-color:var(--glass-edge-ink)}
 .cs-badge.is-concept{color:var(--ink-3);border-color:var(--glass-edge-ink);background:var(--lav-200)}
 
-/* the film leaving the room while one card comes forward */
-.cs-cats.is-leaving .cs-cat{transition:transform .62s var(--ease-out),opacity .5s var(--ease)}
-.cs-cats.is-leaving .cs-cat:not(.is-chosen){transform:translateZ(-180px);opacity:.12;pointer-events:none}
-.cs-cats.is-leaving .cs-cat.is-chosen{border-color:var(--cs-rim);
-  box-shadow:0 0 0 1px rgba(233,107,200,.25),var(--sh-3)}
 
 /* the expanding plate that carries the visitor through the card */
 .cs-portal{position:fixed;z-index:60;pointer-events:none;border:1px solid var(--cs-rim);
@@ -260,27 +241,23 @@
 .cs-nav a:hover,.cs-nav button:hover{color:var(--accent);border-color:var(--accent);background:var(--pink-wash)}
 
 /* ── the bridge out ──────────────────────────────────────────────────────── */
-.cs-bridge{display:grid;gap:24px;padding-block:clamp(70px,11vh,140px);
-  border-top:1px solid var(--glass-edge-ink);justify-items:start}
-.cs-bridge p{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.4rem);line-height:1.1;
-  max-width:22ch;color:var(--ink)}
 
 /* ── concept category ────────────────────────────────────────────────────── */
 .cs-concepts{display:none}
 .cs-concepts.is-open{display:block}
 .cs-conceptgrid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr)}
+.cs-conceptcard > .tag{justify-self:start}
 .cs-conceptcard{background:var(--cs-surface);border:1px solid var(--glass-edge-ink);
   border-radius:18px;
   box-shadow:var(--sh-1),inset 0 1px 0 var(--glass-edge-lit);
   padding:clamp(22px,2.6vw,34px);display:grid;gap:14px;align-content:start}
-.cs-conceptcard h4{font-family:var(--serif);font-size:clamp(1.5rem,2.4vw,2rem);line-height:1.04}
+.cs-conceptcard > h4{font-family:var(--serif);font-size:clamp(1.5rem,2.4vw,2rem);line-height:1.04;
+  justify-self:start}
 .cs-conceptcard .kicker{font-size:.94rem;color:var(--ink-2)}
 
 /* ── responsive ──────────────────────────────────────────────────────────── */
 @media (max-width:1000px){
-  .cs-cats{grid-template-columns:1fr;gap:14px}
-  .cs-cat{min-height:0;padding-top:clamp(56px,9vw,70px)}
-  .cs-deck{grid-template-columns:repeat(2,1fr)}
+      .cs-deck{grid-template-columns:repeat(2,1fr)}
   .cs-kpis{grid-template-columns:repeat(2,1fr)}
   .cs-conceptgrid{grid-template-columns:1fr}
 }
@@ -301,14 +278,13 @@
 /* ── reduced motion: the same content, no choreography ───────────────────── */
 html.rm .cs-track{height:auto!important}
 html.rm .cs-pin{position:static;min-height:0;padding-block:0}
-html.rm .cs-cat,html.rm .cs-card{transform:none!important;will-change:auto}
-html.rm .cs-cats{perspective:none}
-html.rm .cs-deck{perspective:none}
+html.rm html.rm .cs-deck{perspective:none}
 html.rm .cs-plate img{transition:none}
+html.rm .cs-card{transform:none!important;will-change:auto}
 html.rm .cs-portal{display:none}
 html.rm .cs-shot{transform:none!important}
 html.rm .cs-more{max-height:none;opacity:1;overflow:visible}
 
 @media (prefers-reduced-motion:reduce){
-  .cs-portal,.cs-cats.is-leaving .cs-cat{transition-duration:1ms}
+  .cs-portal{transition-duration:1ms}
 }

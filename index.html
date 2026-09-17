@@ -227,17 +227,59 @@
 
 <section class="band light" id="process">
   <div class="band-in">
-    <header class="head rise">
-      <div><span class="label">Process</span><h2>Five things, <em>in order</em>.</h2></div>
-      <p class="sub">Run out of order, a campaign spends money proving something it did not need to ask.</p>
+    <header class="head" data-seq>
+      <div><span class="label">Process</span>
+        <h2 class="seq"><span class="seq-w">Four steps.</span> <em class="seq-w">In order.</em></h2></div>
+      <p class="sub">Run out of order, a campaign spends money proving something it did not need to ask.
+        Where a step was not mine, it says so.</p>
     </header>
-    <div class="flow">
-      <article class="step rise"><span class="n">01</span><h3>Audience</h3><p>Who is worth reaching, sized against the offer rather than the platform's estimate.</p></article>
-      <article class="step rise"><span class="n">02</span><h3>Offer</h3><p>Price, bundle and guarantee — the fastest lever on a cash-on-delivery campaign.</p></article>
-      <article class="step rise"><span class="n">03</span><h3>Creative</h3><p>Hooks tested against hold rate, not against opinion.</p></article>
-      <article class="step rise"><span class="n">04</span><h3>Landing page</h3><p>One promise, carried from ad to page without a break.</p></article>
-      <article class="step rise"><span class="n">05</span><h3>Measurement</h3><p>Reported, delivered and confirmed kept apart — they are not the same number.</p></article>
-    </div>
+
+    <!-- A rail rather than a row: the node fills as its step reaches the
+         middle of the screen, so the reader always knows where they are. -->
+    <ol class="rail" data-rail>
+      <li class="rail-step">
+        <span class="rail-node" aria-hidden="true"></span>
+        <article class="step">
+          <span class="n">01</span>
+          <h3>Research &amp; Insights</h3>
+          <p>Product and competitor research before a dirham is spent: the Facebook Ads Library for what is
+            already running on the angle, and 1688 for what is being sourced and at what cost.</p>
+          <p class="step-who"><span>Shared</span> A product research team searched the Chinese marketplaces.
+            I worked from what that research surfaced.</p>
+        </article>
+      </li>
+      <li class="rail-step">
+        <span class="rail-node" aria-hidden="true"></span>
+        <article class="step">
+          <span class="n">02</span>
+          <h3>Creative Strategy</h3>
+          <p>Audience insight turned into angles, hooks, scripts and storyboards. The idea is written to be
+            testable, not just watchable — every hook has to be something a campaign can answer.</p>
+          <p class="step-who"><span>Mine</span> Angles, hooks, scripts and storyboards.</p>
+        </article>
+      </li>
+      <li class="rail-step">
+        <span class="rail-node" aria-hidden="true"></span>
+        <article class="step">
+          <span class="n">03</span>
+          <h3>Production &amp; Launch</h3>
+          <p>Creative produced, the landing page built or rebuilt around the offer, the campaign structured
+            and launched. One promise carried from the hook to the buy button without a break.</p>
+          <p class="step-who"><span>Mine</span> Creative production, landing page, campaign build and launch.</p>
+        </article>
+      </li>
+      <li class="rail-step">
+        <span class="rail-node" aria-hidden="true"></span>
+        <article class="step">
+          <span class="n">04</span>
+          <h3>Measurement &amp; Optimisation</h3>
+          <p>Daily buying against campaign metrics — budget pacing, audiences, placements — and then the part
+            the dashboard does not show: confirmation, delivery, returns and what is left afterwards.</p>
+          <p class="step-who"><span>Shared</span> The buying is mine. Confirmation calls, importing and
+            delivery belong to the owner and the team.</p>
+        </article>
+      </li>
+    </ol>
   </div>
 </section>
 
@@ -246,10 +288,11 @@
   <div class="cs-in" id="case-studies">
 
     <!-- 01 · overture ─────────────────────────────────────────────────── -->
-    <div class="cs-overture rise">
+    <div class="cs-overture" data-seq>
       <div>
         <span class="label">Case studies</span>
-        <h2 id="cs-h">Strategy is only useful when it <em>produces results</em>.</h2>
+        <h2 id="cs-h" class="seq"><span class="seq-w">Strategy is only useful</span>
+          <em class="seq-w">when it produces results.</em></h2>
       </div>
       <p class="cs-lines"><span>Real products.</span><span>Real decisions.</span><span>Real performance data.</span></p>
       <div class="cs-doctrine">
@@ -262,45 +305,20 @@
       </div>
     </div>
 
-    <!-- 02 · three disciplines ────────────────────────────────────────── -->
-    <div class="rise">
-      <div class="cs-cats" data-cs-cats>
-
-        <button class="cs-cat" type="button" data-category="ecommerce">
-          <span class="cs-cat-n">01</span>
-          <span class="cs-badge is-verified">Verified campaign data</span>
-          <h3>E-commerce Media Buying</h3>
-          <p>Six real products, from validation to performance. Reported Meta figures, shown with their
-            labels.</p>
-        </button>
-
-        <button class="cs-cat" type="button" data-category="creative" aria-disabled="true">
-          <span class="cs-cat-n">02</span>
-          <span class="cs-badge is-pending">In preparation</span>
-          <h3>Creative Strategy</h3>
-          <p>Reels, hooks, concepts, scripts and performance creative. Being prepared — it stays empty until
-            there is something real to show.</p>
-        </button>
-
-        <button class="cs-cat" type="button" data-category="concepts">
-          <span class="cs-cat-n">03</span>
-          <span class="cs-badge is-concept">Concept — not a result</span>
-          <h3>Other &amp; Concept Work</h3>
-          <p>Speculative briefs for businesses I have not run campaigns for. Kept apart from verified results
-            on purpose.</p>
-        </button>
-
-      </div>
-    </div>
-
+    <!-- 02 · the work itself, on the page
+         ────────────────────────────────────────────────────────────────
+         There is no category gate any more: every campaign and every concept
+         is on this page. The detail views are still their own scenes, still
+         reachable at #/ecommerce/product-01, still entered through the card. -->
     <!-- 03/04/05 · the e-commerce world ───────────────────────────────── -->
     <div class="cs-world" data-cs-world>
-      <button class="cs-back" type="button" data-back="cats">
+      <button class="cs-back" type="button" data-back="overview">
         <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M15 5H1M5 1L1 5l4 4"/></svg>
-        Back to disciplines
+        Back to the work
       </button>
 
-      <div class="cs-worldhead">
+      <div class="cs-worldhead" data-cs-grouphead>
+        <span class="cs-group">E-commerce / Paid Media</span>
         <h3>Six products. <em>One full-funnel approach.</em></h3>
         <p class="sub">From rapid product validation to creative development, landing-page work, paid
           acquisition and cash-on-delivery reality.</p>
@@ -316,22 +334,12 @@
 
       <div class="cs-study" data-cs-study></div>
 
-      <div class="cs-bridge">
-        <span class="label">Next</span>
-        <p>Performance tells us what worked. Creative strategy decides what we test next.</p>
-        <p class="sub" style="max-width:46ch;font-size:.95rem;color:var(--ink-3)">That work is being
-          prepared. I would rather show you nothing than show you placeholder projects.</p>
-      </div>
     </div>
 
     <!-- concept work, deliberately separate ───────────────────────────── -->
     <div class="cs-concepts" data-cs-concepts>
-      <button class="cs-back" type="button" data-back="cats">
-        <svg viewBox="0 0 16 10" aria-hidden="true"><path d="M15 5H1M5 1L1 5l4 4"/></svg>
-        Back to disciplines
-      </button>
-
-      <div class="cs-worldhead">
+      <div class="cs-worldhead" data-cs-grouphead>
+        <span class="cs-group is-concept">Other / Concept Work</span>
         <h3>Concept work.</h3>
         <p class="sub">Neither of these has run. They show how I think about a brief before any money is
           spent — not a result. No figures appear because there are none to report.</p>
