@@ -224,9 +224,9 @@
   function studyHTML(p) {
     var m = p.metrics, parts = [];
 
-    parts.push('<button class="cs-back" type="button" data-back="deck">' +
-      '<svg viewBox="0 0 16 10" aria-hidden="true"><path d="M15 5H1M5 1L1 5l4 4"/></svg>' +
-      "Back to the six products</button>");
+    /* No back control here: the page already carries one, which paint()
+       shows for exactly this view. Rendering a second put two identical
+       controls one above the other at the top of every study. */
 
     parts.push('<div class="cs-hero"><div>' +
       '<span class="label">Case study ' + p.n + "</span>" +
@@ -304,13 +304,18 @@
 
     if (v.name === "study") {
       var p = D.byId(v.product);
-      if (!p) { go({ name: "deck", product: null }); return; }
+      if (!p) { go({ name: "overview", product: null }); return; }
       study.innerHTML = studyHTML(p);
       /* the bar widths the existing observer would normally animate */
       $$(".gap .bar i", study).forEach(function (i) {
         requestAnimationFrame(function () { i.style.width = i.dataset.w; });
       });
-      if (!opts.silent) focusFirst(study);
+      /* Focus the control that leaves, so a keyboard or screen-reader user
+         arrives knowing the way out; it is the page-level one now. */
+      if (!opts.silent) {
+        if (back && !back.hidden) { try { back.focus({ preventScroll: true }); } catch (e) { back.focus(); } }
+        else focusFirst(study);
+      }
     } else if (!opts.silent) {
       focusFirst(deck);
     }
@@ -323,6 +328,18 @@
     if (!el.hasAttribute("tabindex") && !/^(A|BUTTON)$/.test(el.tagName)) el.setAttribute("tabindex", "-1");
     try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
   }
+
+  /* A case study reads as a popup, so Escape should close it. It is not a
+     modal — the page behind it is still scrollable and the Back control and
+     the browser's own Back both work — but nothing is gained by making
+     Escape the one way out that does not. */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" && e.key !== "Esc") return;
+    if (parseHash().name !== "study") return;
+    var card = document.querySelector('.cs-card[data-product="' + parseHash().product + '"]');
+    go({ name: "overview", product: null });
+    if (card) { try { card.focus({ preventScroll: true }); } catch (err) { card.focus(); } }
+  });
 
   function go(v, opts) {
     var h = hashFor(v);

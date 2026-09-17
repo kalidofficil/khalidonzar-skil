@@ -77,6 +77,13 @@
   padding:8px 0;margin-bottom:clamp(20px,3vh,34px);transition:color .3s var(--ease)}
 .cs-back:hover{color:var(--accent)}
 .cs-back svg{width:16px;height:10px;fill:none;stroke:currentColor;stroke-width:1.4}
+/* A coarse pointer needs a target it can actually hit: the control is 36px
+   tall, under both Apple's 44px and Android's 48px guidance. The text stays
+   where it is — the box grows around it. */
+@media (pointer:coarse){
+  .cs-back{min-height:48px}
+  .cs-nav a,.cs-nav button{min-height:44px}
+}
 
 .cs-worldhead{display:grid;gap:22px;margin-bottom:clamp(30px,5vh,54px)}
 .cs-worldhead h3{font-family:var(--serif);font-size:clamp(2rem,4.4vw,3.4rem);line-height:1;

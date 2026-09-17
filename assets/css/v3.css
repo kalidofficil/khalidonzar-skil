@@ -819,6 +819,23 @@ html.rm [data-seq] .seq-w,html.rm [data-seq] .label,html.rm [data-seq] .sub{
 .foot{margin-top:clamp(52px,7vh,90px);padding-top:24px;border-top:1px solid var(--glass-edge);
   display:flex;flex-wrap:wrap;gap:12px 30px;justify-content:space-between;font-size:.78rem;color:var(--on-dark-3)}
 
+/* ── Touch targets ──────────────────────────────────────────────────────
+   Measured on a 390px and a 360px phone, several controls came in under the
+   44px Apple and 48px Android ask, and the pair of quiet links under the
+   contact buttons was 13px — under even the 24px WCAG 2.5.8 minimum. These
+   grow the hit area on a coarse pointer only; a mouse-driven screen is
+   untouched, and where the control has a visible box the text does not move
+   inside it. */
+@media (pointer:coarse){
+  .stage-ctl button{min-height:44px;padding-inline:16px}
+  .c-more{gap:10px 20px}
+  .c-more a,.c-more button{min-height:44px;display:inline-flex;align-items:center}
+  .direct a{min-height:40px;display:inline-flex;align-items:center}
+  #enquiry button[type=submit]{min-height:48px}
+  .nav-mark{min-height:44px;display:inline-flex;align-items:center}
+  .nav-cta a{min-height:44px;display:inline-flex;align-items:center}
+}
+
 .rise{opacity:0;transform:translateY(18px)}
 html.js .rise{transition:opacity .75s var(--ease-out),transform .75s var(--ease-out)}
 html.js .rise.in{opacity:1;transform:none}

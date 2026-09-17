@@ -552,6 +552,27 @@
       if (vid.preload !== "auto") { vid.preload = "auto"; try { vid.load(); } catch (e) {} }
     }
 
+    /* iOS Safari will not paint a seeked frame for a <video> that has never
+       been played: the poster stays up and the scrub looks frozen. One muted
+       play() inside a real user gesture unlocks the decoder; the draw loop
+       below pauses it again on the very next frame, so nothing is ever seen
+       to play. Costs nothing anywhere else. This cannot be verified without
+       a physical iOS device, so it is deliberately defensive. */
+    var unlocked = false;
+    var GESTURES = ["pointerdown", "touchstart", "keydown", "wheel"];
+    function unlock() {
+      if (unlocked) return;
+      unlocked = true;
+      GESTURES.forEach(function (t) { removeEventListener(t, unlock, true); });
+      try {
+        var q = vid.play();
+        if (q && q.catch) q.catch(function () { /* refused, or paused first */ });
+      } catch (e) {}
+    }
+    GESTURES.forEach(function (t) {
+      addEventListener(t, unlock, { capture: true, passive: true });
+    });
+
     var live = false;
     function draw() {
       var travel = lap.offsetHeight - innerHeight;
