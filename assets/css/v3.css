@@ -379,6 +379,97 @@ html.rm .intro-clip .w,html.rm .intro-thesis .w{opacity:1!important;transform:no
   .intro-thesis{max-width:none}
 }
 
+/* ══ INTO THE WORK — the laptop cinematic ════════════════════════════════
+   Scroll-controlled, and assembled from one exported frame of the approved
+   master. Five beats, each driven by --p (0 to 1) written from the section's
+   own travel:
+
+     0.00-0.18  hold wide on the desk
+     0.18-0.56  dolly toward the laptop, its screen light blooming
+     0.56-0.74  the light resolves into a screen carrying readable content
+     0.74-0.90  the screen passes the frame edges and washes out
+     0.90-1.00  the wash retreats upward and hands over to About
+
+   The footage is never tinted or filtered — the dolly is a transform on the
+   plate and every other layer sits above it.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lap{position:relative;height:260svh}
+.lap-pin{position:sticky;top:0;height:100svh;overflow:hidden;
+  background:var(--void);
+  /* the ground crossfades to the About band so the hand-over has no seam */
+  box-shadow:inset 0 0 0 100vmax rgba(220,200,245,var(--handover,0))}
+.lap-stage{position:absolute;inset:0}
+
+.lap-plate{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  /* object-position and transform-origin are both written by the script: with
+     `cover` on a portrait frame in a landscape box, where the laptop lands
+     depends on the viewport, and a fixed percentage put the dolly on his face
+     with the laptop cropped away entirely. */
+  will-change:transform}
+
+/* a violet vignette on the surround, the same treatment the hero's edges get */
+.lap-vig{position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(78% 62% at 58% 60%, rgba(27,15,46,0) 34%, rgba(27,15,46,.42) 76%, rgba(27,15,46,.78) 100%),
+    linear-gradient(180deg, rgba(42,22,80,.34), rgba(27,15,46,.30))}
+
+/* the screen's own light, spilling from a lid that faces away from us */
+.lap-bloom{position:absolute;left:var(--lx,58%);top:var(--ly,76%);width:56vmax;height:56vmax;
+  transform:translate(-50%,-50%) scale(var(--bloom-s,.5));
+  opacity:var(--bloom,0);pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,
+    rgba(247,168,226,.95) 0%, rgba(196,169,238,.72) 26%,
+    rgba(139,95,214,.40) 48%, rgba(139,95,214,0) 72%);
+  will-change:transform,opacity}
+
+/* the light resolves into a screen */
+.lap-screen{position:absolute;left:var(--lx,58%);top:var(--ly,76%);
+  width:min(38vw,520px);aspect-ratio:16/10;
+  transform:translate(-50%,-50%) scale(var(--scr-s,.8));
+  opacity:var(--scr,0);pointer-events:none;
+  border-radius:clamp(8px,1vw,14px);overflow:hidden;
+  background:linear-gradient(168deg,#EFE4FB 0%,#DCC8F5 46%,#C9A9EE 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.7),0 40px 90px -30px rgba(12,4,26,.9),
+             0 0 120px -20px rgba(233,107,200,.55);
+  will-change:transform,opacity}
+.lap-screen-in{position:absolute;inset:0;display:grid;align-content:center;justify-items:start;
+  gap:clamp(8px,1.1vw,14px);padding:clamp(18px,3vw,40px);text-align:left;
+  opacity:var(--scr-copy,1)}
+.lap-mark{font-family:var(--serif);font-size:clamp(.9rem,1.8vw,1.6rem);color:var(--ink);line-height:1}
+.lap-line{margin:0;font-family:var(--serif);font-size:clamp(1.1rem,2.9vw,2.6rem);
+  line-height:1.04;letter-spacing:-.028em;color:var(--ink)}
+.lap-rows{display:grid;gap:clamp(5px,.7vw,9px);width:min(62%,320px);margin-top:clamp(4px,.8vw,10px)}
+.lap-rows span{display:block;height:clamp(3px,.42vw,6px);border-radius:99px;background:var(--pink-ink);opacity:.5}
+.lap-rows span:nth-child(2){width:78%;opacity:.34}
+.lap-rows span:nth-child(3){width:52%;opacity:.24}
+
+/* passing through it */
+.lap-flash{position:absolute;inset:0;pointer-events:none;opacity:var(--flash,0);
+  transform:translateY(var(--flash-y,0%));
+  background:linear-gradient(180deg,
+    rgba(252,250,255,1) 0%, rgba(246,239,253,.98) 52%, rgba(220,200,245,.92) 100%)}
+
+.lap-cue{position:absolute;left:50%;bottom:clamp(20px,4vh,38px);transform:translateX(-50%);
+  margin:0;font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--on-dark-2);opacity:var(--cue,1);transition:opacity .4s var(--ease)}
+
+@media (max-width:900px){
+  .lap{height:210svh}
+  .lap-screen{width:min(78vw,420px)}
+  .lap-bloom{width:74vmax;height:74vmax}
+}
+
+/* Reduced motion and no-JS: the frame, held, and a plain hand-over. No tall
+   section, no sticky panel, no dolly — and the screen panel is dropped rather
+   than left mid-flight. */
+html.rm .lap,html:not(.js) .lap{height:auto}
+html.rm .lap-pin,html:not(.js) .lap-pin{position:static;height:auto;box-shadow:none}
+html.rm .lap-stage,html:not(.js) .lap-stage{position:relative;height:min(74svh,620px)}
+html.rm .lap-plate,html:not(.js) .lap-plate{transform:none}
+html.rm .lap-bloom,html.rm .lap-screen,html.rm .lap-flash,
+html:not(.js) .lap-bloom,html:not(.js) .lap-screen,html:not(.js) .lap-flash{display:none}
+html.rm .lap-cue,html:not(.js) .lap-cue{display:none}
+
 /* ══ CHAPTER TWO — the work ═══════════════════════════════════════════════ */
 .work{position:relative;z-index:2;background:transparent}
 .band{padding:clamp(84px,13vh,168px) var(--gut);position:relative}

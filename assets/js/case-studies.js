@@ -57,6 +57,7 @@
   var track   = $("[data-cs-track]");
   var study   = $("[data-cs-study]");
   var concepts= $("[data-cs-concepts]");
+  var creative= $("[data-cs-creative]");
   var totalsEl= $("[data-cs-totals]");
 
   /* ── the six cards ─────────────────────────────────────────────────────── */
@@ -470,6 +471,33 @@
       resize();
     });
   }
+
+  /* The creative group exists in the markup but stays out of the page until
+     there is something to put in it. One list, one rule: no entries, no group.
+     Fields that are absent simply do not render, the same discipline the
+     campaign data follows. */
+  (function renderCreative() {
+    var grid = $("[data-cs-creativegrid]");
+    var items = D.creative || [];
+    if (!creative || !grid) return;
+    if (!items.length) { creative.hidden = true; return; }
+    grid.innerHTML = items.map(function (c) {
+      var unrun = c.status === "concept" || c.status === "proposal";
+      var label = unrun ? (c.status === "proposal" ? "Proposal" : "Concept") : (c.kind || "");
+      return '<article class="cs-conceptcard">' +
+        (label ? '<span class="tag">' + esc(label) + "</span>" : "") +
+        "<h4>" + esc(c.title || "") + "</h4>" +
+        (c.summary ? '<p class="kicker">' + esc(c.summary) + "</p>" : "") +
+        (c.role ? '<p class="cs-role"><span>My part</span> ' + esc(c.role) + "</p>" : "") +
+        (c.deliverables && c.deliverables.length
+          ? '<div class="duo"><div><h4>Delivered</h4><ul>' +
+            c.deliverables.map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("") +
+            "</ul></div></div>"
+          : "") +
+        "</article>";
+    }).join("");
+    creative.hidden = false;
+  })();
 
   paint(parseHash(), { silent: true });
   resize();

@@ -222,6 +222,32 @@ window.CASE_STUDIES = (function () {
     { k: "Profit", d: "What is left after product, delivery, returns and ad cost." }
   ];
 
+  /* ── Creative Strategy / Brand Content ──────────────────────────────────
+     Empty on purpose. The group renders only when this array has entries, so
+     nothing appears on the page until there is real work to show — no card,
+     no placeholder, no "coming soon" panel.
+
+     To add a project, push an object of this shape. Every field except id,
+     title and role is optional; anything left out simply does not render, the
+     same rule the campaign data follows.
+
+       {
+         id:        "parkers",                     // becomes #/creative/parkers
+         title:     "Parker's",
+         kind:      "Brand content",               // the small label on the card
+         role:      "Creative strategy, scripting", // what was mine
+         summary:   "One or two sentences on the concept.",
+         concept:   "The idea, and what it had to do.",
+         process:   ["Research", "Scripts", "Shoot"],   // production steps
+         deliverables: ["6 x 15s cuts", "3 hooks"],     // what actually shipped
+         media:     { poster: "assets/creative/parkers.jpg", video: null },
+         status:    "delivered"                    // or "concept" / "proposal"
+       }
+
+     A concept or proposal must carry status "concept" or "proposal" so it is
+     labelled as unrun work, the way the salon and real-estate briefs are. */
+  var CREATIVE = [];
+
   var CATEGORIES = [
     {
       id: "ecommerce", n: "01",
@@ -271,6 +297,7 @@ window.CASE_STUDIES = (function () {
     products: PRODUCTS,
     categories: CATEGORIES,
     workflow: WORKFLOW,
+    creative: CREATIVE,
     totals: totals(),
     byId: function (id) {
       for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i];

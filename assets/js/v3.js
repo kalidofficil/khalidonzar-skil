@@ -456,6 +456,127 @@
     heads.forEach(function (h) { io.observe(h); });
   })();
 
+  /* ── the laptop cinematic ────────────────────────────────────────────────
+     Scroll-controlled, on the page's one loop, with no scroll lock: the panel
+     is sticky in CSS and the page moves through it at the visitor's pace.
+
+     The dolly is a transform on one exported frame of the approved master.
+     Because the laptop's lid faces away from camera in that frame, what grows
+     is the light it throws — then the light resolves into a screen, the screen
+     passes the frame edges, and the wash retreats upward into About.
+  --------------------------------------------------------------------- */
+  (function () {
+    var lap = document.querySelector("[data-lap]");
+    if (!lap || RM) return;
+    var pin = lap.querySelector(".lap-pin");
+    var plate = lap.querySelector(".lap-plate");
+    if (!pin || !plate) return;
+
+    /* Where the laptop's lid sits inside the frame, measured off the exported
+       plate: 74% across, 74% down. Everything that has to line up with it —
+       the dolly's origin, the light, the screen — is placed from this. */
+    var LX = 0.74, LY = 0.74;
+    var IW = 1080, IH = 1444;
+    /* Where it sits when the shot opens. Low and right, because the opening
+       framing has to hold his face as well, and in this portrait frame the two
+       are nearly half the image apart — wider than `cover` can show at once on
+       a landscape screen. So the shot starts on him with the laptop at the
+       bottom edge, and the push brings the laptop to the middle. */
+    var WANT_X = 0.62, WANT_Y = 0.92;
+    var lap0 = { x: 0, y: 0 };
+
+    /* `object-fit:cover` crops a portrait frame differently at every viewport,
+       so the point is solved rather than assumed. A fixed percentage here put
+       the push on his face with the laptop cropped off the bottom. */
+    function place() {
+      var bw = pin.clientWidth, bh = pin.clientHeight;
+      if (!bw || !bh) return;
+      var sc = Math.max(bw / IW, bh / IH);
+      var rw = IW * sc, rh = IH * sc;
+      var px = rw <= bw ? 0.5 : clamp((LX * rw - WANT_X * bw) / (rw - bw), 0, 1);
+      var py = rh <= bh ? 0.5 : clamp((LY * rh - WANT_Y * bh) / (rh - bh), 0, 1);
+      plate.style.objectPosition = (px * 100).toFixed(2) + "% " + (py * 100).toFixed(2) + "%";
+      lap0.x = (bw - rw) * px + LX * rw;
+      lap0.y = (bh - rh) * py + LY * rh;
+      plate.style.transformOrigin = lap0.x.toFixed(1) + "px " + lap0.y.toFixed(1) + "px";
+    }
+    place();
+
+    /* beat boundaries, as fractions of the section's travel */
+    var B = { hold: 0.18, dolly: 0.56, screen: 0.74, through: 0.90 };
+    var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var span = function (p, a, b) { return clamp((p - a) / (b - a), 0, 1); };
+
+    var live = false;
+    function draw() {
+      var travel = lap.offsetHeight - innerHeight;
+      if (travel <= 0) return;
+      var p = clamp(-lap.getBoundingClientRect().top / travel, 0, 1);
+
+      /* The dolly runs from the hold to the moment we enter the screen, so the
+         push never stops while the screen is still ahead of us. Scaling about
+         the laptop would pin it to the bottom edge where it starts, so the
+         plate is also translated: by the end of the push the laptop has
+         travelled to the middle of the frame, the way a dolly recentres what
+         it is approaching. */
+      var d = ease(span(p, B.hold, B.through));
+      var bw = pin.clientWidth, bh = pin.clientHeight;
+      var cx = bw * 0.5, cy = bh * 0.47;
+      var tx = (cx - lap0.x) * d, ty = (cy - lap0.y) * d;
+
+      /* Translating the plate can pull its edge into frame. With the origin at
+         the laptop, a point P lands at origin + (P - origin) * s + t, so these
+         four are the smallest scales that keep each edge outside the box; the
+         push takes whichever is largest. Without this the violet ground showed
+         through along the bottom for most of the move. */
+      var ox = lap0.x, oy = lap0.y;
+      var need = Math.max(
+        ox > 0.5 ? 1 + tx / ox : 1,
+        bw - ox > 0.5 ? 1 - tx / (bw - ox) : 1,
+        oy > 0.5 ? 1 + ty / oy : 1,
+        bh - oy > 0.5 ? 1 - ty / (bh - oy) : 1
+      );
+      var sc = Math.max(1 + d * 1.55, need * 1.005);
+      plate.style.transform = "translate3d(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px,0) " +
+                              "scale(" + sc.toFixed(4) + ")";
+      /* the light and the screen ride with it */
+      pin.style.setProperty("--lx", (lap0.x + tx).toFixed(1) + "px");
+      pin.style.setProperty("--ly", (lap0.y + ty).toFixed(1) + "px");
+
+      /* the light: up through the dolly, then handed to the screen */
+      var b = span(p, B.hold + 0.04, B.screen);
+      pin.style.setProperty("--bloom", (b * (1 - span(p, B.screen, B.through) * 0.8)).toFixed(3));
+      pin.style.setProperty("--bloom-s", (0.45 + b * 1.15).toFixed(3));
+
+      /* the screen resolves, then passes us */
+      var sIn = span(p, B.screen - 0.10, B.screen + 0.04);
+      var sThru = span(p, B.screen + 0.02, B.through + 0.02);
+      pin.style.setProperty("--scr", sIn.toFixed(3));
+      pin.style.setProperty("--scr-s", (0.80 + ease(sIn) * 0.22 + Math.pow(sThru, 2.1) * 7).toFixed(3));
+      /* Once we are passing through it, what should fill the frame is the
+         screen's own light — not four-foot letterforms sliding past. The
+         content reads at its own size and then lets go. */
+      pin.style.setProperty("--scr-copy", (1 - span(p, B.screen + 0.03, B.screen + 0.11)).toFixed(3));
+
+      /* the wash, and then its retreat upward out of frame */
+      var f = span(p, B.through - 0.06, B.through + 0.03);
+      var out = span(p, 0.94, 1);
+      pin.style.setProperty("--flash", (f * (1 - out * 0.15)).toFixed(3));
+      pin.style.setProperty("--flash-y", (-out * 100).toFixed(1) + "%");
+      /* underneath it, the ground has already become the About band's */
+      pin.style.setProperty("--handover", span(p, B.through, 0.99).toFixed(3));
+      pin.style.setProperty("--cue", (1 - span(p, 0.04, 0.16)).toFixed(3));
+    }
+
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { live = e.isIntersecting; if (live) draw(); });
+    }, { rootMargin: "12% 0px 12% 0px" }).observe(lap);
+    (window.__csFrame = window.__csFrame || []).push(function () { if (live) draw(); });
+    addEventListener("resize", function () { place(); if (live) draw(); }, { passive: true });
+    if (plate.complete) place(); else plate.addEventListener("load", place, { once: true });
+    draw();
+  })();
+
   /* ── the process rail ───────────────────────────────────────────────────
      The line fills and each node lights as its step reaches the middle of the
      screen. Scroll-linked, on the page's one loop, and purely decorative —

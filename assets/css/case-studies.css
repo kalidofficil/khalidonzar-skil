@@ -245,7 +245,13 @@
 /* ── concept category ────────────────────────────────────────────────────── */
 .cs-concepts{display:none}
 .cs-concepts.is-open{display:block}
-.cs-conceptgrid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr)}
+.cs-conceptgrid,.cs-creativegrid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:repeat(2,1fr)}
+.cs-creative[hidden]{display:none}
+.cs-creative{margin-top:clamp(70px,11vh,130px);padding-top:clamp(50px,8vh,90px);
+  border-top:1px solid var(--glass-edge-ink)}
+.cs-role{margin:0;font-size:.8rem;color:var(--ink-3)}
+.cs-role span{font-size:.6rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--accent);margin-right:8px}
 .cs-conceptcard > .tag{justify-self:start}
 .cs-conceptcard{background:var(--cs-surface);border:1px solid var(--glass-edge-ink);
   border-radius:18px;
@@ -259,7 +265,7 @@
 @media (max-width:1000px){
       .cs-deck{grid-template-columns:repeat(2,1fr)}
   .cs-kpis{grid-template-columns:repeat(2,1fr)}
-  .cs-conceptgrid{grid-template-columns:1fr}
+  .cs-conceptgrid,.cs-creativegrid{grid-template-columns:1fr}
 }
 @media (max-width:640px){
   .cs-deck{grid-template-columns:1fr}

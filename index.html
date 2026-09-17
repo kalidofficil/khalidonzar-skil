@@ -336,6 +336,20 @@
 
     </div>
 
+    <!-- Creative Strategy / Brand Content
+         ────────────────────────────────────────────────────────────────
+         Rendered from D.creative, which is empty. While it is empty this
+         group is not in the page at all — no card, no placeholder. Push a
+         project into assets/data/case-studies.js and it appears here with the
+         same label, grid and card treatment as the campaigns. -->
+    <div class="cs-creative" data-cs-creative hidden>
+      <div class="cs-worldhead" data-cs-grouphead>
+        <span class="cs-group">Creative Strategy / Brand Content</span>
+        <h3>Creative work.</h3>
+      </div>
+      <div class="cs-creativegrid" data-cs-creativegrid></div>
+    </div>
+
     <!-- concept work, deliberately separate ───────────────────────────── -->
     <div class="cs-concepts" data-cs-concepts>
       <div class="cs-worldhead" data-cs-grouphead>
@@ -396,6 +410,40 @@
       </div>
     </noscript>
 
+  </div>
+</section>
+
+<!-- ══════════ INTO THE WORK — the laptop cinematic ══════════════════════
+     Scroll-controlled, and built entirely from the approved master: one
+     exported frame, a dolly done with transforms, and a screen drawn in
+     HTML. Nothing here was generated. The laptop's screen faces away from
+     camera in the footage, so what grows is its LIGHT — which is what that
+     lid would actually do — and the light resolves into the screen we then
+     pass through. -->
+<section class="lap" id="laptop" data-lap aria-label="Into the work">
+  <div class="lap-pin">
+    <div class="lap-stage">
+      <img class="lap-plate" src="assets/cinematic/laptop-plate.jpg"
+           srcset="assets/cinematic/laptop-plate-m.jpg 720w, assets/cinematic/laptop-plate.jpg 1080w"
+           sizes="100vw" width="1080" height="1444" loading="lazy" decoding="async"
+           alt="Khalid Ounzar at his desk in a Dubai office at dusk, an open laptop beside him.">
+      <div class="lap-vig" aria-hidden="true"></div>
+      <div class="lap-bloom" aria-hidden="true"></div>
+
+      <div class="lap-screen" aria-hidden="true">
+        <div class="lap-screen-in">
+          <span class="lap-mark">Khalid Ounzar</span>
+          <p class="lap-line">Performance Marketer<br>&amp; Creative Strategist</p>
+          <div class="lap-rows">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lap-flash" aria-hidden="true"></div>
+    </div>
+
+    <p class="lap-cue" aria-hidden="true">Keep scrolling</p>
   </div>
 </section>
 
