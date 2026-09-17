@@ -460,120 +460,220 @@
      Scroll-controlled, on the page's one loop, with no scroll lock: the panel
      is sticky in CSS and the page moves through it at the visitor's pace.
 
-     The dolly is a transform on one exported frame of the approved master.
-     Because the laptop's lid faces away from camera in that frame, what grows
-     is the light it throws — then the light resolves into a screen, the screen
-     passes the frame edges, and the wash retreats upward into About.
+     The approved clip is never played. Its playhead is driven by the scroll
+     position, so the visitor opens the lid themselves, forwards or backwards.
+     When the lid has settled the camera pushes toward the screen — on the
+     SAME element, so the move continues out of the clip's final frame rather
+     than cutting to a second layer — and the screen's HTML contents, pinned
+     to the panel measured in the footage, carry us into About.
   --------------------------------------------------------------------- */
   (function () {
     var lap = document.querySelector("[data-lap]");
     if (!lap || RM) return;
-    var pin = lap.querySelector(".lap-pin");
-    var plate = lap.querySelector(".lap-plate");
-    if (!pin || !plate) return;
+    var pin  = lap.querySelector(".lap-pin");
+    var cam  = lap.querySelector(".lap-cam");
+    var vid  = lap.querySelector("[data-lap-film]");
+    var scr  = lap.querySelector(".lap-screen");
+    if (!pin || !cam || !vid || !scr) return;
 
-    /* Where the laptop's lid sits inside the frame, measured off the exported
-       plate: 74% across, 74% down. Everything that has to line up with it —
-       the dolly's origin, the light, the screen — is placed from this. */
-    var LX = 0.74, LY = 0.74;
-    var IW = 1080, IH = 1444;
-    /* Where it sits when the shot opens. Low and right, because the opening
-       framing has to hold his face as well, and in this portrait frame the two
-       are nearly half the image apart — wider than `cover` can show at once on
-       a landscape screen. So the shot starts on him with the laptop at the
-       bottom edge, and the push brings the laptop to the middle. */
-    var WANT_X = 0.62, WANT_Y = 0.92;
-    var lap0 = { x: 0, y: 0 };
+    var IW = 1280, IH = 716;              /* the clip's own frame */
 
-    /* `object-fit:cover` crops a portrait frame differently at every viewport,
-       so the point is solved rather than assumed. A fixed percentage here put
-       the push on his face with the laptop cropped off the bottom. */
+    /* The laptop's panel, measured off the clip's settled frame by sampling
+       the lit rectangle rather than eyeballing it: x 0.400-0.598 across,
+       0.531-0.715 down. The HTML screen is placed onto exactly this. */
+    var SX0 = 0.4000, SX1 = 0.5977, SY0 = 0.5307, SY1 = 0.7151;
+    var SCX = (SX0 + SX1) / 2, SCY = (SY0 + SY1) / 2;
+
+    /* The framing anchor: a point between his eyes and the panel, held near
+       the middle of the box. `cover` crops a 16:9 clip differently on a phone
+       (sides) and on an ultrawide (top and bottom), and a flat 50%/50% loses
+       the top of his head on the wide ones. */
+    var AX = 0.500, AY = 0.420, WANT_X = 0.50, WANT_Y = 0.46;
+
+    /* How much of the box the panel should fill by the end of the push, and
+       the band the resulting scale is kept inside. The footage is soft at the
+       far end of that band, which is the point: by then the panel is opaque
+       HTML and the footage around it is fading out of focus. */
+    var FILL = 0.58, S_MIN = 1.8, S_MAX = 2.9;
+
+    var G = { ox: 0, oy: 0, w: 0, h: 0, max: 2.4 };
+
     function place() {
       var bw = pin.clientWidth, bh = pin.clientHeight;
       if (!bw || !bh) return;
-      var sc = Math.max(bw / IW, bh / IH);
-      var rw = IW * sc, rh = IH * sc;
-      var px = rw <= bw ? 0.5 : clamp((LX * rw - WANT_X * bw) / (rw - bw), 0, 1);
-      var py = rh <= bh ? 0.5 : clamp((LY * rh - WANT_Y * bh) / (rh - bh), 0, 1);
-      plate.style.objectPosition = (px * 100).toFixed(2) + "% " + (py * 100).toFixed(2) + "%";
-      lap0.x = (bw - rw) * px + LX * rw;
-      lap0.y = (bh - rh) * py + LY * rh;
-      plate.style.transformOrigin = lap0.x.toFixed(1) + "px " + lap0.y.toFixed(1) + "px";
+      var s = Math.max(bw / IW, bh / IH);
+      var rw = IW * s, rh = IH * s;
+      var px = rw <= bw ? 0.5 : clamp((AX * rw - WANT_X * bw) / (rw - bw), 0, 1);
+      var py = rh <= bh ? 0.5 : clamp((AY * rh - WANT_Y * bh) / (rh - bh), 0, 1);
+      vid.style.objectPosition = (px * 100).toFixed(2) + "% " + (py * 100).toFixed(2) + "%";
+
+      var left = (bw - rw) * px, top = (bh - rh) * py;
+      G.ox = left + SCX * rw;  G.oy = top + SCY * rh;
+      G.w  = (SX1 - SX0) * rw; G.h  = (SY1 - SY0) * rh;
+      G.max = clamp(FILL * bw / G.w, S_MIN, S_MAX);
+
+      cam.style.transformOrigin = G.ox.toFixed(1) + "px " + G.oy.toFixed(1) + "px";
+      scr.style.left   = (G.ox - G.w / 2).toFixed(1) + "px";
+      scr.style.top    = (G.oy - G.h / 2).toFixed(1) + "px";
+      scr.style.width  = G.w.toFixed(1) + "px";
+      scr.style.height = G.h.toFixed(1) + "px";
+      scr.style.setProperty("--sw", G.w.toFixed(1) + "px");
     }
     place();
 
-    /* beat boundaries, as fractions of the section's travel */
-    var B = { hold: 0.18, dolly: 0.56, screen: 0.74, through: 0.90 };
+    /* Beat boundaries as fractions of the section's travel. The scrub gets
+       most of it: it is the only stretch where the visitor is doing the
+       acting, and the push reads better fast. */
+    var B = { hold: 0.06, scrub: 0.62, dolly: 0.86 };
     var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
     var span = function (p, a, b) { return clamp((p - a) / (b - a), 0, 1); };
+
+    /* ── the playhead ──────────────────────────────────────────────────
+       The same discipline that held the hero's old scrub at zero drift:
+       glide toward the target, land exactly when scrolling stops, cut the
+       glide short on a jump so it never becomes a wait, and keep one seek
+       in flight — asking for a new frame while the decoder is still
+       resolving the last one queues work it then throws away, which is
+       what makes a scrub stall. */
+    var SMOOTH = small.matches ? 0.20 : 0.17;
+    var SNAP = 1 / 48, SEEK = 1 / 48, LEAP = 0.8, TAIL = 0.02;
+    var dur = 0, shown = 0, warmed = false, wasLit = false;
+
+    function noteDuration() {
+      if (dur || !vid.duration || !isFinite(vid.duration)) return;
+      dur = vid.duration;
+    }
+    /* The clip is not wanted at page load — the hero owns the decoder then —
+       so it arrives with metadata only and is fetched in full once the
+       section is within about a screen and a half. */
+    function warm() {
+      if (warmed) return;
+      warmed = true;
+      if (vid.preload !== "auto") { vid.preload = "auto"; try { vid.load(); } catch (e) {} }
+    }
 
     var live = false;
     function draw() {
       var travel = lap.offsetHeight - innerHeight;
       if (travel <= 0) return;
       var p = clamp(-lap.getBoundingClientRect().top / travel, 0, 1);
-
-      /* The dolly runs from the hold to the moment we enter the screen, so the
-         push never stops while the screen is still ahead of us. Scaling about
-         the laptop would pin it to the bottom edge where it starts, so the
-         plate is also translated: by the end of the push the laptop has
-         travelled to the middle of the frame, the way a dolly recentres what
-         it is approaching. */
-      var d = ease(span(p, B.hold, B.through));
       var bw = pin.clientWidth, bh = pin.clientHeight;
-      var cx = bw * 0.5, cy = bh * 0.47;
-      var tx = (cx - lap0.x) * d, ty = (cy - lap0.y) * d;
 
-      /* Translating the plate can pull its edge into frame. With the origin at
-         the laptop, a point P lands at origin + (P - origin) * s + t, so these
-         four are the smallest scales that keep each edge outside the box; the
-         push takes whichever is largest. Without this the violet ground showed
-         through along the bottom for most of the move. */
-      var ox = lap0.x, oy = lap0.y;
+      /* ── the lid, opened by scroll ── */
+      if (!dur) noteDuration();
+      if (dur) {
+        var hi = Math.max(0, dur - TAIL);
+        var q = span(p, B.hold, B.scrub);
+        var target = q * hi;
+        var d = target - shown;
+        if (Math.abs(d) > LEAP) { shown = target - (d > 0 ? LEAP : -LEAP); d = target - shown; }
+        if (Math.abs(d) < SNAP) shown = target; else shown += d * SMOOTH;
+        shown = clamp(shown, 0, hi);
+        /* the two ends are asserted exactly, so the lid is fully shut at the
+           top of the section and fully open before the push begins */
+        var exact = q <= 0.0005 ? 0 : (q >= 0.9995 ? hi : null);
+        if (exact !== null) shown = exact;
+        var want = exact !== null ? exact : shown;
+        var tol  = exact !== null ? 0.004 : SEEK;
+        if (vid.readyState >= 1 && !vid.seeking &&
+            Math.abs(vid.currentTime - want) > tol) {
+          try { vid.currentTime = want; } catch (e) { /* seek races are harmless */ }
+        }
+        if (!vid.paused) vid.pause();
+        if (!vid.muted) vid.muted = true;
+      }
+
+      /* ── the push ──
+         Scaling about the panel alone would leave it where it sits, low and
+         a little left of centre, so the camera also translates: by the end
+         the panel is in the middle of the frame, the way a dolly recentres
+         what it is approaching. */
+      var dd = ease(span(p, B.scrub, B.dolly));
+      var tx = (bw * 0.5 - G.ox) * dd, ty = (bh * 0.5 - G.oy) * dd;
+
+      /* Translating the element can pull its own edge into the box. With the
+         origin on the panel, a point P lands at origin + (P - origin) * s + t,
+         so these four are the smallest scales that keep each edge outside;
+         the push takes whichever is largest. Without it the violet ground
+         showed through along one side for most of the move. */
+      var ox = G.ox, oy = G.oy;
       var need = Math.max(
         ox > 0.5 ? 1 + tx / ox : 1,
         bw - ox > 0.5 ? 1 - tx / (bw - ox) : 1,
         oy > 0.5 ? 1 + ty / oy : 1,
         bh - oy > 0.5 ? 1 - ty / (bh - oy) : 1
       );
-      var sc = Math.max(1 + d * 1.55, need * 1.005);
-      plate.style.transform = "translate3d(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px,0) " +
-                              "scale(" + sc.toFixed(4) + ")";
-      /* the light and the screen ride with it */
-      pin.style.setProperty("--lx", (lap0.x + tx).toFixed(1) + "px");
-      pin.style.setProperty("--ly", (lap0.y + ty).toFixed(1) + "px");
+      var sc = Math.max(1 + dd * (G.max - 1), need * 1.005);
+      cam.style.transform = "translate3d(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px,0) " +
+                            "scale(" + sc.toFixed(4) + ")";
 
-      /* the light: up through the dolly, then handed to the screen */
-      var b = span(p, B.hold + 0.04, B.screen);
-      pin.style.setProperty("--bloom", (b * (1 - span(p, B.screen, B.through) * 0.8)).toFixed(3));
-      pin.style.setProperty("--bloom-s", (0.45 + b * 1.15).toFixed(3));
+      /* ── the light off the panel ──
+         Keyed to the lid, not to the camera: it rises as the lid opens,
+         because that is when the room would actually get brighter. */
+      var q2 = span(p, B.hold, B.scrub);
+      var b = ease(span(q2, 0.42, 1));
+      pin.style.setProperty("--lx", (ox + tx).toFixed(1) + "px");
+      pin.style.setProperty("--ly", (oy + ty).toFixed(1) + "px");
+      pin.style.setProperty("--bloom", (b * 0.52 * (1 - span(p, B.dolly - 0.04, B.dolly + 0.06))).toFixed(3));
+      pin.style.setProperty("--bloom-s", (0.40 + b * 0.55 + dd * 0.7).toFixed(3));
 
-      /* the screen resolves, then passes us */
-      var sIn = span(p, B.screen - 0.10, B.screen + 0.04);
-      var sThru = span(p, B.screen + 0.02, B.through + 0.02);
+      /* ── the screen turns on ──
+         It fades up over the real panel once the lid has settled, so what
+         the camera closes on is readable rather than a blank rectangle. */
+      var sIn = span(p, B.scrub - 0.02, B.scrub + 0.10);
+      var sThru = span(p, B.dolly - 0.02, 1);
       pin.style.setProperty("--scr", sIn.toFixed(3));
-      pin.style.setProperty("--scr-s", (0.80 + ease(sIn) * 0.22 + Math.pow(sThru, 2.1) * 7).toFixed(3));
+      pin.style.setProperty("--scr-s", (0.965 + ease(sIn) * 0.035 + Math.pow(sThru, 2.2) * 6).toFixed(3));
       /* Once we are passing through it, what should fill the frame is the
-         screen's own light — not four-foot letterforms sliding past. The
-         content reads at its own size and then lets go. */
-      pin.style.setProperty("--scr-copy", (1 - span(p, B.screen + 0.03, B.screen + 0.11)).toFixed(3));
+         screen's own light — not four-foot letterforms sliding past. */
+      pin.style.setProperty("--scr-copy", (1 - span(p, B.dolly + 0.01, B.dolly + 0.08)).toFixed(3));
 
-      /* the wash, and then its retreat upward out of frame */
-      var f = span(p, B.through - 0.06, B.through + 0.03);
-      var out = span(p, 0.94, 1);
+      /* ── focus falls off as the camera closes ──
+         Only in the last third of the push, by which point his face has long
+         left the frame. Nothing here grades or tints the footage. */
+      pin.style.setProperty("--film-o", (1 - span(p, B.dolly + 0.005, B.dolly + 0.085)).toFixed(3));
+      /* A vignette belongs to the wide shot. It has to be gone by the time we
+         are reading the screen, because its flat tint sits over the panel too
+         and was costing the headline four stops of contrast. */
+      pin.style.setProperty("--vig", (1 - span(p, B.scrub, B.scrub + (B.dolly - B.scrub) * 0.6)).toFixed(3));
+
+      /* ── the wash, and its retreat upward into About ── */
+      var f = span(p, B.dolly, B.dolly + 0.07);
+      var out = span(p, 0.92, 1);
       pin.style.setProperty("--flash", (f * (1 - out * 0.15)).toFixed(3));
       pin.style.setProperty("--flash-y", (-out * 100).toFixed(1) + "%");
-      /* underneath it, the ground has already become the About band's */
-      pin.style.setProperty("--handover", span(p, B.through, 0.99).toFixed(3));
-      pin.style.setProperty("--cue", (1 - span(p, 0.04, 0.16)).toFixed(3));
+      pin.style.setProperty("--handover", span(p, B.dolly, 0.99).toFixed(3));
+      pin.style.setProperty("--cue", (1 - span(p, 0.03, 0.14)).toFixed(3));
+
+      /* The bar is painted for whatever band is under it, and this section is
+         dark — right up until the wash turns its ground white, at which point
+         a white bar is white on white. So the section declares itself light
+         once the wash has taken the frame, and the bar dips through the
+         crossover rather than passing through a moment of 1.1:1. */
+      var lit = f > 0.5;
+      if (lit !== wasLit) {
+        wasLit = lit;
+        if (lit) lap.setAttribute("data-nav-light", ""); else lap.removeAttribute("data-nav-light");
+        if (window.__csNav) window.__csNav();
+      }
+      /* The wash crosses from near-black to near-white in about a fifth of
+         this section, and measured across that crossover neither bar tone
+         clears 4.5:1. So the bar is held out for the whole of it — not just
+         the midpoint — and returns once its ground has settled. */
+      var dip = Math.min(1, clamp(1 - (f - 0.02) / 0.13, 0, 1) + clamp((f - 0.85) / 0.13, 0, 1));
+      document.documentElement.style.setProperty("--nav-dip", dip.toFixed(3));
     }
 
     new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) warm(); });
+    }, { rootMargin: "150% 0px 150% 0px" }).observe(lap);
+    new IntersectionObserver(function (es) {
       es.forEach(function (e) { live = e.isIntersecting; if (live) draw(); });
     }, { rootMargin: "12% 0px 12% 0px" }).observe(lap);
+
     (window.__csFrame = window.__csFrame || []).push(function () { if (live) draw(); });
     addEventListener("resize", function () { place(); if (live) draw(); }, { passive: true });
-    if (plate.complete) place(); else plate.addEventListener("load", place, { once: true });
+    vid.addEventListener("loadedmetadata", function () { noteDuration(); place(); draw(); });
     draw();
   })();
 
@@ -724,7 +824,10 @@
     }
     if (!under) return;
     if (nav) {
-      nav.classList.toggle("on-light", under.classList.contains("light"));
+      /* `data-nav-light` lets a dark section declare that its ground has
+         turned light under the bar — the laptop's hand-over wash does. */
+      nav.classList.toggle("on-light",
+        under.classList.contains("light") || under.hasAttribute("data-nav-light"));
       /* a light band can set its own bar tone: bone is not right over mist */
       var tone = under.getAttribute("data-nav");
       if (tone) nav.setAttribute("data-nav", tone); else nav.removeAttribute("data-nav");
@@ -736,6 +839,7 @@
   }
   addEventListener("scroll", paintNav, { passive: true });
   addEventListener("resize", paintNav);
+  window.__csNav = paintNav;
   paintNav();
 
   /* ── contact ──────────────────────────────────────────────────────────── */

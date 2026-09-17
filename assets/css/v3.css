@@ -165,7 +165,12 @@ p{margin:0 0 1em}p:last-child{margin-bottom:0}
 .nav{position:fixed;inset:0 0 auto;z-index:150;display:flex;align-items:center;
   justify-content:space-between;gap:24px;padding:18px var(--gut);color:var(--on-dark);
   border-bottom:1px solid transparent;
+  /* --nav-dip carries the bar through the laptop hand-over, where the ground
+     crosses from near-black to near-white and neither tone reads. It is a
+     dip, not a hide: the bar is still there for a keyboard. */
+  opacity:var(--nav-dip,1);
   transition:background .5s var(--ease),color .5s var(--ease),border-color .5s var(--ease)}
+.nav:focus-within{opacity:1}
 .nav.on-light{background:var(--glass-l2);color:var(--ink);
   border-bottom-color:var(--glass-edge-ink);
   -webkit-backdrop-filter:saturate(1.5) blur(var(--blur-2));
@@ -380,41 +385,56 @@ html.rm .intro-clip .w,html.rm .intro-thesis .w{opacity:1!important;transform:no
 }
 
 /* ══ INTO THE WORK — the laptop cinematic ════════════════════════════════
-   Scroll-controlled, and assembled from one exported frame of the approved
-   master. Five beats, each driven by --p (0 to 1) written from the section's
-   own travel:
+   The approved clip, scrubbed by scroll rather than played, then continued
+   by a camera push on the same element. Beats, driven by --p (0 to 1)
+   written from the section's own travel:
 
-     0.00-0.18  hold wide on the desk
-     0.18-0.56  dolly toward the laptop, its screen light blooming
-     0.56-0.74  the light resolves into a screen carrying readable content
-     0.74-0.90  the screen passes the frame edges and washes out
-     0.90-1.00  the wash retreats upward and hands over to About
+     0.00-0.06  hold on the closed lid while the sticky panel settles
+     0.06-0.62  SCRUB — the visitor opens the laptop; playhead 0 -> 3.92s
+     0.62-0.86  DOLLY — the camera pushes to the screen, which lights up
+     0.86-1.00  THROUGH — the screen passes the frame and hands over to About
 
-   The footage is never tinted or filtered — the dolly is a transform on the
-   plate and every other layer sits above it.
+   The push runs on the same element as the footage, so it continues from
+   the clip's final frame instead of cutting to a second layer. The footage
+   is never tinted, graded or re-timed.
    ══════════════════════════════════════════════════════════════════════════ */
-.lap{position:relative;height:260svh}
+.lap{position:relative;height:340svh}
 .lap-pin{position:sticky;top:0;height:100svh;overflow:hidden;
   background:var(--void);
   /* the ground crossfades to the About band so the hand-over has no seam */
   box-shadow:inset 0 0 0 100vmax rgba(220,200,245,var(--handover,0))}
 .lap-stage{position:absolute;inset:0}
 
-.lap-plate{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  /* object-position and transform-origin are both written by the script: with
-     `cover` on a portrait frame in a landscape box, where the laptop lands
-     depends on the viewport, and a fixed percentage put the dolly on his face
-     with the laptop cropped away entirely. */
-  will-change:transform}
+/* THE CAMERA.  Footage and screen are both children of this one element, so
+   the dolly moves them as a single rigid object — the HTML screen cannot
+   drift off the laptop no matter how the frame is cropped.  transform and
+   transform-origin are written by the script, because with `cover` the crop
+   (and therefore where the laptop lands) changes at every viewport. */
+.lap-cam{position:absolute;inset:0;will-change:transform}
 
-/* a violet vignette on the surround, the same treatment the hero's edges get */
-.lap-vig{position:absolute;inset:0;pointer-events:none;
+.lap-film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  /* object-position is written by the script alongside the origin. Nothing
+     tints, grades, filters or re-times the footage — it is the approved clip
+     exactly as delivered, moved by a transform and nothing else.
+     A focus falloff was tried here and measured: `filter:blur()` on a layer
+     whose scale changes every frame forces a re-raster every frame, and it
+     cost 20 fps of the 49 available (29 with it, 49.5 without, five runs
+     each). The upscale is soft enough on its own. */
+  opacity:var(--film-o,1)}
+
+/* A violet vignette on the surround, the same treatment the hero's edges get.
+   Only the radial: this layer sits above the camera, so a flat tint over it
+   also tints the screen we are about to read, and measured that cost the
+   headline a stop and a half. The radial's core is transparent, so the panel
+   in the middle of the frame is untouched. */
+.lap-vig{position:absolute;inset:0;pointer-events:none;opacity:var(--vig,1);
   background:
-    radial-gradient(78% 62% at 58% 60%, rgba(27,15,46,0) 34%, rgba(27,15,46,.42) 76%, rgba(27,15,46,.78) 100%),
-    linear-gradient(180deg, rgba(42,22,80,.34), rgba(27,15,46,.30))}
+    radial-gradient(78% 62% at 50% 56%, rgba(27,15,46,0) 38%, rgba(27,15,46,.42) 78%, rgba(27,15,46,.80) 100%)}
 
-/* the screen's own light, spilling from a lid that faces away from us */
-.lap-bloom{position:absolute;left:var(--lx,58%);top:var(--ly,76%);width:56vmax;height:56vmax;
+/* the screen's own light. This one lives in viewport space, not camera
+   space, because it is a bloom in the lens rather than an object in the
+   room — the script writes its centre from the screen's projected position. */
+.lap-bloom{position:absolute;left:var(--lx,50%);top:var(--ly,62%);width:56vmax;height:56vmax;
   transform:translate(-50%,-50%) scale(var(--bloom-s,.5));
   opacity:var(--bloom,0);pointer-events:none;
   background:radial-gradient(circle at 50% 50%,
@@ -422,24 +442,27 @@ html.rm .intro-clip .w,html.rm .intro-thesis .w{opacity:1!important;transform:no
     rgba(139,95,214,.40) 48%, rgba(139,95,214,0) 72%);
   will-change:transform,opacity}
 
-/* the light resolves into a screen */
-.lap-screen{position:absolute;left:var(--lx,58%);top:var(--ly,76%);
-  width:min(38vw,520px);aspect-ratio:16/10;
-  transform:translate(-50%,-50%) scale(var(--scr-s,.8));
-  opacity:var(--scr,0);pointer-events:none;
-  border-radius:clamp(8px,1vw,14px);overflow:hidden;
-  background:linear-gradient(168deg,#EFE4FB 0%,#DCC8F5 46%,#C9A9EE 100%);
-  box-shadow:0 0 0 1px rgba(255,255,255,.7),0 40px 90px -30px rgba(12,4,26,.9),
-             0 0 120px -20px rgba(233,107,200,.55);
+/* THE SCREEN.  left/top/width/height and --sw (its width in px) are written
+   by the script onto the panel measured in the footage: image-space
+   0.400–0.598 across, 0.531–0.715 down. Type is sized from --sw rather than
+   the viewport so the screen reads correctly at any crop or dolly scale. */
+.lap-screen{position:absolute;pointer-events:none;
+  transform-origin:50% 50%;
+  transform:scale(var(--scr-s,.96));
+  opacity:var(--scr,0);
+  border-radius:calc(var(--sw,300px) * .022);overflow:hidden;
+  background:linear-gradient(168deg,#F3EAFD 0%,#E4D2F8 48%,#D3B9F2 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.55),
+             0 0 calc(var(--sw,300px) * .34) calc(var(--sw,300px) * -.06) rgba(233,107,200,.5);
   will-change:transform,opacity}
 .lap-screen-in{position:absolute;inset:0;display:grid;align-content:center;justify-items:start;
-  gap:clamp(8px,1.1vw,14px);padding:clamp(18px,3vw,40px);text-align:left;
+  gap:calc(var(--sw,300px) * .035);padding:calc(var(--sw,300px) * .075);text-align:left;
   opacity:var(--scr-copy,1)}
-.lap-mark{font-family:var(--serif);font-size:clamp(.9rem,1.8vw,1.6rem);color:var(--ink);line-height:1}
-.lap-line{margin:0;font-family:var(--serif);font-size:clamp(1.1rem,2.9vw,2.6rem);
+.lap-mark{font-family:var(--serif);font-size:calc(var(--sw,300px) * .046);color:var(--ink);line-height:1}
+.lap-line{margin:0;font-family:var(--serif);font-size:calc(var(--sw,300px) * .097);
   line-height:1.04;letter-spacing:-.028em;color:var(--ink)}
-.lap-rows{display:grid;gap:clamp(5px,.7vw,9px);width:min(62%,320px);margin-top:clamp(4px,.8vw,10px)}
-.lap-rows span{display:block;height:clamp(3px,.42vw,6px);border-radius:99px;background:var(--pink-ink);opacity:.5}
+.lap-rows{display:grid;gap:calc(var(--sw,300px) * .022);width:62%;margin-top:calc(var(--sw,300px) * .026)}
+.lap-rows span{display:block;height:calc(var(--sw,300px) * .0135);border-radius:99px;background:var(--pink-ink);opacity:.5}
 .lap-rows span:nth-child(2){width:78%;opacity:.34}
 .lap-rows span:nth-child(3){width:52%;opacity:.24}
 
@@ -454,18 +477,22 @@ html.rm .intro-clip .w,html.rm .intro-thesis .w{opacity:1!important;transform:no
   color:var(--on-dark-2);opacity:var(--cue,1);transition:opacity .4s var(--ease)}
 
 @media (max-width:900px){
-  .lap{height:210svh}
-  .lap-screen{width:min(78vw,420px)}
+  /* the clip is landscape and the phone is portrait, so `cover` crops the
+     sides hard; the section is shortened so the scrub does not outstay a
+     thumb. */
+  .lap{height:280svh}
   .lap-bloom{width:74vmax;height:74vmax}
 }
 
-/* Reduced motion and no-JS: the frame, held, and a plain hand-over. No tall
-   section, no sticky panel, no dolly — and the screen panel is dropped rather
-   than left mid-flight. */
+/* Reduced motion and no-JS: the last frame of the clip, held, and a plain
+   hand-over. No tall section, no sticky panel, no dolly, no scrub — the
+   video never loads a byte beyond its poster, and the screen panel is
+   dropped rather than left mid-flight. */
 html.rm .lap,html:not(.js) .lap{height:auto}
 html.rm .lap-pin,html:not(.js) .lap-pin{position:static;height:auto;box-shadow:none}
 html.rm .lap-stage,html:not(.js) .lap-stage{position:relative;height:min(74svh,620px)}
-html.rm .lap-plate,html:not(.js) .lap-plate{transform:none}
+html.rm .lap-cam,html:not(.js) .lap-cam{transform:none}
+html.rm .lap-film,html:not(.js) .lap-film{filter:none;opacity:1}
 html.rm .lap-bloom,html.rm .lap-screen,html.rm .lap-flash,
 html:not(.js) .lap-bloom,html:not(.js) .lap-screen,html:not(.js) .lap-flash{display:none}
 html.rm .lap-cue,html:not(.js) .lap-cue{display:none}

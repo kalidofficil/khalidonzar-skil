@@ -414,32 +414,46 @@
 </section>
 
 <!-- ══════════ INTO THE WORK — the laptop cinematic ══════════════════════
-     Scroll-controlled, and built entirely from the approved master: one
-     exported frame, a dolly done with transforms, and a screen drawn in
-     HTML. Nothing here was generated. The laptop's screen faces away from
-     camera in the footage, so what grows is its LIGHT — which is what that
-     lid would actually do — and the light resolves into the screen we then
-     pass through. -->
+     Scroll-controlled from the first frame to the last. The approved clip
+     is not played — its playhead is driven by the scroll position, so the
+     visitor opens the lid themselves. When the lid has settled, the camera
+     pushes toward the screen on the SAME element, so the move continues
+     from the clip's final frame rather than cutting to a second layer.
+     The screen's contents are HTML, pinned to the panel measured in the
+     footage, and the light off that panel becomes the About section. -->
 <section class="lap" id="laptop" data-lap aria-label="Into the work">
   <div class="lap-pin">
     <div class="lap-stage">
-      <img class="lap-plate" src="assets/cinematic/laptop-plate.jpg"
-           srcset="assets/cinematic/laptop-plate-m.jpg 720w, assets/cinematic/laptop-plate.jpg 1080w"
-           sizes="100vw" width="1080" height="1444" loading="lazy" decoding="async"
-           alt="Khalid Ounzar at his desk in a Dubai office at dusk, an open laptop beside him.">
-      <div class="lap-vig" aria-hidden="true"></div>
-      <div class="lap-bloom" aria-hidden="true"></div>
 
-      <div class="lap-screen" aria-hidden="true">
-        <div class="lap-screen-in">
-          <span class="lap-mark">Khalid Ounzar</span>
-          <p class="lap-line">Performance Marketer<br>&amp; Creative Strategist</p>
-          <div class="lap-rows">
-            <span></span><span></span><span></span>
+      <!-- Camera. One transform moves the footage and the screen together,
+           so they can never drift apart. -->
+      <div class="lap-cam">
+        <video class="lap-film" data-lap-film
+               playsinline muted preload="metadata" disablepictureinpicture
+               poster="assets/cinematic/laptop-poster.jpg"
+               width="1280" height="716"
+               aria-label="Khalid Ounzar, standing, opening a laptop toward the camera.">
+          <source src="assets/cinematic/laptop-open-m.mp4"  type='video/mp4; codecs="avc1.640029"' media="(max-width: 900px)">
+          <source src="assets/cinematic/laptop-open-m.webm" type='video/webm; codecs="vp9"'          media="(max-width: 900px)">
+          <source src="assets/cinematic/laptop-open.mp4"    type='video/mp4; codecs="avc1.640029"'>
+          <source src="assets/cinematic/laptop-open.webm"   type='video/webm; codecs="vp9"'>
+        </video>
+
+        <!-- The screen. Positioned by script onto the panel measured in the
+             footage, so it sits on the laptop at every viewport. -->
+        <div class="lap-screen" aria-hidden="true">
+          <div class="lap-screen-in">
+            <span class="lap-mark">Khalid Ounzar</span>
+            <p class="lap-line">Performance Marketer<br>&amp; Creative Strategist</p>
+            <div class="lap-rows">
+              <span></span><span></span><span></span>
+            </div>
           </div>
         </div>
       </div>
 
+      <div class="lap-vig" aria-hidden="true"></div>
+      <div class="lap-bloom" aria-hidden="true"></div>
       <div class="lap-flash" aria-hidden="true"></div>
     </div>
 
