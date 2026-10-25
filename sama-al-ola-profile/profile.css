@@ -1,0 +1,429 @@
+/* ==========================================================================
+   Sama Al Ola General Contracting — Company Profile
+   Print stylesheet for a 24-page A4 portrait document (210 × 297 mm).
+
+   Palette    midnight navy · champagne · warm ivory
+   Type       Noto Serif Display (display) + Jost (text), both SIL OFL
+   Units      mm for layout, pt for type, so the file maps 1:1 to print
+   ========================================================================== */
+
+@font-face { font-family: "SAO Display"; src: url("assets/fonts/NotoSerifDisplay-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "SAO Display"; src: url("assets/fonts/NotoSerifDisplay-Medium.ttf") format("truetype"); font-weight: 500; font-style: normal; }
+@font-face { font-family: "SAO Display"; src: url("assets/fonts/NotoSerifDisplay-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "SAO Sans"; src: url("assets/fonts/Jost-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "SAO Sans"; src: url("assets/fonts/Jost-Medium.ttf") format("truetype"); font-weight: 500; font-style: normal; }
+@font-face { font-family: "SAO Sans"; src: url("assets/fonts/Jost-SemiBold.ttf") format("truetype"); font-weight: 600; font-style: normal; }
+@font-face { font-family: "SAO Sans"; src: url("assets/fonts/Jost-Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; }
+
+:root {
+  /* colour */
+  --navy: #0D1F3A;
+  --navy-deep: #081529;
+  --navy-2: #132A4B;
+  --champagne: #C9A66B;
+  --champagne-lt: #E4CC9C;
+  --bronze: #8C6A3A;      /* accent on ivory, large type only */
+  --bronze-dk: #7E5E31;   /* accent on ivory, small type */
+  --ivory: #F6F1E7;
+  --sand: #ECE3D3;
+  --ink: #0D1F3A;
+  --ink-2: #4B5568;
+  --ink-3: #6B7385;
+  --on-navy: #F4EEE3;
+  --on-navy-2: rgba(244, 238, 227, .78);
+  --on-navy-3: rgba(244, 238, 227, .58);
+
+  /* type */
+  --serif: "SAO Display", "Noto Serif Display", Georgia, serif;
+  --sans: "SAO Sans", "Jost", "Helvetica Neue", Arial, sans-serif;
+
+  /* grid */
+  --mx: 18mm;             /* side margin */
+  --cw: 174mm;            /* content width */
+}
+
+@page { size: 210mm 297mm; margin: 0; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #2E3238;
+  font-family: var(--sans);
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  hyphens: manual;
+}
+h1, h2, h3, p, ol, ul, li, figure, blockquote { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; text-decoration: none; }
+
+/* ----- page shell ------------------------------------------------------- */
+.page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  break-after: page;
+}
+.page:last-child { break-after: auto; }
+@media screen {
+  .page { margin: 12mm auto; box-shadow: 0 3mm 12mm rgba(0, 0, 0, .45); }
+}
+
+.dark  { background: var(--navy);  color: var(--on-navy);
+         --accent: var(--champagne); --em: var(--champagne-lt); --muted: var(--on-navy-2);
+         --faint: var(--on-navy-3); --rule: rgba(201, 166, 107, .30); --rule-strong: rgba(201, 166, 107, .75); }
+.light { background: var(--ivory); color: var(--ink);
+         --accent: var(--bronze-dk); --em: var(--bronze); --muted: var(--ink-2);
+         --faint: var(--ink-3); --rule: rgba(13, 31, 58, .15); --rule-strong: var(--navy); }
+
+/* ----- type ------------------------------------------------------------- */
+.eyebrow {
+  display: flex; align-items: center; gap: 3.2mm;
+  font: 600 7.75pt/1.2 var(--sans);
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow::before { content: ""; flex: none; width: 9mm; height: .35mm; background: currentColor; }
+
+.display {
+  font-family: var(--serif); font-weight: 400;
+  line-height: 1.02; letter-spacing: -.012em;
+  text-wrap: balance;
+}
+.display em { font-style: italic; color: var(--em); letter-spacing: -.004em; }
+
+.lead { font: 400 12pt/1.5 var(--sans); text-wrap: pretty; }
+.body { font: 400 9.75pt/1.62 var(--sans); color: var(--muted); text-wrap: pretty; }
+.body + .body { margin-top: 3mm; }
+
+/* project counter, e.g. 03 / 06 */
+.count { font: 400 11pt/1 var(--serif); letter-spacing: .02em; color: var(--muted); }
+.count b { font-weight: 400; color: var(--accent); }
+
+/* label/value metadata panels */
+.meta { display: grid; gap: 0 7mm; border-top: .3mm solid var(--rule-strong); padding-top: 3.4mm; }
+.meta.c3 { grid-template-columns: repeat(3, 1fr); }
+.meta.c2 { grid-template-columns: 1fr 1.6fr; }
+.meta.stack { grid-template-columns: 1fr; border-top: 0; padding-top: 0; }
+.meta.stack > div { border-top: .3mm solid var(--rule); padding: 3mm 0 3.4mm; }
+.meta.stack > div:first-child { border-top: .3mm solid var(--rule-strong); }
+.meta .k { display: block; margin-bottom: 1.5mm; font: 600 7pt/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.meta .v { display: block; font: 500 10.25pt/1.38 var(--sans); text-wrap: pretty; }
+
+/* ----- images ----------------------------------------------------------- */
+.ph { position: absolute; overflow: hidden; margin: 0; background: #1A2333; }
+.ph img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--x, 50%) var(--y, 50%); }
+/* marks a 3D visualisation (not a site photograph) */
+.vis {
+  position: absolute; right: 2.4mm; bottom: 2.2mm;
+  font: 600 6.5pt/1 var(--sans); letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .94); background: rgba(8, 21, 41, .55);
+  padding: 1.25mm 1.8mm 1.1mm;
+}
+.bleed .vis { right: var(--mx); bottom: 3.2mm; }
+.cap { position: absolute; font: 400 7.75pt/1.35 var(--sans); color: var(--muted); }
+.cap b { font-weight: 600; color: inherit; }
+
+/* ----- running footer --------------------------------------------------- */
+.folio {
+  position: absolute; left: var(--mx); right: var(--mx); bottom: 9.5mm;
+  display: flex; justify-content: space-between; align-items: center;
+  font: 600 7pt/1 var(--sans); letter-spacing: .15em; text-transform: uppercase; color: var(--faint);
+}
+.folio .no { display: flex; align-items: center; gap: 2.6mm; font: 400 10.5pt/1 var(--serif); letter-spacing: .02em; color: inherit; }
+.folio .no::before { content: ""; width: 7mm; height: .3mm; background: var(--accent); }
+.light .folio .no { color: var(--ink); }
+.dark .folio .no { color: var(--on-navy); }
+.page .folio.on-dark { color: var(--on-navy-3); --accent: var(--champagne); }
+.page .folio.on-dark .no { color: var(--on-navy); }
+
+/* top row on project pages: section label left, counter right */
+.toprow { position: absolute; left: var(--mx); right: var(--mx); top: 20mm; display: flex; justify-content: space-between; align-items: center; }
+
+/* bullet rows */
+.ticks { border-top: .3mm solid var(--rule); }
+.ticks li { position: relative; padding: 2.5mm 0 2.6mm 6mm; border-bottom: .3mm solid var(--rule); font: 400 9.75pt/1.4 var(--sans); }
+.ticks li::before { content: ""; position: absolute; left: 0; top: 4.5mm; width: 3mm; height: .4mm; background: var(--accent); }
+
+/* ==========================================================================
+   PAGE 01 — Cover
+   ========================================================================== */
+.p01 { background: linear-gradient(180deg, #102546 0%, var(--navy) 42%, var(--navy-deep) 100%); }
+.p01 .logo { position: absolute; top: 17mm; left: 50%; width: 76mm; transform: translateX(-50%); }
+.p01 .hero { left: 0; top: 47mm; width: 210mm; height: 142mm; --y: 46%; }
+.p01 .title { position: absolute; left: 0; right: 0; top: 204mm; text-align: center; }
+.p01 .title .display { font-size: 56pt; letter-spacing: -.015em; }
+.p01 .est { margin-top: 7.5mm; display: flex; justify-content: center; align-items: center; gap: 4mm;
+            font: 600 7.75pt/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--champagne); }
+.p01 .est::before, .p01 .est::after { content: ""; width: 12mm; height: .3mm; background: rgba(201, 166, 107, .7); }
+.p01 .services { position: absolute; left: var(--mx); right: var(--mx); top: 263mm; padding-top: 5.5mm;
+                 border-top: .3mm solid rgba(201, 166, 107, .35);
+                 display: flex; justify-content: space-between;
+                 font: 600 7.25pt/1 var(--sans); letter-spacing: .13em; text-transform: uppercase; color: var(--on-navy-2); }
+
+/* ==========================================================================
+   PAGE 02 — About us
+   ========================================================================== */
+.p02 .img { left: 104mm; top: 0; width: 106mm; height: 184mm; --x: 15%; }
+.p02 .imgcap { left: 108mm; top: 187.5mm; }
+.p02 .intro { position: absolute; left: var(--mx); top: 22mm; width: 77mm; }
+.p02 .intro .display { margin-top: 9mm; font-size: 29pt; line-height: 1.08; }
+.p02 .intro .lead { margin-top: 10mm; }
+.p02 .intro .body { margin-top: 5mm; }
+.p02 .stats { position: absolute; left: var(--mx); right: var(--mx); top: 196mm; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 6mm; }
+.p02 .stats > div { border-top: .3mm solid var(--navy); padding-top: 3.6mm; }
+.p02 .stats .n { display: block; font: 400 34pt/1 var(--serif); letter-spacing: -.01em; }
+.p02 .stats .k { display: block; margin-top: 2.6mm; font: 600 7.25pt/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--bronze-dk); }
+.p02 .vision { position: absolute; left: 0; right: 0; bottom: 0; height: 64mm; padding: 10.5mm var(--mx) 0; background: var(--navy); color: var(--on-navy); --accent: var(--champagne); }
+.p02 .vision blockquote { margin-top: 5mm; max-width: 158mm; font: italic 400 15.5pt/1.36 var(--serif); color: var(--on-navy); text-wrap: pretty; }
+
+/* ==========================================================================
+   PAGE 03 — Contents
+   ========================================================================== */
+.p03 .head { position: absolute; left: var(--mx); top: 22mm; }
+.p03 .head .display { margin-top: 9mm; font-size: 54pt; }
+.p03 .toc { position: absolute; left: var(--mx); right: var(--mx); top: 82mm; border-top: .3mm solid var(--rule-strong); }
+.p03 .toc li { padding: 6.6mm 0 6.4mm; border-bottom: .3mm solid var(--rule); }
+.p03 .toc a { display: grid; grid-template-columns: 27mm 1fr auto; align-items: baseline; }
+.p03 .toc .pg { font: 400 27pt/1 var(--serif); color: var(--champagne); letter-spacing: .01em; }
+.p03 .toc .t { font: 400 21pt/1.1 var(--serif); }
+.p03 .toc .d { font: 400 9pt/1.3 var(--sans); color: var(--on-navy-2); text-align: right; }
+.p03 .cover-note { position: absolute; left: var(--mx); top: 268mm; font: 400 7.75pt/1.35 var(--sans); color: var(--on-navy-3); }
+
+/* ==========================================================================
+   PAGE 04 — Mission & values
+   ========================================================================== */
+.p04 .mission { position: absolute; left: var(--mx); top: 22mm; width: var(--cw); }
+.p04 .mission .display { margin-top: 9mm; font-size: 22.5pt; line-height: 1.3; letter-spacing: -.006em; text-wrap: pretty; }
+.p04 .img { left: var(--mx); top: 109mm; width: 74mm; height: 134mm; --x: 22%; }
+.p04 .imgcap { left: var(--mx); top: 246mm; }
+.p04 .values { position: absolute; left: 102mm; top: 109mm; width: 90mm; }
+.p04 .values ol { margin-top: 6mm; border-top: .3mm solid var(--navy); }
+.p04 .values li { display: grid; grid-template-columns: 11mm 1fr; padding: 3.8mm 0 4mm; border-bottom: .3mm solid var(--rule); }
+.p04 .values .i { font: 400 11pt/1.45 var(--serif); color: var(--bronze); }
+.p04 .values h3 { font: 400 15pt/1.2 var(--serif); }
+.p04 .values li p { margin-top: 1.2mm; font: 400 9.5pt/1.5 var(--sans); color: var(--ink-2); }
+
+/* ==========================================================================
+   PAGE 05 — Why choose us
+   ========================================================================== */
+.p05 .head { position: absolute; left: var(--mx); top: 22mm; width: var(--cw); }
+.p05 .head .display { margin-top: 9mm; font-size: 44pt; }
+.p05 .grid { position: absolute; left: var(--mx); right: var(--mx); top: 84mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 13mm 8mm; }
+.p05 .grid > div { border-top: .3mm solid var(--rule-strong); padding-top: 4.4mm; }
+.p05 .grid .n { font: 400 30pt/1 var(--serif); color: var(--champagne); }
+.p05 .grid h3 { margin-top: 6mm; font: 400 17pt/1.2 var(--serif); }
+.p05 .grid p { margin-top: 2.6mm; font: 400 9.75pt/1.55 var(--sans); color: var(--on-navy-2); }
+.p05 .sectors { position: absolute; left: 0; right: 0; bottom: 0; height: 72mm; padding: 13mm var(--mx) 0; background: var(--navy-deep); }
+.p05 .sectors ul { margin-top: 7mm; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: .3mm solid var(--rule-strong); }
+.p05 .sectors li { padding: 4.4mm 1.5mm 0 0; font: 400 12pt/1.22 var(--serif); }
+.p05 .sectors li + li { padding-left: 3.5mm; border-left: .3mm solid var(--rule); }
+.p05 .sectors li span { display: block; margin-bottom: 3mm; font: italic 400 11pt/1 var(--serif); color: var(--champagne); }
+
+/* ==========================================================================
+   PAGE 06 — Services overview + A. General contracting
+   ========================================================================== */
+.p06 .head { position: absolute; left: var(--mx); top: 22mm; width: var(--cw); }
+.p06 .head .display { margin-top: 9mm; font-size: 34pt; }
+.p06 .index { position: absolute; left: 0; right: 0; top: 76mm; height: 70mm; padding: 0 var(--mx); background: var(--navy); color: var(--on-navy);
+              display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.p06 .index li { padding: 10mm 3.5mm 0 0; }
+.p06 .index li + li { padding-left: 4mm; border-left: .3mm solid rgba(201, 166, 107, .28); }
+.p06 .index a { display: block; }
+.p06 .index .l { display: block; font: 400 40pt/1 var(--serif); color: var(--champagne); }
+.p06 .index .t { display: block; margin-top: 5mm; font: 500 9.5pt/1.35 var(--sans); color: var(--on-navy); }
+.p06 .index .p { display: block; margin-top: 3mm; font: 600 6.75pt/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--on-navy-3); }
+.p06 .svc { position: absolute; left: var(--mx); top: 160mm; width: 84mm; }
+.p06 .svc .display { margin-top: 5mm; font-size: 27pt; line-height: 1.06; }
+.p06 .svc .lead { margin-top: 6mm; font-size: 10.5pt; line-height: 1.55; }
+.p06 .svc .ticks { margin-top: 5mm; }
+.p06 .img { left: 110mm; top: 161mm; width: 82mm; height: 68mm; --x: 50%; }
+.p06 .imgcap { left: 110mm; top: 232mm; width: 82mm; }
+
+/* ==========================================================================
+   PAGE 07 — B. Interior design & fit-out
+   ========================================================================== */
+.p07 .hero { left: 0; top: 0; width: 210mm; height: 117mm; --y: 58%; }
+.p07 .herocap { left: var(--mx); top: 120.5mm; }
+.p07 .head { position: absolute; left: var(--mx); top: 132mm; width: 76mm; }
+.p07 .head .display { margin-top: 6mm; font-size: 29pt; line-height: 1.06; }
+.p07 .desc { position: absolute; left: 104mm; top: 133mm; width: 88mm; }
+.p07 .lists { position: absolute; left: var(--mx); top: 195mm; width: 110mm; display: grid; grid-template-columns: 1fr 1fr; gap: 0 7mm; }
+.p07 .lists .eyebrow::before { display: none; }
+.p07 .lists ul { margin-top: 3mm; }
+.p07 .lists .ticks li { font-size: 9.5pt; padding-top: 2.15mm; padding-bottom: 2.25mm; }
+.p07 .lists .ticks li::before { top: 4.2mm; }
+.p07 .detail { left: 136mm; top: 195mm; width: 56mm; height: 43mm; }
+.p07 .detailcap { left: 136mm; top: 241mm; width: 56mm; }
+
+/* ==========================================================================
+   PAGE 08 — C. Maintenance & FM · D. Central A/C · E. MEP
+   ========================================================================== */
+.p08 .c { position: absolute; left: var(--mx); top: 22mm; width: 100mm; }
+.p08 .img { left: 126mm; top: 22mm; width: 66mm; height: 88mm; --y: 40%; }
+.p08 .imgcap { left: 126mm; top: 113mm; width: 66mm; }
+.p08 .display { margin-top: 5mm; font-size: 22pt; line-height: 1.08; }
+.p08 .c .body, .p08 .d .body { margin-top: 4mm; color: var(--ink-2); }
+.p08 .ticks { margin-top: 4mm; }
+.p08 .d { position: absolute; left: var(--mx); right: var(--mx); top: 132mm; display: grid; grid-template-columns: 1fr 1fr; gap: 0 10mm; }
+.p08 .d .display { margin-top: 5mm; }
+.p08 .d .ticks { margin-top: 0; }
+.p08 .e { position: absolute; left: 0; right: 0; bottom: 0; height: 88mm; padding: 13mm var(--mx) 0; background: var(--navy); color: var(--on-navy);
+          --accent: var(--champagne); --em: var(--champagne-lt); --rule: rgba(201, 166, 107, .3); display: grid; grid-template-columns: 1fr 1fr; gap: 0 10mm; }
+.p08 .e .body { margin-top: 4mm; color: var(--on-navy-2); }
+.p08 .e .ticks { margin-top: 0; }
+
+/* ==========================================================================
+   PROJECT PAGES — shared pieces
+   ========================================================================== */
+.proj-title .display { font-size: 40pt; }
+.proj-title .sub { display: block; margin-top: 2.5mm; font: italic 400 19pt/1.2 var(--serif); color: var(--em); }
+
+/* PAGE 09 — Villa Mohammad Al Shehhi (crop of the cover image, ~600 px wide) */
+.p09 .title { position: absolute; left: var(--mx); top: 33mm; width: var(--cw); }
+.p09 .side { position: absolute; left: var(--mx); top: 84mm; width: 46mm; }
+.p09 .side .bignum { font: 400 64pt/.9 var(--serif); color: var(--bronze); letter-spacing: -.02em; }
+.p09 .side .meta { margin-top: 12mm; }
+.p09 .img { left: 72mm; top: 84mm; width: 120mm; height: 150mm; --x: 50%; }
+.p09 .imgcap { left: 72mm; top: 237mm; }
+
+/* PAGE 10 / 12 — single villa on navy with medium image */
+.villa-mid .img { left: var(--mx); top: 60mm; width: 124mm; }
+.villa-mid .side { position: absolute; left: 150mm; top: 60mm; width: 42mm; }
+.villa-mid .bignum { font: 400 64pt/.9 var(--serif); color: var(--champagne); letter-spacing: -.02em; }
+.villa-mid .title { position: absolute; left: var(--mx); width: var(--cw); }
+.villa-mid .meta { position: absolute; left: var(--mx); width: var(--cw); }
+
+/* PAGE 10 — Villa Hussain Al Hosani (image ~600 px wide: kept at 124 mm) */
+.p10 .img   { top: 72mm; height: 90.5mm; }
+.p10 .side  { top: 72mm; }
+.p10 .title { top: 176mm; }
+.p10 .meta  { top: 212mm; }
+
+/* PAGE 12 — Villa Mohammad Al Kaabi (mirrored; image ~600 px wide) */
+.p12 .img   { left: 68mm; top: 76mm; height: 81.3mm; }
+.p12 .side  { left: var(--mx); top: 76mm; }
+.p12 .title { top: 171mm; }
+.p12 .meta  { top: 207mm; }
+
+/* PAGE 11 — Villa Qedaib Musabbeh Alkaabi (exterior) */
+.p11 .title { position: absolute; left: var(--mx); top: 33mm; width: var(--cw); }
+.p11 .meta { position: absolute; left: var(--mx); right: var(--mx); top: 80mm; }
+.p11 .img { left: 0; top: 106mm; width: 210mm; height: 173mm; --y: 55%; }
+
+/* PAGE 13 — MEP villas */
+.p13 .intro { position: absolute; left: var(--mx); top: 33mm; width: var(--cw); display: grid; grid-template-columns: 70mm 1fr; gap: 0 10mm; align-items: end; }
+.p13 .intro .display { font-size: 34pt; }
+.p13 .intro .meta { border-top: .3mm solid var(--navy); }
+.p13 .row { position: absolute; left: var(--mx); right: var(--mx); display: grid; gap: 0 10mm; }
+.p13 .row .num { font: 400 13pt/1 var(--serif); color: var(--bronze); }
+.p13 .row .display { margin-top: 3mm; font-size: 24pt; line-height: 1.08; }
+.p13 .row .meta { margin-top: 6mm; }
+.p13 .r1 { top: 82mm; grid-template-columns: 104mm 1fr; }
+.p13 .r2 { top: 176mm; grid-template-columns: 1fr 112mm; }
+.p13 .r1 .ph { position: relative; width: 104mm; height: 74mm; }
+.p13 .r2 .ph { position: relative; width: 112mm; height: 81mm; }
+
+/* PAGE 14 — Interiors opener */
+.p14 .hero { left: 0; top: 0; width: 210mm; height: 117mm; }
+.p14 .herocap { left: var(--mx); top: 120.5mm; }
+.p14 .head { position: absolute; left: var(--mx); top: 133mm; width: var(--cw); }
+.p14 .head .display { margin-top: 7mm; font-size: 44pt; }
+.p14 .list { position: absolute; left: var(--mx); right: var(--mx); top: 193mm; display: grid; grid-template-columns: 1fr 1fr; gap: 0 10mm; }
+.p14 .list ol { border-top: .3mm solid var(--rule-strong); }
+.p14 .list li { padding: 2.9mm 0 3mm; border-bottom: .3mm solid var(--rule); }
+.p14 .list a { display: grid; grid-template-columns: 9mm 1fr auto; align-items: baseline; }
+.p14 .list .i { font: 400 10pt/1 var(--serif); color: var(--champagne); }
+.p14 .list .t { font: 400 12.5pt/1.2 var(--serif); }
+.p14 .list .p { font: 600 7pt/1 var(--sans); letter-spacing: .14em; color: var(--on-navy-3); }
+
+/* interior project pages */
+.int-head { position: absolute; left: var(--mx); right: var(--mx); top: 33mm; }
+.int-head .display { font-size: 44pt; }
+.int-head .meta { margin-top: 9mm; }
+
+/* PAGE 15 — Kissaki */
+.p15 .int-head .display { font-size: 58pt; }
+.p15 .img { left: 0; top: 120mm; width: 210mm; height: 124mm; }
+.p15 .imgcap { left: var(--mx); top: 247mm; }
+
+/* PAGE 16 — Villa Qedaib interiors */
+.p16 .grid { position: absolute; left: var(--mx); right: var(--mx); top: 121mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.p16 .grid .ph { position: relative; height: 47mm; }
+.p16 .note { position: absolute; left: var(--mx); top: 228mm; width: 120mm; font: italic 400 13pt/1.4 var(--serif); color: var(--on-navy-2); }
+.p16 .note b { font-weight: 400; color: var(--champagne-lt); }
+
+/* PAGE 17 — VIP Villa */
+.p17 .hero { left: 0; top: 0; width: 210mm; height: 139mm; }
+.p17 .herocap { left: var(--mx); top: 142.5mm; }
+.p17 .toprow { top: 151mm; }
+.p17 .head { position: absolute; left: var(--mx); top: 161mm; width: 80mm; }
+.p17 .head .display { font-size: 46pt; }
+.p17 .head .meta { margin-top: 8mm; }
+.p17 .img2 { left: 104mm; top: 163mm; width: 88mm; height: 58.6mm; }
+.p17 .img2cap { left: 104mm; top: 224.5mm; }
+.p17 .more { position: absolute; left: 104mm; top: 238mm; width: 88mm; font: italic 400 11pt/1.45 var(--serif); color: var(--ink-2); }
+
+/* PAGE 18 — Tamim */
+.p18 .int-head { display: grid; grid-template-columns: minmax(0, 1fr) 88mm; gap: 0 10mm; align-items: end; }
+.p18 .int-head .meta { margin-top: 0; }
+.p18 .int-head .display { font-size: 40pt; }
+.p18 .img { left: var(--mx); top: 96mm; width: var(--cw); height: 147.5mm; }
+.p18 .imgcap { left: var(--mx); top: 246mm; }
+
+/* PAGE 19 — Picasso Salon */
+.p19 .hero { left: 0; top: 0; width: 210mm; height: 128mm; --x: 100%; --y: 50%; }
+.p19 .herocap { left: var(--mx); top: 131.5mm; }
+.p19 .int-head { top: 142mm; }
+.p19 .row { position: absolute; left: var(--mx); right: var(--mx); top: 204mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.p19 .row .ph { position: relative; height: 39mm; }
+.p19 .rowcap { left: var(--mx); top: 246.5mm; }
+
+/* PAGE 20 — Le Méridien (site photos are only ~430–520 px wide: sized to stay sharp) */
+.p20 .int-head .meta { max-width: 120mm; }
+.p20 .a { left: 92mm; top: 92mm; width: 100mm; height: 72mm; }
+.p20 .b { left: 92mm; top: 168mm; width: 100mm; height: 72mm; }
+.p20 .c { left: var(--mx); top: 92mm; width: 64mm; height: 46mm; }
+.p20 .concept { left: var(--mx); top: 142mm; width: 64mm; height: 64mm; --y: 55%; }
+.p20 .ccap { left: var(--mx); top: 210mm; width: 64mm; }
+
+/* PAGE 21 — Hitachi Zosen */
+.p21 .a { left: var(--mx); top: 102mm; width: 80mm; height: 107mm; }
+.p21 .b { left: 112mm; top: 102mm; width: 80mm; height: 51.5mm; --y: 58%; }
+.p21 .c { left: 112mm; top: 157.5mm; width: 80mm; height: 51.5mm; --y: 60%; }
+.p21 .cap1 { left: var(--mx); top: 212mm; }
+
+/* PAGE 22 — Lucky Office */
+.p22 .int-head { display: grid; grid-template-columns: minmax(0, 1fr) 88mm; gap: 0 10mm; align-items: end; }
+.p22 .int-head .meta { margin-top: 0; }
+.p22 .grid { position: absolute; left: var(--mx); right: var(--mx); top: 90mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5mm; }
+.p22 .grid .ph { position: relative; height: 55.6mm; }
+
+/* PAGE 23 — Game room */
+.p23 .int-head { display: grid; grid-template-columns: minmax(0, 1fr) 88mm; gap: 0 10mm; align-items: end; }
+.p23 .int-head .meta { margin-top: 0; }
+.p23 .a { left: var(--mx); top: 94mm; width: 128mm; height: 85mm; }
+.p23 .b { left: 64mm; top: 185mm; width: 128mm; height: 85mm; }
+
+/* ==========================================================================
+   PAGE 24 — Contact
+   ========================================================================== */
+.p24 { background: linear-gradient(180deg, var(--navy) 0%, var(--navy) 55%, var(--navy-deep) 100%); }
+.p24 .head { position: absolute; left: var(--mx); top: 22mm; width: var(--cw); }
+.p24 .head .display { margin-top: 9mm; font-size: 54pt; }
+.p24 .img { left: 74mm; top: 86mm; width: 118mm; height: 86mm; }
+.p24 .imgcap { left: 74mm; top: 175mm; }
+.p24 .contacts { position: absolute; left: var(--mx); top: 86mm; width: 48mm; }
+.p24 .contacts > div { padding: 4mm 0 4.6mm; border-top: .3mm solid var(--rule); }
+.p24 .contacts > div:first-child { padding-top: 3.6mm; border-top: .3mm solid var(--rule-strong); }
+.p24 .contacts .k { display: block; margin-bottom: 2.4mm; font: 600 7pt/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--on-navy-3); }
+.p24 .contacts a { display: block; font: 400 12.5pt/1.5 var(--serif); color: var(--on-navy); white-space: nowrap; }
+.p24 .sign { position: absolute; left: var(--mx); right: var(--mx); top: 214mm; padding-top: 12mm; border-top: .3mm solid var(--rule-strong);
+             display: flex; justify-content: space-between; align-items: center; }
+.p24 .logo { width: 66mm; }
+.p24 .svc { text-align: right; font: 600 7pt/2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--on-navy-2); }
