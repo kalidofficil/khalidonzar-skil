@@ -30,12 +30,15 @@ npx supabase link --project-ref YOUR_REF    # YOUR_REF is in the project URL: su
 npm run db:push                             # applies every migration that hasn't run yet
 ```
 
-Each later phase adds a new file to `supabase/migrations/`. Run `npm run db:push` again after pulling it.
+Each later phase adds a new file to `supabase/migrations/`. Run `npm install` and `npm run db:push`
+again after pulling it. (Phase 2 added `20261026000001_pipeline_and_activities.sql`: deals,
+activities, the services list and the private **attachments** file bucket.)
 
 ### Option B: copy and paste
 
 In Supabase open **SQL Editor → New query**, paste the whole content of
 `supabase/migrations/20261025000001_foundation.sql`, and click **Run**. It should say "Success".
+Then do the same with `20261026000001_pipeline_and_activities.sql`.
 For later phases, run each new migration file once, oldest first. If you use this option,
 keep a note of which files you've already run.
 
@@ -143,4 +146,5 @@ update public.profiles set role = 'sales' where email = 'teammate@example.com'; 
 | Signed in but sees "Waiting for access" | That user has no role. See step 8 (or step 5's note for your own account). |
 | Email link says "invalid or has expired" | Links work once and expire after an hour. Request a new one. Also check the template from step 4. |
 | Lists are empty after signing in | Check the migration ran (step 2) and your profile has role `owner` (step 5). |
+| File upload fails | Check the Phase 2 migration ran: **Storage** should show a private bucket called `attachments`. Files must be 10 MB or smaller. |
 | Copy buttons show a pop-up instead of copying | Browsers only allow copying on `https://` or `localhost`. It works on the Vercel address. |

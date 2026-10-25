@@ -12,6 +12,8 @@ export type FormState = {
   values?: Record<string, string>;
   /** After success, the page the form should go to. */
   redirectTo?: string;
+  /** After success, the id of the saved row (e.g. to attach files to it). */
+  id?: string;
 };
 
 export const initialFormState: FormState = { ok: false };

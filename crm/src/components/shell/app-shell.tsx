@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import type { CurrentUser } from "@/lib/auth";
+import { QuickLog } from "@/components/activities/quick-log-fab";
+import { hasRole, type CurrentUser } from "@/lib/auth";
 import { navItemsFor } from "@/lib/nav";
 import { BottomNav, SidebarNav } from "./nav-links";
 import { TopSearch } from "./top-search";
@@ -15,6 +16,7 @@ import { UserMenu } from "./user-menu";
 export async function AppShell({ user, children }: { user: CurrentUser; children: React.ReactNode }) {
   const t = await getTranslations("app");
   const items = navItemsFor(user.role);
+  const canLog = hasRole(user, "owner", "sales");
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">
@@ -37,8 +39,13 @@ export async function AppShell({ user, children }: { user: CurrentUser; children
               </Suspense>
             )}
           </div>
-          <div className="ms-auto">
-            <UserMenu name={user.fullName} email={user.email} />
+          <div className="ms-auto flex items-center gap-2">
+            {canLog && (
+              <div className="hidden md:block">
+                <QuickLog variant="button" />
+              </div>
+            )}
+            <UserMenu name={user.fullName} email={user.email} isOwner={hasRole(user, "owner")} />
           </div>
         </header>
 
@@ -49,6 +56,8 @@ export async function AppShell({ user, children }: { user: CurrentUser; children
       </div>
 
       <BottomNav items={items} />
+      {/* Phones: floating "+" to log an activity from anywhere. */}
+      {canLog && <QuickLog variant="fab" />}
     </div>
   );
 }

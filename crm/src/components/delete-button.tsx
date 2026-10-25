@@ -30,7 +30,8 @@ export function DeleteButton({
   title: string;
   description: string;
   successText: string;
-  redirectTo: string;
+  /** Page to open afterwards; leave out to stay and refresh. */
+  redirectTo?: string;
   size?: "sm" | "icon-sm";
 }) {
   const t = useTranslations();
@@ -44,7 +45,8 @@ export function DeleteButton({
       if (result.ok) {
         setOpen(false);
         toast.success(successText);
-        router.push(redirectTo);
+        if (redirectTo) router.push(redirectTo);
+        else router.refresh();
       } else {
         const key = `errors.${result.message ?? "generic"}`;
         toast.error(t.has(key as never) ? t(key as never) : (result.message ?? t("errors.generic")));

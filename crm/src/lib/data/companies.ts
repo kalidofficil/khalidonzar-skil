@@ -31,7 +31,7 @@ export function parseCompanyFilters(params: Record<string, string | string[] | u
 }
 
 const LIST_COLUMNS =
-  "id, name, industry, emirate, city, status, source, tags, updated_at, contacts(id, full_name, job_title, phone, whatsapp, email, is_primary)";
+  "id, name, industry, emirate, city, status, source, tags, updated_at, last_activity_at, contacts(id, full_name, job_title, phone, whatsapp, email, is_primary)";
 
 export async function listCompanies(filters: CompanyFilters) {
   const supabase = await createClient();

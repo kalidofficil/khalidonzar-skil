@@ -24,7 +24,22 @@
     "pageOf": "Page {page} of {pages}",
     "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
     "updatedAgo": "Updated {date}",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "close": "Close",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "in3Days": "In 3 days",
+    "nextWeek": "Next week",
+    "none": "None",
+    "more": "More",
+    "less": "Less",
+    "view": "View",
+    "total": "Total",
+    "by": "by {name}",
+    "daysOverdue": "{days, plural, one {# day overdue} other {# days overdue}}",
+    "dueToday": "Due today",
+    "inDays": "{days, plural, one {in # day} other {in # days}}",
+    "yesterday": "Yesterday"
   },
   "nav": {
     "main": "Main navigation",
@@ -38,7 +53,10 @@
     "themeDark": "Dark",
     "themeSystem": "System",
     "userMenu": "Account menu",
-    "searchPlaceholder": "Search everything…"
+    "searchPlaceholder": "Search everything…",
+    "pipeline": "Pipeline",
+    "logActivity": "Log activity",
+    "settings": "Settings"
   },
   "auth": {
     "signInTitle": "Sign in",
@@ -124,7 +142,10 @@
     "select": {
       "none": "—"
     },
-    "searchPlaceholder": "Search name, phone, email, tag, notes…"
+    "searchPlaceholder": "Search name, phone, email, tag, notes…",
+    "deals": "Deals",
+    "lastActivity": "Last contact",
+    "never": "Never"
   },
   "contacts": {
     "title": "Contacts",
@@ -163,11 +184,13 @@
   },
   "search": {
     "title": "Search",
-    "prompt": "Type a name, phone number, email, tag or note.",
+    "prompt": "Type a name, phone number, email, tag, note or anything you logged.",
     "companies": "Companies",
     "contacts": "Contacts",
     "noResults": "Nothing found for “{q}”.",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "deals": "Deals",
+    "activities": "Activities"
   },
   "options": {
     "source": {
@@ -199,6 +222,37 @@
       "en": "English",
       "ar": "Arabic",
       "fr": "French"
+    },
+    "stage": {
+      "lead": "Lead",
+      "contacted": "Contacted",
+      "discovery": "Discovery call",
+      "proposal": "Proposal sent",
+      "negotiation": "Negotiation",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "lostReason": {
+      "price": "Price too high",
+      "budget": "No budget",
+      "timing": "Bad timing",
+      "competitor": "Chose a competitor",
+      "no_response": "Stopped responding",
+      "not_a_fit": "Not a fit",
+      "other": "Other"
+    },
+    "billing": {
+      "one_off": "One-off",
+      "monthly": "Monthly retainer"
+    },
+    "channel": {
+      "whatsapp": "WhatsApp",
+      "call": "Call",
+      "meeting": "Meeting",
+      "email": "Email",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram DM",
+      "other": "Other"
     }
   },
   "errors": {
@@ -211,6 +265,163 @@
     "notAllowed": "You don't have permission to do this.",
     "notFound": "This page doesn't exist or you don't have access to it.",
     "notFoundTitle": "Not found",
-    "goHome": "Go to companies"
+    "goHome": "Go to companies",
+    "contactCompanyMismatch": "That contact doesn't belong to the selected company.",
+    "invalidAmount": "Enter an amount like 15000 or 15,000.50.",
+    "invalidDate": "Enter a valid date.",
+    "invalidNumber": "Enter a whole number in range.",
+    "lostReasonRequired": "Choose why the deal was lost.",
+    "duplicateName": "That name is already used."
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "board": "Board",
+    "table": "Table",
+    "newDeal": "New deal",
+    "empty": "No deals yet. Add your first one.",
+    "emptyFiltered": "No deals match these filters.",
+    "emptyColumn": "Drop deals here",
+    "openValue": "Open pipeline",
+    "weighted": "Weighted",
+    "closedNote": "Won and lost columns show the last 60 days. Use the table to see all.",
+    "moveTo": "Move to…",
+    "moved": "Moved to {stage}",
+    "wonToast": "Deal won! 🎉",
+    "searchPlaceholder": "Search deals or companies…",
+    "filters": {
+      "stage": "Stage",
+      "anyStage": "Open deals",
+      "allStages": "All stages",
+      "followUp": "Follow-up",
+      "anyFollowUp": "Any follow-up",
+      "overdue": "Overdue",
+      "dueToday": "Due today",
+      "thisWeek": "Due this week",
+      "none": "No follow-up set",
+      "sort": "Sort"
+    },
+    "columns": {
+      "deal": "Deal",
+      "company": "Company",
+      "stage": "Stage",
+      "value": "Value",
+      "probability": "Prob.",
+      "weighted": "Weighted",
+      "expectedClose": "Expected close",
+      "nextFollowUp": "Next follow-up",
+      "lastActivity": "Last activity"
+    },
+    "lostDialog": {
+      "title": "Why was it lost?",
+      "description": "This helps you see patterns later.",
+      "reason": "Reason",
+      "note": "Note",
+      "confirm": "Mark as lost"
+    },
+    "sort": {
+      "updated": "Recently updated",
+      "followup": "Next follow-up first",
+      "value": "Highest value",
+      "close": "Closing soonest",
+      "title": "Name A–Z"
+    },
+    "weightedTotal": "Weighted total ({count, plural, one {# deal} other {# deals}})"
+  },
+  "deals": {
+    "title": "Deals",
+    "new": "New deal",
+    "edit": "Edit deal",
+    "created": "Deal added",
+    "saved": "Deal saved",
+    "deleted": "Deal deleted",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "The deal is removed. Its activities stay on the company's timeline. It can't be undone.",
+    "noDeals": "No deals yet.",
+    "openDeals": "{count, plural, =0 {No open deals} one {# open deal} other {# open deals}}",
+    "details": "Details",
+    "stage": "Stage",
+    "perMonth": "/mo",
+    "contractValue": "{monthly}/mo × {months} months = {total}",
+    "lostBecause": "Lost: {reason}",
+    "history": "Stage history",
+    "historyCreated": "Created as {stage}",
+    "historyMoved": "{from} → {to}",
+    "fields": {
+      "company": "Company",
+      "title": "Deal name",
+      "titleHint": "e.g. \"Meta ads – Ramadan campaign\"",
+      "services": "Services",
+      "value": "Value (AED)",
+      "valueHint": "For retainers, the monthly amount",
+      "billing": "Billing",
+      "term_months": "Expected length (months)",
+      "stage": "Stage",
+      "probability": "Probability (%)",
+      "probabilityHint": "Leave empty to use the stage default ({default}%)",
+      "expected_close_date": "Expected close date",
+      "next_follow_up_date": "Next follow-up",
+      "primary_contact_id": "Main contact",
+      "notes": "Notes",
+      "lost_reason": "Lost reason",
+      "lost_note": "Lost note"
+    }
+  },
+  "activities": {
+    "title": "Conversation history",
+    "log": "Log activity",
+    "edit": "Edit activity",
+    "saved": "Activity logged",
+    "updated": "Activity saved",
+    "deleted": "Activity deleted",
+    "deleteTitle": "Delete this activity?",
+    "deleteBody": "It's removed from the timeline. It can't be undone.",
+    "empty": "Nothing logged yet. After your next call or message, tap “Log activity”.",
+    "nextStep": "Next step",
+    "outcome": "Outcome",
+    "withContact": "with {name}",
+    "onDeal": "Deal: {name}",
+    "moreDetails": "Outcome, next step, file…",
+    "fields": {
+      "company": "Company",
+      "companyPlaceholder": "Type to find a company…",
+      "channel": "Channel",
+      "summary": "What happened?",
+      "summaryPlaceholder": "e.g. Sent proposal on WhatsApp, she'll discuss with partner",
+      "occurred_at": "When",
+      "contact_id": "Contact",
+      "deal_id": "Deal",
+      "outcome": "Outcome",
+      "next_step": "Next step",
+      "next_step_date": "Next step date",
+      "nextStepHint": "Sets the deal's next follow-up",
+      "files": "Attach files"
+    }
+  },
+  "files": {
+    "title": "Files",
+    "upload": "Upload file",
+    "uploading": "Uploading…",
+    "uploaded": "{count, plural, one {File uploaded} other {# files uploaded}}",
+    "empty": "No files yet. Attach proposals, briefs and screenshots here.",
+    "tooBig": "{name} is larger than 10 MB.",
+    "failed": "Couldn't upload {name}.",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "The file is removed for everyone. It can't be undone.",
+    "deleted": "File deleted"
+  },
+  "settings": {
+    "title": "Settings",
+    "services": "Services",
+    "servicesHint": "The services you sell. They appear as choices on every deal.",
+    "addService": "Add service",
+    "serviceName": "Service name",
+    "defaultBilling": "Usually billed",
+    "defaultPrice": "Typical price (AED)",
+    "active": "Active",
+    "inactive": "Hidden",
+    "hide": "Hide",
+    "show": "Show",
+    "saved": "Service saved",
+    "ownerOnly": "Only the owner can change settings."
   }
 }

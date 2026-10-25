@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseAED } from "@/lib/money";
 import { normalizePhone } from "@/lib/phone";
 
 // Reusable field rules. Error messages are keys into messages/en.json "errors".
@@ -48,3 +49,47 @@ export const optionalPhone = z.preprocess(asString, z.string().trim()).transform
 
 /** HTML checkbox: "on" when ticked, missing when not. */
 export const checkbox = z.preprocess((v) => v === "on" || v === "true", z.boolean());
+
+/** Required AED amount typed by a person, returned in fils. */
+export const aedAmount = z.preprocess(asString, z.string().trim()).transform((v, ctx) => {
+  const fils = parseAED(v === "" ? "0" : v);
+  if (fils === null) {
+    ctx.addIssue({ code: "custom", message: "invalidAmount" });
+    return z.NEVER;
+  }
+  return fils;
+});
+
+/** Optional AED amount: "" becomes null. */
+export const optionalAedAmount = z.preprocess(asString, z.string().trim()).transform((v, ctx) => {
+  if (!v) return null;
+  const fils = parseAED(v);
+  if (fils === null) {
+    ctx.addIssue({ code: "custom", message: "invalidAmount" });
+    return z.NEVER;
+  }
+  return fils;
+});
+
+/** Optional date from <input type="date"> ("YYYY-MM-DD"): "" becomes null. */
+export const optionalDate = z.preprocess(
+  (v) => (v === "" || v == null ? null : v),
+  z.iso.date("invalidDate").nullable(),
+);
+
+/** Optional whole number in a range: "" becomes null. */
+export const optionalInt = (min: number, max: number) =>
+  z.preprocess(
+    (v) => (v === "" || v == null ? null : Number(v)),
+    z.number("invalidNumber").int("invalidNumber").min(min, "invalidNumber").max(max, "invalidNumber").nullable(),
+  );
+
+/** Required whole number in a range. */
+export const requiredInt = (min: number, max: number) =>
+  z.preprocess(
+    (v) => Number(v),
+    z.number("invalidNumber").int("invalidNumber").min(min, "invalidNumber").max(max, "invalidNumber"),
+  );
+
+/** Optional id (uuid) from a <select>: "" becomes null. */
+export const optionalId = z.preprocess((v) => (v === "" || v == null ? null : v), z.uuid("required").nullable());

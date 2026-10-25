@@ -14,8 +14,8 @@ Built for one person now, ready for a small team later.
 | Phase | What | Status |
 | --- | --- | --- |
 | 1 | Setup, login, database, companies and contacts | ✅ built |
-| 2 | Pipeline (kanban + table) and conversation history | next |
-| 3 | Follow-ups, tasks and the Today page | |
+| 2 | Pipeline (kanban + table) and conversation history | ✅ built |
+| 3 | Follow-ups, tasks and the Today page | next |
 | 4 | Projects, freelancers and margins | |
 | 5 | Proposals, invoices and PDF export | |
 | 6 | Dashboard, track record, CSV import/export | |
@@ -29,7 +29,7 @@ Run these inside the `crm` folder.
 | --- | --- |
 | `npm run dev` | Start the app on http://localhost:3000 (reloads as you edit) |
 | `npm run check` | Lint + type check + unit tests. Run before every commit |
-| `npm test` | Unit tests only (phone numbers, links, form validation; money maths from Phase 4) |
+| `npm test` | Unit tests: money maths (AED parsing, deal and pipeline values), dates in Dubai time, phone numbers, form rules |
 | `npm run test:db` | Database security tests on a throwaway local Postgres (needs Postgres installed; optional) |
 | `npm run build` | Production build, the same as Vercel runs |
 | `npm run db:push` | Apply new database migrations to your Supabase project |
@@ -49,18 +49,30 @@ crm/
     app/
       (auth)/               sign-in and forgot-password pages
       auth/confirm/         handles links from Supabase emails (invite, reset password)
+      files/[id]/           opens an attached file through a short-lived private link
       (app)/                everything behind the login
-        companies/          list, detail, new, edit (+ actions.ts = saving to the database)
+        pipeline/           kanban board and table of deals
+        deals/              deal detail, new, edit (+ actions.ts = saving to the database)
+        activities/         saving logged activities
+        companies/          list, detail, new, edit
         contacts/           list, new, edit
+        settings/           owner-only settings (services you sell)
         search/             one search across everything
         account/            your name and password
     components/
+      activities/           "Log activity" dialog and the conversation timeline
+      deals/                kanban board, stage badges, lost-reason pop-up
+      files/                file list and upload button
       ui/                   buttons, inputs, dialogs... (shadcn/ui style)
       shell/                sidebar, top bar, phone tab bar, account menu
     lib/
       auth.ts               who is signed in, and what role they have
       data/                 database reads used by pages
       validation/           form rules (required fields, phone format...)
+      money.ts              AED <-> fils, formatting (all money is stored as whole fils)
+      pipeline.ts           stages, probabilities, deal and pipeline values
+      dates.ts              "today", overdue etc. in Dubai time
+      upload.ts             uploads files from the browser straight to Supabase Storage
       phone.ts              phone number cleaning + WhatsApp links
       supabase/             database clients (server, browser, proxy)
 ```
@@ -73,6 +85,12 @@ crm/
 2. **Server Actions** (`actions.ts` files) validate every form with the rules in
    `src/lib/validation/` before anything is saved.
 3. **The UI** hides what your role can't use, but that's only for convenience.
+
+### Money
+
+Amounts are stored as whole **fils** (AED × 100) so totals never drift by rounding.
+A one-off deal's value is its price. A monthly retainer's value is the monthly price, and
+pipeline totals count it as *monthly × expected months*. "Weighted" = value × probability.
 
 ### Security notes
 

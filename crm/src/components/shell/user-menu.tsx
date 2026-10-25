@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { LogOut, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,7 @@ function initials(nameOrEmail: string) {
   return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "?";
 }
 
-export function UserMenu({ name, email }: { name: string; email: string }) {
+export function UserMenu({ name, email, isOwner }: { name: string; email: string; isOwner: boolean }) {
   const t = useTranslations("nav");
   const { theme, setTheme } = useTheme();
 
@@ -47,6 +47,14 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
             {t("account")}
           </Link>
         </DropdownMenuItem>
+        {isOwner && (
+          <DropdownMenuItem asChild>
+            <Link href="/settings">
+              <Settings />
+              {t("settings")}
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuLabel>{t("theme")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>

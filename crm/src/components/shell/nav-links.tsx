@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Building2, Search, Users, type LucideIcon } from "lucide-react";
+import { Building2, Columns3, Search, Users, type LucideIcon } from "lucide-react";
 import type { NavItem } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<NavItem["icon"], LucideIcon> = {
+  pipeline: Columns3,
   companies: Building2,
   contacts: Users,
   search: Search,

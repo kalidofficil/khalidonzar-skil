@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { ContactActions } from "@/components/contact-actions";
 import { EmptyState } from "@/components/empty-state";
@@ -30,11 +30,15 @@ export default async function CompaniesPage({ searchParams }: PageProps<"/compan
 
   const params = await searchParams;
   const filters = parseCompanyFilters(params);
-  const [{ companies, total, pageCount }, tags, t] = await Promise.all([
+  const [{ companies, total, pageCount }, tags, t, format] = await Promise.all([
     listCompanies(filters),
     listTags(),
     getTranslations(),
+    getFormatter(),
   ]);
+  const now = new Date();
+  const lastContact = (c: CompanyListItem) =>
+    c.last_activity_at ? format.relativeTime(new Date(c.last_activity_at), now) : t("companies.never");
   const filtered = Boolean(filters.q || filters.status || filters.source || filters.emirate || filters.tag);
 
   const location = (c: CompanyListItem) =>
@@ -121,6 +125,9 @@ export default async function CompaniesPage({ searchParams }: PageProps<"/compan
                   <p className="mt-1 truncate text-sm text-muted-foreground">
                     {[c.industry, location(c)].filter(Boolean).join(" · ")}
                   </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {t("companies.lastActivity")}: {lastContact(c)}
+                  </p>
                   {contact && (
                     <div className="mt-3 flex items-center justify-between gap-2">
                       <span className="truncate text-sm">{contact.full_name}</span>
@@ -144,6 +151,7 @@ export default async function CompaniesPage({ searchParams }: PageProps<"/compan
                 <tr>
                   <th className="px-4 py-3 text-start font-medium">{t("companies.fields.name")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("companies.fields.status")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("companies.lastActivity")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("companies.fields.industry")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("companies.contacts")}</th>
                   <th className="px-4 py-3 text-start font-medium">{t("companies.fields.tags")}</th>
@@ -163,6 +171,7 @@ export default async function CompaniesPage({ searchParams }: PageProps<"/compan
                       <td className="px-4 py-3">
                         <CompanyStatusBadge status={c.status} />
                       </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{lastContact(c)}</td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {c.industry}
                         {c.source && <div className="text-xs">{t(`options.source.${c.source}`)}</div>}

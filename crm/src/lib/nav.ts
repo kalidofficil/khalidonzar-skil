@@ -3,6 +3,7 @@ import type { AppRole } from "@/lib/types";
 // Main menu. Each later phase adds its section here (Today, Pipeline, ...).
 // `roles` controls who sees the link; the database enforces the same rules.
 export const NAV_ITEMS = [
+  { href: "/pipeline", label: "pipeline", icon: "pipeline", roles: ["owner", "sales"] },
   { href: "/companies", label: "companies", icon: "companies", roles: ["owner", "sales"] },
   { href: "/contacts", label: "contacts", icon: "contacts", roles: ["owner", "sales"] },
   { href: "/search", label: "search", icon: "search", roles: ["owner", "sales"] },
