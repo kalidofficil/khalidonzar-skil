@@ -1,0 +1,104 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Dark mode follows the "dark" class that next-themes puts on <html>. */
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Colour tokens. Change the look of the whole app here.
+ * Values are OKLCH: lightness, chroma (colourfulness), hue.
+ */
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.985 0.002 247);
+  --foreground: oklch(0.21 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.02 260);
+  --primary: oklch(0.47 0.13 264);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.955 0.006 260);
+  --secondary-foreground: oklch(0.27 0.02 260);
+  --muted: oklch(0.955 0.006 260);
+  --muted-foreground: oklch(0.5 0.02 260);
+  --accent: oklch(0.94 0.012 264);
+  --accent-foreground: oklch(0.27 0.03 264);
+  --destructive: oklch(0.577 0.215 27);
+  --success: oklch(0.55 0.13 155);
+  --warning: oklch(0.68 0.15 70);
+  --whatsapp: oklch(0.62 0.15 150);
+  --border: oklch(0.91 0.008 260);
+  --input: oklch(0.88 0.01 260);
+  --ring: oklch(0.47 0.13 264);
+}
+
+.dark {
+  --background: oklch(0.16 0.012 262);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.2 0.014 262);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.22 0.014 262);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.7 0.13 264);
+  --primary-foreground: oklch(0.16 0.02 262);
+  --secondary: oklch(0.26 0.014 262);
+  --secondary-foreground: oklch(0.95 0.005 260);
+  --muted: oklch(0.26 0.014 262);
+  --muted-foreground: oklch(0.7 0.015 260);
+  --accent: oklch(0.28 0.03 264);
+  --accent-foreground: oklch(0.95 0.005 260);
+  --destructive: oklch(0.66 0.19 25);
+  --success: oklch(0.7 0.14 155);
+  --warning: oklch(0.78 0.14 75);
+  --whatsapp: oklch(0.7 0.15 150);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.7 0.13 264);
+}
+
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", "Noto Sans Arabic", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-whatsapp: var(--whatsapp);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  /* Space for the phone's home bar under the bottom navigation. */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

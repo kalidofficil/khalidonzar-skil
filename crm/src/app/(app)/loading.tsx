@@ -1,0 +1,14 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Shown instantly while a page's data loads.
+export default function Loading() {
+  return (
+    <div className="grid gap-4" aria-busy="true">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-20 w-full" />
+      <Skeleton className="h-20 w-full" />
+      <Skeleton className="h-20 w-full" />
+    </div>
+  );
+}

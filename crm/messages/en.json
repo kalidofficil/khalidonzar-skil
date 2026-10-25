@@ -1,0 +1,216 @@
+{
+  "app": {
+    "name": "Onzar CRM",
+    "description": "Clients, pipeline and delivery for a digital marketing business."
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "add": "Add",
+    "back": "Back",
+    "search": "Search",
+    "clearFilters": "Clear filters",
+    "all": "All",
+    "copy": "Copy",
+    "copied": "Copied",
+    "optional": "optional",
+    "notes": "Notes",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "updatedAgo": "Updated {date}",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "main": "Main navigation",
+    "companies": "Companies",
+    "contacts": "Contacts",
+    "search": "Search",
+    "account": "Account",
+    "signOut": "Sign out",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "userMenu": "Account menu",
+    "searchPlaceholder": "Search everything…"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInSubtitle": "Welcome back. Sign in to your CRM.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "forgotPassword": "Forgot password?",
+    "invalidCredentials": "Email or password is incorrect.",
+    "resetTitle": "Reset your password",
+    "resetSubtitle": "Enter your email and we'll send you a link to set a new password.",
+    "resetSend": "Send reset link",
+    "resetSent": "If that email has an account, a reset link is on its way. Check your inbox.",
+    "backToSignIn": "Back to sign in",
+    "linkError": "That link is invalid or has expired. Request a new one.",
+    "noAccessTitle": "Waiting for access",
+    "noAccessBody": "You're signed in, but the owner hasn't given your account a role yet. Ask them to set it up, then refresh this page.",
+    "forbiddenTitle": "Not available",
+    "forbiddenBody": "Your role doesn't include this section."
+  },
+  "account": {
+    "title": "Account",
+    "profile": "Profile",
+    "fullName": "Full name",
+    "role": "Role",
+    "saveProfile": "Save profile",
+    "profileSaved": "Profile saved",
+    "passwordTitle": "Password",
+    "setPasswordPrompt": "Set a password so you can sign in with your email next time.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "updatePassword": "Update password",
+    "passwordUpdated": "Password updated",
+    "passwordsDontMatch": "The two passwords don't match.",
+    "passwordTooShort": "Use at least 10 characters.",
+    "roles": {
+      "owner": "Owner",
+      "sales": "Sales",
+      "delivery": "Delivery",
+      "none": "No role yet"
+    }
+  },
+  "companies": {
+    "title": "Companies",
+    "new": "New company",
+    "edit": "Edit company",
+    "empty": "No companies yet. Add your first one.",
+    "emptyFiltered": "No companies match these filters.",
+    "details": "Details",
+    "contacts": "Contacts",
+    "contactsCount": "{count, plural, =0 {No contacts} one {# contact} other {# contacts}}",
+    "addContact": "Add contact",
+    "noContacts": "No contacts yet.",
+    "created": "Company added",
+    "updated": "Company saved",
+    "deleted": "Company deleted",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "This also deletes its {count, plural, =0 {contacts} one {# contact} other {# contacts}}. It can't be undone. To hide a company without losing anything, set its status to Archived instead.",
+    "fields": {
+      "name": "Company name",
+      "industry": "Industry",
+      "emirate": "Emirate",
+      "city": "City / area",
+      "website": "Website",
+      "instagram": "Instagram",
+      "source": "Source",
+      "status": "Status",
+      "tags": "Tags",
+      "tagsHint": "Separate with commas, e.g. restaurant, VIP",
+      "notes": "Notes"
+    },
+    "filters": {
+      "status": "Status",
+      "source": "Source",
+      "emirate": "Emirate",
+      "tag": "Tag",
+      "anyStatus": "Active",
+      "anySource": "Any source",
+      "anyEmirate": "Any emirate",
+      "anyTag": "Any tag"
+    },
+    "select": {
+      "none": "—"
+    },
+    "searchPlaceholder": "Search name, phone, email, tag, notes…"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "new": "New contact",
+    "edit": "Edit contact",
+    "empty": "No contacts yet. Add one from a company page.",
+    "emptyFiltered": "No contacts match these filters.",
+    "primary": "Primary",
+    "saved": "Contact saved",
+    "deleted": "Contact deleted",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "This removes the contact from {company}. It can't be undone.",
+    "whatsapp": "WhatsApp",
+    "call": "Call",
+    "email": "Email",
+    "copyPhone": "Copy phone",
+    "copyEmail": "Copy email",
+    "fields": {
+      "company": "Company",
+      "full_name": "Full name",
+      "job_title": "Role / job title",
+      "phone": "Phone",
+      "phoneHint": "UAE numbers can be typed as 050 123 4567",
+      "whatsapp": "WhatsApp number",
+      "whatsappHint": "Only if different from the phone number",
+      "email": "Email",
+      "preferred_language": "Preferred language",
+      "is_primary": "Primary contact for this company",
+      "notes": "Notes"
+    },
+    "filters": {
+      "language": "Language",
+      "anyLanguage": "Any language"
+    },
+    "searchPlaceholder": "Search name, phone, email, company…"
+  },
+  "search": {
+    "title": "Search",
+    "prompt": "Type a name, phone number, email, tag or note.",
+    "companies": "Companies",
+    "contacts": "Contacts",
+    "noResults": "Nothing found for “{q}”.",
+    "seeAll": "See all"
+  },
+  "options": {
+    "source": {
+      "network": "My network",
+      "linkedin": "LinkedIn",
+      "referral": "Referral",
+      "instagram": "Instagram",
+      "event": "Event",
+      "freelance_platform": "Fiverr / Upwork",
+      "other": "Other"
+    },
+    "emirate": {
+      "dubai": "Dubai",
+      "abu_dhabi": "Abu Dhabi",
+      "sharjah": "Sharjah",
+      "ajman": "Ajman",
+      "umm_al_quwain": "Umm Al Quwain",
+      "ras_al_khaimah": "Ras Al Khaimah",
+      "fujairah": "Fujairah",
+      "outside_uae": "Outside UAE"
+    },
+    "status": {
+      "lead": "Lead",
+      "client": "Client",
+      "past_client": "Past client",
+      "archived": "Archived"
+    },
+    "language": {
+      "en": "English",
+      "ar": "Arabic",
+      "fr": "French"
+    }
+  },
+  "errors": {
+    "required": "This field is required.",
+    "tooLong": "This is too long.",
+    "invalidEmail": "Enter a valid email address.",
+    "invalidPhone": "Enter a valid phone number.",
+    "invalidOption": "Choose an option from the list.",
+    "generic": "Something went wrong. Please try again.",
+    "notAllowed": "You don't have permission to do this.",
+    "notFound": "This page doesn't exist or you don't have access to it.",
+    "notFoundTitle": "Not found",
+    "goHome": "Go to companies"
+  }
+}
