@@ -34,6 +34,7 @@ Run these inside the `crm` folder.
 | `npm run build` | Production build, the same as Vercel runs |
 | `npm run db:push` | Apply new database migrations to your Supabase project |
 | `npm run db:types` | Regenerate `src/lib/database.types.ts` from your Supabase project |
+| `python3 scripts/import_lead_analysis.py <workbook.xlsx> imports/leads.sql` | Build a lead-import SQL file (see [docs/IMPORT.md](docs/IMPORT.md)) |
 
 ## How the code is organised
 

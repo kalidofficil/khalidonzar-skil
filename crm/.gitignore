@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated lead imports (contain personal data)
+/imports/
+__pycache__/
